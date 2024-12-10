@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-Hello! I'm Yiğit, though many people call me Yigas—a nickname blending my first and last names. I hold a degree in English Literature, but I currently work as a data scientist at a private bank in Istanbul. In my free time, I dive into basketball data, exploring patterns and creating statistical models.
+Hello! I'm Yiğit, though many people call me Yigas—a nickname blending my first and last names. I hold a degree in English Literature, but I currently work as a data scientist at DenizBank in Istanbul. In my free time, I dive into basketball data, exploring patterns and creating statistical models.
 
 
 ## The Start
@@ -16,15 +16,15 @@ I began watching [Stanford’s Human Behavioral Biology courses](https://youtube
 
 ## Learning Statistics
 
-Ahead of the lab’s start, I took an [edX's Science of Religion](https://www.edx.org/learn/humanities/university-of-british-columbia-the-science-of-religion) course to ensure I had foundational knowledge. Although enjoyable, I quickly realized, once we started reading research papers, that I needed a solid ground in statistics to evaluate them. As an English Literature major, I needed a resource that started from scratch, and [OpenIntro Statistics](https://www.openintro.org/book/stat/) and [Learning Stats with JASP](https://tomfaulkenberry.github.io/JASPbook/index.html) became essential guides for me. Studying statistics was unexpectedly enjoyable, and I decided to develop my skills further.
+Ahead of the lab’s start, I took an [edX's Science of Religion](https://www.edx.org/learn/humanities/university-of-british-columbia-the-science-of-religion) course to ensure I had foundational knowledge. Although enjoyable, I quickly realized, once we started reading research papers, that I needed a solid ground in statistics to evaluate them. As an English Literature major, I needed a resource that started from scratch, and [_OpenIntro Statistics_](https://www.openintro.org/book/stat/) and [_Learning Stats with JASP_](https://tomfaulkenberry.github.io/JASPbook/index.html) became essential guides for me. Studying statistics was unexpectedly enjoyable, and I decided to develop my skills further.
 
 ## Learning Mathematics
 
-continue independently, and I still study linear algebra occasionally, using my notes, [Mathematics for Machine Learning](https://mml-book.github.io/), and [Gilbert Strang’s works](https://www.amazon.com/Linear-Gilbert-Strang-Algebra/s?rh=n%3A13899%2Cp_lbr_one_browse-bin%3AGilbert+Strang).
+continue independently, and I still study linear algebra occasionally, using my notes, [_Mathematics for Machine Learning_](https://mml-book.github.io/), and [Gilbert Strang’s works](https://www.amazon.com/Linear-Gilbert-Strang-Algebra/s?rh=n%3A13899%2Cp_lbr_one_browse-bin%3AGilbert+Strang).
 
 ## Python for Data Science & ML
 
-In the lab and academia, statistical tools like JASP, Jamovi, and SPSS are prevalent, with some usage of R. Around this time, however, my academic interests began shifting, so I decided to learn Python. I enrolled in a Data Science & Machine Learning Bootcamp, which focused on programming and industry cases, building on my previous knowledge from [Introduction to Statistical Learning](https://www.statlearning.com/).
+In the lab and academia, statistical tools like JASP, Jamovi, and SPSS are prevalent, with some usage of R. Around this time, however, my academic interests began shifting, so I decided to learn Python. I enrolled in a Data Science & Machine Learning Bootcamp, which focused on programming and industry cases, building on my previous knowledge from [_Introduction to Statistical Learning_](https://www.statlearning.com/).
 
 ## Data Science Internship
 
