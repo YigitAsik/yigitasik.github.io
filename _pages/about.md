@@ -20,7 +20,7 @@ Ahead of the lab’s start, I took an [edX's Science of Religion](https://www.ed
 
 ## Learning Mathematics
 
-continue independently, and I still study linear algebra occasionally, using my notes, [_Mathematics for Machine Learning_](https://mml-book.github.io/), and [Gilbert Strang’s works](https://www.amazon.com/Linear-Gilbert-Strang-Algebra/s?rh=n%3A13899%2Cp_lbr_one_browse-bin%3AGilbert+Strang).
+Not knowing mathematics bothered me, and I began to wonder how it might enhance my understanding of statistics. Fortunately, I connected with Dr. Basar Coşkunoğlu, whom I knew through playing Hearthstone. With his patient guidance, I started with basics like functions and inequalities, eventually advancing to calculus and linear algebra. We reached a point where I could continue independently, and I still study linear algebra occasionally, using my notes, [_Mathematics for Machine Learning_](https://mml-book.github.io/), and [Gilbert Strang’s works](https://www.amazon.com/Linear-Gilbert-Strang-Algebra/s?rh=n%3A13899%2Cp_lbr_one_browse-bin%3AGilbert+Strang).
 
 ## Python for Data Science & ML
 
