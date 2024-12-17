@@ -1,4 +1,4 @@
 .Rroj.user/
-quarto_blog.Rproj
-
 /.quarto/
+.Rhistory
+quarto_blog.Rproj
