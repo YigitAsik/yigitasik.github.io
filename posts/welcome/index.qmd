@@ -1,0 +1,14 @@
+---
+title: "Welcome To My Blog"
+author: "Yiğit Aşık"
+date: "2024-12-28"
+categories: [news]
+---
+
+This is the first post in a Quarto blog. Welcome!
+
+I always had the idea of blogging but a suggestion that I received recently pushed me towards taking an action. I am hoping to use this place to share the stuff that I learn, it makes me develop an intuition and I feel like I learn better.
+
+Main things that I think about blogging fall under statistics (both frequentist and Bayesian methods), machine learning, and psychology (less frequently).
+
+Aim of this blog is to make this place a useful place for the mentioned topics above, while improving myself on them as well. I hope you find this place useful.

@@ -1,0 +1,50 @@
+---
+title: "About"
+about:
+  template: jolla
+  links:
+    - icon: twitter
+      text: Twitter
+      href: https://bsky.app/profile/yigas.bsky.social
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/YigitAsik
+    - icon: github
+      text: Github
+      href: https://github.com/YigitAsik
+
+---
+
+Hello! I'm Yiğit, though many people call me Yigas—a nickname blending my first and last names. I hold a degree in English Literature, but I currently work as a data scientist at DenizBank in Istanbul. I am mainly interested in causal inference, predictive modeling, explainable AI. In my free time, I dive into basketball data, exploring patterns and creating statistical models that lead to new metrics.
+
+## The Start
+
+During my first year at university, I spent a semester break in Beirut, Lebanon, where I earned a human biomechanics trainer certificate. I’d been training basketball players at various levels, including those in the Turkish Basketball League (TBL). While in Beirut, I often heard about the impact of prolonged stress on human health. This led me to watch Dr. Robert Sapolsky’s TED Talk, [*The Biology of Our Best and Worst Selves*](https://youtu.be/ORthzIOEf30?si=_b2pNgN-JvPm35UA), and I thought, "I want to understand human behavior the way he does."
+
+## Getting Into Psychology Lab
+
+I began watching [Stanford’s Human Behavioral Biology courses](https://youtube.com/playlist?list=PL848F2368C90DDC3D&si=jGwG62rGSvgSEi5L) online. While intriguing, I found the material challenging without a background in the field. To get answers, I reached out to my university’s Psychology Department, where I met Dr. Hasan Bahçekapılı and Dr. Onurcan Yılmaz. Soon, I was visiting Dr. Yılmaz’s office regularly to discuss topics related to psychology, and I grew fascinated with his research interests—especially how morality, politics, religion, and decision-making intersect. Gradually, I shifted my focus from [behavioral biology](https://www.amazon.com/Behave-Biology-Humans-Best-Worst/dp/1594205078) to [social](https://www.pearson.com/en-us/subject-catalog/p/social-psychology/P200000006448) and [evolutionary psychology](https://www.amazon.com/Evolutionary-Psychology-New-Science-Mind/dp/0205992129). When he offered me a spot in the lab ([MINT Lab](https://www.moralintuitionslab.com/)) he was forming, I jumped at the opportunity.
+
+## Learning Statistics
+
+Ahead of the lab’s start, I took an [edX's Science of Religion](https://www.edx.org/learn/humanities/university-of-british-columbia-the-science-of-religion) course to ensure I had foundational knowledge. Although enjoyable, I quickly realized, once we started reading research papers, that I needed a solid ground in statistics to evaluate them. As an English Literature major, I needed a resource that started from scratch, and [*OpenIntro Statistics*](https://www.openintro.org/book/stat/) and [*Learning Stats with JASP*](https://tomfaulkenberry.github.io/JASPbook/index.html) became essential guides for me. Studying statistics was unexpectedly enjoyable, and I decided to develop my skills further.
+
+## Learning Mathematics
+
+Not knowing mathematics bothered me, and I began to wonder how it might enhance my understanding of statistics. Fortunately, I connected with Dr. Basar Coşkunoğlu, whom I knew through playing Hearthstone. With his patient guidance, I started with basics like functions and inequalities, eventually advancing to calculus and linear algebra. We reached a point where I could continue independently, and I still study linear algebra occasionally, using my notes, [*Mathematics for Machine Learning*](https://mml-book.github.io/), and [Gilbert Strang’s works](https://www.amazon.com/Linear-Gilbert-Strang-Algebra/s?rh=n%3A13899%2Cp_lbr_one_browse-bin%3AGilbert+Strang).
+
+## Python for Data Science & ML
+
+In the lab and academia, statistical tools like JASP, Jamovi, and SPSS are prevalent, with some usage of R. Around this time, however, my academic interests began shifting, so I decided to learn Python. I enrolled in a Data Science & Machine Learning Bootcamp, which focused on programming and industry cases, building on my previous knowledge from [*Introduction to Statistical Learning*](https://www.statlearning.com/).
+
+## Data Science Internship
+
+While still an undergraduate, I received a scholarship from TUBITAK (The Scientific and Technological Research Council of Turkey) for research participation. Wanting broader experience, I sought a part-time role or long-term internship to balance with school. I started building a project portfolio and applied to various positions. Many interviews revealed that prospective employers lacked data science teams, which felt limiting for my first role. Finally, I applied for and was accepted to DenizBank’s data science internship program.
+
+## Transition to Full-Time
+
+During my internship, things went well, and DenizBank invited me to join full-time after graduation. Despite six months of on-the-job coding, I needed to pass a data scientist test in SQL, Python/R, and statistics to secure the position, which I did. I now work full-time as a Data Scientist at DenizBank.
+
+## Basketball Analytics
+
+After ten years of playing and training in basketball, I always hoped to integrate it into my work. Inspired by a [Formula 1 analytics account](https://linktr.ee/fdataanalysis), I launched a basketball analytics account of my own. You can find links in the footer.
