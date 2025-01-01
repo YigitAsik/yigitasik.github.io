@@ -12,6 +12,7 @@ Some time ago, I stumbled upon the website [*Less Certainty, More Inquiry*](http
 This year, I’m taking inspiration from his approach. I’ll share what I study each month, providing a brief overview of the topics I’ve explored, focusing on what I found particularly interesting or useful. To kick things off, here are my learning goals for 2025. Let’s dive in.  
 \
 \
+
 ---
 
 ### What to Learn in 2025: Deep Learning  
@@ -53,6 +54,7 @@ This one’s a “maybe.” Deep learning and LLMs are higher priorities, and th
 For now, it’s something I’ll keep on the back burner, but we’ll see how the year unfolds.  
 \
 \
+
 ---
 
 ### A Final Note 
