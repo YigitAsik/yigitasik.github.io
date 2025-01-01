@@ -1,4 +1,14 @@
 /* css styles */
+
+h2 {
+    text-align: center;
+}
+
+
+h3 {
+    text-align: center;
+}
+
 .navbar-title {
     text-transform:capitalize;
 }
