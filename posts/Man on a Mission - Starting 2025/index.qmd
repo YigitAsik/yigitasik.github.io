@@ -10,8 +10,6 @@ categories: [update]
 Some time ago, I stumbled upon the website [*Less Certainty, More Inquiry*](https://darrylblackport.com/). If you click on the link, you'll see that Darryl Blackport shares what he listens to or reads every week of the year. I found the concept intriguing and thought it would be a great fit for me, as I’m often immersed in studying or reading something.  
 
 This year, I’m taking inspiration from his approach. I’ll share what I study each month, providing a brief overview of the topics I’ve explored, focusing on what I found particularly interesting or useful. To kick things off, here are my learning goals for 2025. Let’s dive in.  
-\
-\
 
 ---
 
@@ -20,22 +18,18 @@ This year, I’m taking inspiration from his approach. I’ll share what I study
 For most of my data science journey, I’ve taken a theory-first approach, focusing heavily on statistics. However, with recent advancements in tools like LLMs, I think it’s time for a shift. In 2025, I plan to delve into deep learning (a domain I’ve avoided so far) with a hands-on approach.  
 
 Here’s my roadmap for deep learning:  
-- [*Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*](https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/)  
-- [Advanced Learning Algorithms](https://www.coursera.org/learn/advanced-learning-algorithms?specialization=machine-learning-introduction)  
-- [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning)  
-\
-\
+* [*Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow*](https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/)  
+* [Advanced Learning Algorithms](https://www.coursera.org/learn/advanced-learning-algorithms?specialization=machine-learning-introduction)  
+* [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning)  
 
 ### What to Learn in 2025: Sports Analytics  
 
 I’ve been passionate about sports analytics for nearly a year now and have made significant strides in basketball analytics. (You can check out some of my work [here](https://www.linkedin.com/in/yigitasik/).)  
 
 This year, I aim to expand my focus by creating videos on football (soccer) analytics, in addition to basketball, on my [YouTube channel](https://www.youtube.com/@yigasIRL). To prepare for this, I’ve started the following specialization:  
-- [Sports Performance Analytics Specialization](https://www.coursera.org/specializations/sports-analytics)  
+* [Sports Performance Analytics Specialization](https://www.coursera.org/specializations/sports-analytics)  
 
 Also, Dean Oliver’s new book, [*Basketball Beyond Paper*](https://www.amazon.com/Basketball-beyond-Paper-Analytics-Revolution/dp/1496240499), is on my reading list—it’s a must-read for anyone in this space.  
-\
-\
 
 ### What to Learn in 2025: Statistics  
 
@@ -44,16 +38,12 @@ I consider statistics to be one of my stronger skills compared to other data sci
 Currently, I’m halfway through [*Think Bayes*](https://allendowney.github.io/ThinkBayes2/), and I’m looking forward to Tom Faulkenberry’s [upcoming book](https://www.routledge.com/Bayesian-Statistics-The-Basics/Faulkenberry/p/book/9781032744001) when it’s released.  
 
 There are specific topics, like meta-analysis, that I want to strengthen, but I don’t plan to tackle them systematically. Instead, I’ll explore them as curiosity strikes.  
-\
-\
 
 ### What to Learn in 2025: Production-Level Data Science (Maybe)  
 
 This one’s a “maybe.” Deep learning and LLMs are higher priorities, and the list is already packed. However, gaining production-level data science expertise could be beneficial in the long run.  
 
 For now, it’s something I’ll keep on the back burner, but we’ll see how the year unfolds.  
-\
-\
 
 ---
 
