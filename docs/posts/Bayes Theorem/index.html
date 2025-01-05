@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Yiğit Aşık">
+<meta name="dcterms.date" content="2025-01-05">
 
-<title>YIGIT ASIK, Data Scientist</title>
+<title>An Intro Example to Bayes’ Theorem – YIGIT ASIK, Data Scientist</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,24 +25,22 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
-<script src="site_libs/quarto-html/quarto.js"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-bf19b75f51ea680c8de03e84aa65eabd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-bf19b75f51ea680c8de03e84aa65eabd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -68,35 +68,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -128,17 +99,17 @@ window.Quarto = {
 };
 </script>
 
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-fixed fullcontent">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">YIGIT ASIK, Data Scientist</span>
     </a>
   </div>
@@ -149,7 +120,7 @@ window.Quarto = {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item compact">
@@ -180,192 +151,110 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block"></header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">An Intro Example to Bayes’ Theorem</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">stats</div>
+                <div class="quarto-category">probability</div>
+                <div class="quarto-category">Bayesian</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Yiğit Aşık </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 5, 2025</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(4)</span></div><div class="category" data-category="QmF5ZXNpYW4=">Bayesian <span class="quarto-category-count">(1)</span></div><div class="category" data-category="bmV3cw==">news <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cHJvYmFiaWxpdHk=">probability <span class="quarto-category-count">(1)</span></div><div class="category" data-category="c3RhdHM=">stats <span class="quarto-category-count">(2)</span></div><div class="category" data-category="dXBkYXRl">update <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
 
 
 
 
+<section id="usual-dice-example" class="level2">
+<h2 class="anchored" data-anchor-id="usual-dice-example">USUAL DICE EXAMPLE</h2>
+<p>Imagine that you and I are playing a guessing game. I have two dice, 12-sided and 6-sided, and I am holding them in both of my hands. You are trying to guess which hand has the 12-sided die. At this very moment, there is no information for you. So, it’s not uncommon for a rational agent to think 50-50.</p>
+<p>However, you tell me to roll the die I hold on my left hand, and close your eyes. I inform you that I rolled above 3 (i.e., &gt;= 4). Is it still 50-50? It feels like it’s not, since rolling above 3 is more likely with the 12-sided die, right? So, how should you <em>update</em> your initial belief?</p>
+<p>I emphasized the “update” above, this is what one should think of when one encounters the word <em>Bayesian</em>: Updating the prior beliefs in the light of new data. Let’s go through the example.</p>
+<section id="calculations" class="level3">
+<h3 class="anchored" data-anchor-id="calculations">CALCULATIONS</h3>
+<p>At the beginning, before any information, it’s 50-50: <span class="math inline">\(P(12\: sided \ LH) = 0.5\)</span> and <span class="math inline">\(P(12\: sided \ RH) = 0.5\)</span> where LH and RH stands for left-hand and right-hand, respectively. Once you have the information that I rolled bigger than 3, there are two possible scenarios: Either I rolled bigger than 3 with 12-sided or with 6-sided.</p>
+<ul>
+<li><span class="math inline">\(P(&gt;3\: |\ 12\ sided) = 0.75\)</span></li>
+<li><span class="math inline">\(P(&gt;3\: |\ 6\ sided) = 0.5\)</span></li>
+</ul>
+<p>Let’s put those in a tree diagram.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="tree_diagram.png" class="img-fluid figure-img"></p>
+<figcaption>Tree Diagram</figcaption>
+</figure>
+</div>
+<ul>
+<li>The first column (left to the first vertical white bar) represents initial beliefs.</li>
+<li>The second column represents the probabilities given the first column.</li>
+<li>Third column is the multiplication of the three, and represents P(A and B).</li>
+</ul>
+<p>Well, you are not interested in the whole diagram since you have observed some data: I rolled a number bigger than 3. You wonder:</p>
+<p><span class="math inline">\(P(12\ sided\ LH\: | &gt;3)\)</span>, which is <span class="math inline">\(\dfrac{P(12\ sided\ LH\: ,\ &gt;3)}{P(&gt;3)}\)</span>.</p>
+<p>For the numerator, you can track the first row of the tree diagram which leads to 0.375. The denominator consists of two parts, rolling above 3 under two different hypotheses: Following the path of rolling above 3 with 12-sided on the left leads to 0.375, which is the first part. In addition, tracking the other scenario of rolling above 3 with 6-sided on hand leads to 0.25. Hence: <span class="math inline">\(\dfrac{0.375}{0.375+0.25} = 0.6\)</span></p>
+<p>This represents your new belief of having the 12-sided die on my left hand. If you tell me to roll the die again and construct a new tree diagram, the first column will consist of 0.6 and 0.4 and the following columns would be adjusted accordingly.</p>
+</section>
+<section id="derivation" class="level3">
+<h3 class="anchored" data-anchor-id="derivation">DERIVATION</h3>
+<p>Do you have to construct tree diagram each time? After all, even for this simple question the whole process takes a bit of time. With a little bit of algebra, you don’t have to: <span class="math inline">\(P(A\: |\ B) = \dfrac{P(A,B)}{P(B)}\)</span>. Multiplying both sides by the P(B): <span class="math inline">\(P(A\: |\ B) P(B) = P(A,B)\)</span> and since P(A,B) = P(B,A)<br>
+<span class="math inline">\(P(A\: |\ B) P(B) = P(B,A)\)</span> which leads to <span class="math inline">\(P(A\: |\ B) P(B) = P(B\: |\ A) P (A)\)</span></p>
+<p>and voila: <span class="math inline">\(P(A\: |\ B) = \dfrac{P(B\: |\ A) P(A)}{P(B)}\)</span></p>
+<ul>
+<li>The left hand side is called <em>posterior probability</em>, and you may come across it in the form of P(hypothesis | data).</li>
+<li>The denominator on the right is total probability of the data, sometimes referred to as <em>marginal probability</em>.</li>
+<li>P(A) is your initial belief here, the <em>prior</em>.</li>
+<li>While P(B | A) is called <em>likelihood</em> which is the probability of the data under given the hypothesis.</li>
+</ul>
+<p>For our example: <span class="math inline">\(P(12\ sided\: |\ &gt; 3) = \dfrac{P(&gt;3\: |\ 12\ sided) P(12\ sided)}{P(&gt;3)}\)</span></p>
+</section>
+<section id="about-the-framework" class="level3">
+<h3 class="anchored" data-anchor-id="about-the-framework">ABOUT THE FRAMEWORK</h3>
+<p>You may see versions of this where instead of hypothesis there can be theory or parameters (and instead of data, evidence) but they all are the same initially. This type of approach has its advantages such as incorporating the prior knowledge: If I would roll the die again, you would make those calculations with new priors (learned from the first roll), making use of what you already know. It allows for priors that are subjective: Maybe I am known to favor my left hand so it is possible for you to have an initial belief that is not reflected as 50-50.</p>
+<p>I will talk more about this view in the future posts but if you’re interested, you can check probability and Bayesian chapter in each of the books below:</p>
+<ul>
+<li><em>Learning Statistics with R</em> by Daniel Navarro</li>
+<li><em>Philosophy of Quantitative Methods</em> by Brian D. Haig</li>
+<li><em>Doing Bayesian Data Analysis</em> by John K. Kruschke</li>
+<li><em>Improving Your Statistical Inferences</em> by Daniel Lakens</li>
+<li><em>Think Bayes</em> by Allen B. Downey</li>
+</ul>
+<p>and I believe I remember the example above from Mine Çetinkaya-Rundel.</p>
 
 
+</section>
+</section>
 
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="listing-actions-group">
-   <div class="input-group input-group-sm quarto-listing-sort">
-     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
-     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
-       <option value="" disabled="" selected="" hidden="">Order By</option>
-       <option value="index" data-direction="asc">Default</option>
-         <option value="listing-title" data-direction="asc">
-          Title
-        </option>
-         <option value="listing-date-sort" data-direction="asc">
-          Date - Oldest
-        </option>
-         <option value="listing-date-sort" data-direction="desc">
-          Date - Newest
-        </option>
-         <option value="listing-author" data-direction="asc">
-          Author
-        </option>
-     </select>
-  </div>
-    <div class="input-group input-group-sm quarto-listing-filter">
-      <span class="input-group-text"><i class="bi bi-search"></i></span>
-      <input type="text" class="search form-control" placeholder="Filter">
-    </div>
-</div>
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="c3RhdHMlMkNwcm9iYWJpbGl0eSUyQ0JheWVzaWFu" data-listing-date-sort="1736024400000" data-listing-file-modified-sort="1736082807473" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="752">
-<div class="thumbnail">
-<p><a href="./posts/Bayes Theorem/index.html" class="no-external"></a></p><a href="./posts/Bayes Theorem/index.html" class="no-external">
-<p class="card-img-top"><img src="posts\Bayes Theorem\tree_diagram.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/Bayes Theorem/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/Bayes Theorem/index.html" class="no-external">An Intro Example to Bayes’ Theorem</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/Bayes Theorem/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdHM='); return false;">
-stats
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('cHJvYmFiaWxpdHk='); return false;">
-probability
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('QmF5ZXNpYW4='); return false;">
-Bayesian
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/Bayes Theorem/index.html" class="no-external">Imagine that you and I are playing a guessing game. I have two dice, 12-sided and 6-sided, and I am holding them in both of my hands. You are trying to guess which hand has…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/Bayes Theorem/index.html" class="no-external">
-<div class="listing-date">
-Jan 5, 2025
-</div>
-<div class="listing-author">
-Yiğit Aşık
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="1" data-categories="dXBkYXRl" data-listing-date-sort="1735678800000" data-listing-file-modified-sort="1735735559747" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="475">
-<div class="thumbnail">
-<p><a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external"></a></p><a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external">Man on a Mission: Starting 2025</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('dXBkYXRl'); return false;">
-update
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external">Some time ago, I stumbled upon the website <em>Less Certainty, More Inquiry</em>. If you click on the link, you’ll see that Darryl Blackport shares what he listens to or reads every…</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/Man on a Mission - Starting 2025/index.html" class="no-external">
-<div class="listing-date">
-Jan 1, 2025
-</div>
-<div class="listing-author">
-Yiğit Aşık
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="c3RhdHM=" data-listing-date-sort="1735506000000" data-listing-file-modified-sort="1735567301034" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="167">
-<div class="thumbnail">
-<p><a href="./posts/what happens to sample statistics/index.html" class="no-external"></a></p><a href="./posts/what happens to sample statistics/index.html" class="no-external">
-<p class="card-img-top"><img src="posts\what happens to sample statistics\index_files\figure-html\cell-7-output-1.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./posts/what happens to sample statistics/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/what happens to sample statistics/index.html" class="no-external">What Happens to Sample Statistics?</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/what happens to sample statistics/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('c3RhdHM='); return false;">
-stats
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/what happens to sample statistics/index.html" class="no-external">Let’s start from the basics: The idea is to gather data to make an inference about the population. We use what we know (sample data) to estimate what we don’t (population).</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/what happens to sample statistics/index.html" class="no-external">
-<div class="listing-date">
-Dec 30, 2024
-</div>
-<div class="listing-author">
-Yiğit Aşık
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="3" data-categories="bmV3cw==" data-listing-date-sort="1735333200000" data-listing-file-modified-sort="1735564640236" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="106">
-<div class="thumbnail">
-<p><a href="./posts/welcome/index.html" class="no-external"></a></p><a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./posts/welcome/index.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./posts/welcome/index.html" class="no-external">Welcome To My Blog</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./posts/welcome/index.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('bmV3cw=='); return false;">
-news
-</div>
-</div>
-<div class="listing-description">
-<a href="./posts/welcome/index.html" class="no-external">This is the first post in a Quarto blog. Welcome!</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./posts/welcome/index.html" class="no-external">
-<div class="listing-date">
-Dec 28, 2024
-</div>
-<div class="listing-author">
-Yiğit Aşık
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">
-No matching items
-</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
