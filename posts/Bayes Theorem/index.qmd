@@ -2,7 +2,7 @@
 title: "An Intro Example to Bayes' Theorem"
 author: "Yiğit Aşık"
 date: "2025-01-05"
-categories: [stats, probability, Bayesian]
+categories: [Stats, probability, Bayesian]
 ---
 
 ## USUAL DICE EXAMPLE
