@@ -511,7 +511,7 @@ Mean of Crotia:  1.7</code></pre>
 </div>
 </div>
 <p>Probability of superiority feels very intuitive: It is the probability of randomly sampled lambda for France being higher than randomly sampled lambda for Crotia. If there isn’t much overlap between two distributions, we are more confident that the one group (in this example, a team) is higher/lower than the other: Probability of superiority reflects that. You can use any tool (Python, R etc.) to simulate this, and I highly suggest it if you are not currently able to wrap your head around. Just generate different distributions and play with the idea.</p>
-<p>I didn’t include but there is one more reason why we used poisson and gamma distributions, it is related to something called conjugates that I first came across while I was going through Daniel Lakens’ <a href="https://lakens.github.io/statistical_inferences/04-bayes.html">Improving Your Statistical Inferences: Bayesian statistics</a>. Maybe we may dive into them later down the road.</p>
+<p>I didn’t include but there is one more reason why we used poisson and gamma distributions, it is related to something called <a href="https://www.sciencedirect.com/topics/computer-science/conjugate-prior"><em>conjugates</em></a> that I first came across while I was going through Daniel Lakens’ <a href="https://lakens.github.io/statistical_inferences/04-bayes.html">Improving Your Statistical Inferences: Bayesian statistics</a>. They make things computationally more feasible compared to the <em>grid</em> approach here.</p>
 <p>Examples (like this one) from many books can be found on my <a href="https://github.com/YigitAsik/learn-stats-with-sims">GitHub repo</a>, and I highly suggest you to go through Allen Downey’s books. Have a nice weekend.</p>
 
 
