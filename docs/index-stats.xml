@@ -1,0 +1,3731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>YIGIT ASIK, Data Scientist</title>
+<link>https://yigitasik.github.io/#category=Stats</link>
+<atom:link href="https://yigitasik.github.io/index-stats.xml" rel="self" type="application/rss+xml"/>
+<description>Anything related to statistics, analytics, and data science</description>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Sat, 11 Jan 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Which p-values to expect under different realities?</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/p-value distribution/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Statistics classes in social sciences, during an undergraduate degree, revolve around p-values mainly. Despite that, I have never seen the mention of p-value distributions. So, here we go:</p>
+<div id="cell-2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> st</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib.ticker <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> AutoMinorLocator</span>
+<span id="cb1-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-7"></span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> warnings</span>
+<span id="cb1-9">warnings.filterwarnings(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ignore'</span>)</span></code></pre></div>
+</div>
+<p>How does the p-value distribution look like when there is <strong>no</strong> effect?</p>
+<div id="cell-4" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># a bag to hold p-values</span></span>
+<span id="cb2-2"></span>
+<span id="cb2-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb2-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># sampling from a normal distribution with mean 100, std 15</span></span>
+<span id="cb2-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># sampling from a normal distribution with mean 100, std 15</span></span>
+<span id="cb2-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># doing a t-test and grabbing the p-value</span></span>
+<span id="cb2-7"></span>
+<span id="cb2-8">    p_val_list.append(p_val) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># storing the p-value in the bag</span></span></code></pre></div>
+</div>
+<div id="cell-5" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb3-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb3-3"></span>
+<span id="cb3-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb3-5"></span>
+<span id="cb3-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb3-7">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb3-8">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb3-9">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb3-10">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb3-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb3-12"></span>
+<span id="cb3-13">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb3-14">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'When the true effect size = 0'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>Text(0.5, 1.0, 'When the true effect size = 0')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-4-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Every p-value is equally likely. That’s why chosen alpha level corresponds to how often you will fool yourself in the long run, when there is no effect.<br>
+If the chosen alpha level is .10, then under the null hypothesis 10 percent of the p-values fall below 0.10.</p>
+<div id="cell-7" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb5-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.05</code></pre>
+</div>
+</div>
+<p>This is our long-term type I error rate, since theoretically the power is undefined in this case (i.e., the null is the truth). We don’t expect to fool ourselves more than 5% in the long run, when there is no effect.</p>
+<p>Let’s see what happens when there is an effect:</p>
+<div id="cell-10" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb7-2"></span>
+<span id="cb7-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb7-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb7-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">104.5</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb7-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb7-7"></span>
+<span id="cb7-8">    p_val_list.append(p_val)</span></code></pre></div>
+</div>
+<div id="cell-11" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb8-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb8-3"></span>
+<span id="cb8-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb8-5"></span>
+<span id="cb8-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb8-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb8-8"></span>
+<span id="cb8-9">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb8-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb8-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb8-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb8-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb8-14"></span>
+<span id="cb8-15">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb8-16">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.3'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.3")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-12" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb10-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.32</code></pre>
+</div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb12-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb12-3"></span>
+<span id="cb12-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb12-5"></span>
+<span id="cb12-6">ax.hist([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.05</span>], bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb12-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb12-8"></span>
+<span id="cb12-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ax.xaxis.set_minor_locator(AutoMinorLocator(5))</span></span>
+<span id="cb12-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb12-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb12-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb12-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb12-14"></span>
+<span id="cb12-15">ax.set_xlim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>)</span>
+<span id="cb12-16">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb12-17">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.3'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.3")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-9-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb14-2"></span>
+<span id="cb14-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb14-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb14-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">107.5</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb14-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb14-7"></span>
+<span id="cb14-8">    p_val_list.append(p_val)</span></code></pre></div>
+</div>
+<div id="cell-15" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb15-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb15-3"></span>
+<span id="cb15-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb15-5"></span>
+<span id="cb15-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb15-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.5</span>)</span>
+<span id="cb15-8"></span>
+<span id="cb15-9">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb15-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb15-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb15-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb15-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb15-14"></span>
+<span id="cb15-15">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb15-16">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.5'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.5")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-11-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-16" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb17-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.71</code></pre>
+</div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb19-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb19-3"></span>
+<span id="cb19-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb19-5"></span>
+<span id="cb19-6">ax.hist([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.05</span>], bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb19-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb19-8"></span>
+<span id="cb19-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ax.xaxis.set_minor_locator(AutoMinorLocator(5))</span></span>
+<span id="cb19-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb19-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb19-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb19-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb19-14"></span>
+<span id="cb19-15">ax.set_xlim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>)</span>
+<span id="cb19-16">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb19-17">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.5'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.5")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-13-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-18" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb21-2"></span>
+<span id="cb21-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb21-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb21-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">109.5</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb21-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb21-7"></span>
+<span id="cb21-8">    p_val_list.append(p_val)</span></code></pre></div>
+</div>
+<div id="cell-19" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb22-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb22-3"></span>
+<span id="cb22-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb22-5"></span>
+<span id="cb22-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb22-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.5</span>)</span>
+<span id="cb22-8"></span>
+<span id="cb22-9">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb22-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb22-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb22-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb22-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb22-14"></span>
+<span id="cb22-15">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb22-16">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.7'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.7")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-15-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-20" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb24-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.89</code></pre>
+</div>
+</div>
+<div id="cell-21" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb26-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb26-3"></span>
+<span id="cb26-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb26-5"></span>
+<span id="cb26-6">ax.hist([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.05</span>], bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb26-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb26-8"></span>
+<span id="cb26-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ax.xaxis.set_minor_locator(AutoMinorLocator(5))</span></span>
+<span id="cb26-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb26-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb26-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb26-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb26-14"></span>
+<span id="cb26-15">ax.set_xlim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>)</span>
+<span id="cb26-16">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb26-17">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.7'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.7")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-17-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.00</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.01</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.715716</code></pre>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb30-2"></span>
+<span id="cb30-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb30-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb30-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">112</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>)</span>
+<span id="cb30-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb30-7"></span>
+<span id="cb30-8">    p_val_list.append(p_val)</span></code></pre></div>
+</div>
+<div id="cell-24" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb31-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb31-3"></span>
+<span id="cb31-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb31-5"></span>
+<span id="cb31-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb31-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb31-8"></span>
+<span id="cb31-9">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb31-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb31-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb31-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb31-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb31-14"></span>
+<span id="cb31-15">ax.set_xticks(np.arange(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>))</span>
+<span id="cb31-16">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb31-17">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.8'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.8")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-20-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-25" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb33-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb33-3"></span>
+<span id="cb33-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb33-5"></span>
+<span id="cb33-6">ax.hist([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.05</span>], bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb33-7">ax.axhline(y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'r'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb33-8"></span>
+<span id="cb33-9"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># ax.xaxis.set_minor_locator(AutoMinorLocator(5))</span></span>
+<span id="cb33-10">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb33-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb33-12">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb33-13">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb33-14"></span>
+<span id="cb33-15">ax.set_xlim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>)</span>
+<span id="cb33-16">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb33-17">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.8'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.8")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-21-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-26" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.04</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.05</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>,</span>
+<span id="cb35-2">      <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.03</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.04</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>,</span>
+<span id="cb35-3">      <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.02</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.03</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>,</span>
+<span id="cb35-4">      <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.01</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.02</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>,</span>
+<span id="cb35-5">      <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.00</span> <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">and</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.01</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.005389 
+ 0.008187 
+ 0.014401 
+ 0.032377 
+ 0.91928</code></pre>
+</div>
+</div>
+<div id="cell-27" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb37-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.98</code></pre>
+</div>
+</div>
+<p>As the statistical power increases, distribution of p-values pile up at the very left: Some p-values below 0.05 become more likely (ones more close to 0.00). And when you have very high power, certain p-values below 0.05 (relatively high ones) become more likely under the null:<br>
+Hence, wouldn’t be wise to reject the null despite p-value &lt; .05</p>
+<div id="cell-29" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb39-2"></span>
+<span id="cb39-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb39-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">65</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># different sample size</span></span>
+<span id="cb39-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">107.5</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">65</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># different sample size</span></span>
+<span id="cb39-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb39-7"></span>
+<span id="cb39-8">    p_val_list.append(p_val)</span></code></pre></div>
+</div>
+<div id="cell-30" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb40" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb40-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.81</code></pre>
+</div>
+</div>
+<div id="cell-31" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb42" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb42-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb42-3"></span>
+<span id="cb42-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb42-5"></span>
+<span id="cb42-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb42-7">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb42-8">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb42-9">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb42-10">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb42-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb42-12"></span>
+<span id="cb42-13">ax.set_xticks(np.arange(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>))</span>
+<span id="cb42-14">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb42-15">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.5'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.5")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-26-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-32" class="cell" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb44" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1">p_val_list <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb44-2"></span>
+<span id="cb44-3"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>):</span>
+<span id="cb44-4">    ctrl <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># different sample size</span></span>
+<span id="cb44-5">    trt <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">107.5</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># different sample size</span></span>
+<span id="cb44-6">    p_val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.ttest_ind(trt, ctrl)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]</span>
+<span id="cb44-7"></span>
+<span id="cb44-8">    p_val_list.append(p_val)</span></code></pre></div>
+</div>
+<div id="cell-33" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb45" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1">power <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> p_val_list <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> val <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># .05 is the chosen for alpha</span></span>
+<span id="cb45-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Power: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(power) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(p_val_list), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Power:  0.94</code></pre>
+</div>
+</div>
+<div id="cell-34" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb47" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">9</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb47-2">ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fig.add_subplot(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb47-3"></span>
+<span id="cb47-4">plt.ticklabel_format(style<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'plain'</span>, axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>)</span>
+<span id="cb47-5"></span>
+<span id="cb47-6">ax.hist(p_val_list, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.9</span>)</span>
+<span id="cb47-7">ax.xaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb47-8">ax.yaxis.set_minor_locator(AutoMinorLocator(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb47-9">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'both'</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb47-10">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'major'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb47-11">ax.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'minor'</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb47-12"></span>
+<span id="cb47-13">ax.set_xticks(np.arange(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.05</span>))</span>
+<span id="cb47-14">ax.set_ylim(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000000</span>)</span>
+<span id="cb47-15">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'For Cohen</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s d of 0.5'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<pre><code>Text(0.5, 1.0, "For Cohen's d of 0.5")</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/p-value distribution/index_files/figure-html/cell-29-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As one can see, statistical power also depends on the sample size and it should make sense: <em>p</em>-value is a function of test statistic (<em>t</em>, in this case) and following from there, function of sample size. If this doesn’t feel comfortable to you, I suggest you to take a look at <a href="https://yigitasik.github.io/posts/what%20happens%20to%20sample%20statistics/">this post</a>, and check what happens to standard error as the sample size increases.</p>
+<p>In the examples below, we always knew the underlying distributions of the populations we sample from. In reality, we usually end up with a result and we wonder the true effect: What is the chance that there is an effect, given that I observed one. This conditional probability is called <em>positive predictive value</em>, something that I heard from a political scientist during pre-COVID days, and if you’re interested in these stuff I suggest you to take a look at it. You can start from Ioannidis’ <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0020124">paper</a> or Lakens’ <a href="https://lakens.github.io/statistical_inferences/">book</a> for more structured follow.</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Inference</category>
+  <guid>https://yigitasik.github.io/posts/p-value distribution/</guid>
+  <pubDate>Sat, 11 Jan 2025 21:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Bayesian Updating: Poisson &amp; Gamma</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>The following example is taken from Allen Downey’s <em>Think Bayes</em>. I believe this is a great one to show how to update priors.</p>
+<p>Downey takes a match between France and Crotia, played back in 2018 World Cup, that France won 4-2. Then, he aims to answer two questions:</p>
+<ul>
+<li>How confident we are about France being the better team?</li>
+<li>In a rematch, what is the probability that France would win again?</li>
+</ul>
+<p>I’ll only attempt to answer the first question so that you have a reason to check Downey’s book <a href="https://allendowney.github.io/ThinkBayes2/chap08.html"><em>Think Bayes</em></a>.</p>
+<div id="2b765bef-77ed-424a-8c87-5dff1f17fa19" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-6"></span>
+<span id="cb1-7"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> empiricaldist <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> emd</span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> st</span>
+<span id="cb1-9"></span>
+<span id="cb1-10">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.max_columns'</span>, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>)</span>
+<span id="cb1-11">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.width'</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">170</span>)</span>
+<span id="cb1-12">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.max_rows'</span>, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>)</span>
+<span id="cb1-13">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.float_format'</span>, <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.3f</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%</span> x)</span></code></pre></div>
+</div>
+<p>Starting out with certain assumptions:</p>
+<ul>
+<li>There is a goal scoring-rate for every team, goals per game (more specifically, per 90), which we will denote as lambda.</li>
+<li>A goal is equally likely during any minute of the game, regardless of strategy, tempo etc.<br>
+(This is also an assumption under a huge framework in basketball analytics, regularized adjusted plus-minus, wanted to point out just in case you follow my basketball analytics content)</li>
+<li>It isn’t possible for a team to score more than once during a single minute.</li>
+</ul>
+<div id="3ce03495-38c8-43a8-b791-1cf8c2408f35" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">lam <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># lambda, goal scoring rate (i.e. goals per game)</span></span>
+<span id="cb2-2">dist <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lam) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># poisson dist. with lambda = 1.4</span></span></code></pre></div>
+</div>
+<div id="ecb994db-4cf7-453a-8b91-e6b8489d3566" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># probability of scoring "k" goals (4 in this case)</span></span>
+<span id="cb3-2">k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span></span>
+<span id="cb3-3">dist.pmf(k).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># pmf evaluated at 4.</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>0.039</code></pre>
+</div>
+</div>
+<p>So, there’s 3.9% chance to observe 4 goals, under the model above.</p>
+<div id="77a06bd9-bf53-4474-81c8-bcc5d13411dd" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">lam <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># goal scoring rate</span></span>
+<span id="cb5-2">goals <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.arange(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># possible values for goals</span></span>
+<span id="cb5-3">probas <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lam).pmf(goals)</span>
+<span id="cb5-4"></span>
+<span id="cb5-5">probas</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>array([2.46596964e-01, 3.45235750e-01, 2.41665025e-01, 1.12777012e-01,
+       3.94719540e-02, 1.10521471e-02, 2.57883433e-03, 5.15766866e-04,
+       9.02592015e-05, 1.40403202e-05])</code></pre>
+</div>
+</div>
+<div id="31ed542a-e52e-4ff7-bb86-2b2be18d6284" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb7-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.barplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>goals, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>probas)</span>
+<span id="cb7-3"></span>
+<span id="cb7-4">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goals'</span>)</span>
+<span id="cb7-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>Text(0, 0.5, 'PMF')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-6-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s try to move the other way around: Estimate the goal-scoring rate from given goals.</p>
+<p>Downey has used data from previous World Cups to estimate that the each team scores 1.4 goals per game, approximately. Hence, it is reasonable to make mean of lambda 1.4.</p>
+<p>The goal scoring rate is continuous and it can’t take values below 0, hence a distribution that reflects this features would be great: Gamma distribution. Additionally, it’s easy to construct one since it only takes one parameter which is the mean which we already have value for.</p>
+<div id="3280f8f3-ea3d-424a-8c00-5c2bf56bdafb" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">alpha <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># mean of the distribution</span></span>
+<span id="cb9-2">lams <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># possible values of lam between 0 and 10</span></span>
+<span id="cb9-3">ps <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.gamma(alpha).pdf(lams) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># probability densities</span></span></code></pre></div>
+</div>
+<div id="d196d0a4-1eb6-43fd-9aab-7fa212078370" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">prior <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emd.Pmf(ps, lams)</span>
+<span id="cb10-2">prior.normalize() <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Pmf offers "normalize" method, which divides by the total probability of the data (i.e., probability under any parameter/hypothesis)</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>9.889360237140306</code></pre>
+</div>
+</div>
+<div id="0596370f-0ff6-4964-a0c7-ad2d4e5f3da3" class="cell" data-scrolled="true" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">df_prior <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame(prior.ps, prior.qs).rename(columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>{<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>:<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>})</span></code></pre></div>
+</div>
+<div id="168058b3-5ebb-4cd7-9167-a7ce99914f37" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb13-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.probas, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'orange'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb13-3"></span>
+<span id="cb13-4">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Prior Distribution'</span>)</span>
+<span id="cb13-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb13-6">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goals'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>Text(0.5, 0, 'Goals')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="3f82f247-511c-4cad-9008-0ce51970a3ce" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(df_prior.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_prior.probas) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># mean of the distribution</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>1.4140818156118378</code></pre>
+</div>
+</div>
+<section id="updating-with-new-data" class="level3">
+<h3 class="anchored" data-anchor-id="updating-with-new-data">Updating with new data</h3>
+<p>So, our initial belief for France’s goal scoring rate (in this example, for other teams as well), goals per 90 mins, was 1.4. Then we observed 4 goals from France, should we still think that France’s goal scoring rate is 1.4? If not, how much should it change?</p>
+<div id="16a37c3c-c82c-4a72-908a-a5c32a3fee2f" class="cell" data-scrolled="true" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">lambdas <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> lams <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># different lambdas (different goal scoring rates)</span></span>
+<span id="cb17-2">k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># observed data</span></span>
+<span id="cb17-3">likelihood <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lambdas).pmf(k) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># for each lambda (for each parameter), how likely we are to see 4 goals</span></span>
+<span id="cb17-4">likelihood[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>array([0.00000000e+00, 3.77015591e-06, 5.45820502e-05, 2.50026149e-04])</code></pre>
+</div>
+</div>
+<div id="afa90707-a567-4ac3-8360-3ea0ac0d880a" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> likelihood</span>
+<span id="cb19-2">df_prior.head(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">probas</th>
+<th data-quarto-table-cell-role="th">likelihood</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0.100</td>
+<td>0.041</td>
+<td>0.000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.200</td>
+<td>0.049</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0.300</td>
+<td>0.052</td>
+<td>0.000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="f6e1bdd7-d6ea-4534-87e1-d1f881af1228" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1">p_norm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emd.Pmf(df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>], df_prior.index)</span>
+<span id="cb20-2">p_norm.normalize()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>0.05015532557804499</code></pre>
+</div>
+</div>
+<div id="ec709091-cde2-42a7-8f4d-645cc73fb116" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1">df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> p_norm</span></code></pre></div>
+</div>
+<div id="ea0b4d07-dd92-4c2f-9235-2d903c9b872c" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb23-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.posterior, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'blue'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb23-3"></span>
+<span id="cb23-4">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goal scoring rate'</span>)</span>
+<span id="cb23-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb23-6">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'France'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>Text(0.5, 1.0, 'France')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-16-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Same steps for Crotia:</p>
+<div id="fbfb7066-e937-4665-a21b-132c741ecae8" class="cell" data-scrolled="true" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">df_crotia <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df_prior[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>]].copy()</span>
+<span id="cb25-2">df_crotia.head(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">probas</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.000</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0.100</td>
+<td>0.041</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.200</td>
+<td>0.049</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="d450c69e-8333-4e71-9ff6-4e40d568a39b" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1">k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Crotia's number of goals in the match</span></span>
+<span id="cb26-2">likelihood_cro <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lams).pmf(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb26-3">likelihood_cro[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>array([0.        , 0.00452419, 0.01637462, 0.03333682])</code></pre>
+</div>
+</div>
+<div id="dd30b773-feba-4e71-aea6-c7be522552c6" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> likelihood_cro</span></code></pre></div>
+</div>
+<div id="075dfbba-7d6c-4472-94dd-fedc08e95398" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1">p_norm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emd.Pmf(df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>], df_crotia.index)</span>
+<span id="cb29-2">p_norm.normalize()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>0.1609321178598705</code></pre>
+</div>
+</div>
+<div id="2f2e8fbc-9458-4e28-8fcf-f943869eddaa" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> p_norm</span></code></pre></div>
+</div>
+<div id="90473ed7-46ea-41f2-b9f7-c8deea14e2bc" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb32-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>], color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb32-3"></span>
+<span id="cb32-4">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goal scoring rate'</span>)</span>
+<span id="cb32-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb32-6">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Crotia'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>Text(0.5, 1.0, 'Crotia')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-22-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>How confident we are that France is the better team?</p>
+<div id="78210691" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(</span>
+<span id="cb34-2">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Mean of France: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(df_prior.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_prior.posterior).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span></span>
+<span id="cb34-3">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Mean of Crotia: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(df_crotia.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_crotia.posterior).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb34-4">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean of France:  2.7 
+Mean of Crotia:  1.7</code></pre>
+</div>
+</div>
+<div id="b3f10805-123e-4c3d-9aab-50ce33beaa39" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb36-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>], color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Crotia'</span>)</span>
+<span id="cb36-3">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>], color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'blue'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'France'</span>)</span>
+<span id="cb36-4"></span>
+<span id="cb36-5">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goals'</span>)</span>
+<span id="cb36-6">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb36-7">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'France vs Crotia'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>Text(0.5, 1.0, 'France vs Crotia')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-24-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Probability of superiority is a way to express an <em>effect size</em>. Here’s a great visualization tool that you can play with to make expression of effect sizes more intuitive: <a href="https://rpsychologist.com/cohend/">Interpreting Effect Sizes: An Interactive Visualization</a></p>
+<div id="7b91b63c-17cc-4767-8525-2e4fae7291bb" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Probability of superiority.</span></span>
+<span id="cb38-2"></span>
+<span id="cb38-3">france_proba <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb38-4"></span>
+<span id="cb38-5"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> df_prior.index.tolist():</span>
+<span id="cb38-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> j <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> df_crotia.index.tolist():</span>
+<span id="cb38-7">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> i <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> j:</span>
+<span id="cb38-8">            france_proba <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+=</span> df_prior.loc[i, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_crotia.loc[j, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>]</span>
+<span id="cb38-9">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb38-10">            <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">continue</span></span>
+<span id="cb38-11"></span>
+<span id="cb38-12">france_proba.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>0.75</code></pre>
+</div>
+</div>
+<p>Probability of superiority feels very intuitive: It is the probability of randomly sampled lambda for France being higher than randomly sampled lambda for Crotia. If there isn’t much overlap between two distributions, we are more confident that the one group (in this example, a team) is higher/lower than the other: Probability of superiority reflects that. You can use any tool (Python, R etc.) to simulate this, and I highly suggest it if you are not currently able to wrap your head around. Just generate different distributions and play with the idea.</p>
+<p>I didn’t include but there is one more reason why we used poisson and gamma distributions, it is related to something called <a href="https://www.sciencedirect.com/topics/computer-science/conjugate-prior"><em>conjugates</em></a> that I first came across while I was going through Daniel Lakens’ <a href="https://lakens.github.io/statistical_inferences/04-bayes.html">Improving Your Statistical Inferences: Bayesian statistics</a>. They make things computationally more feasible compared to the <em>grid</em> approach here.</p>
+<p>Examples (like this one) from many books can be found on my <a href="https://github.com/YigitAsik/learn-stats-with-sims">GitHub repo</a>, and I highly suggest you to go through Allen Downey’s books. Have a nice weekend.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Bayesian</category>
+  <category>Sports Analytics</category>
+  <guid>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/</guid>
+  <pubDate>Thu, 09 Jan 2025 21:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>An Intro Example to Bayes’ Theorem</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Bayes Theorem/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="usual-dice-example" class="level2">
+<h2 class="anchored" data-anchor-id="usual-dice-example">USUAL DICE EXAMPLE</h2>
+<p>Imagine that you and I are playing a guessing game. I have two dice, 12-sided and 6-sided, and I am holding them in both of my hands. You are trying to guess which hand has the 12-sided die. At this very moment, there is no information for you. So, it’s not uncommon for a rational agent to think 50-50.</p>
+<p>However, you tell me to roll the die I hold on my left hand, and close your eyes. I inform you that I rolled above 3 (i.e., &gt;= 4). Is it still 50-50? It feels like it’s not, since rolling above 3 is more likely with the 12-sided die, right? So, how should you <em>update</em> your initial belief?</p>
+<p>I emphasized the “update” above, this is what one should think of when one encounters the word <em>Bayesian</em>: Updating the prior beliefs in the light of new data. Let’s go through the example.</p>
+<section id="calculations" class="level3">
+<h3 class="anchored" data-anchor-id="calculations">CALCULATIONS</h3>
+<p>At the beginning, before any information, it’s 50-50: <img src="https://latex.codecogs.com/png.latex?P(12%5C:%20sided%20%5C%20LH)%20=%200.5"> and <img src="https://latex.codecogs.com/png.latex?P(12%5C:%20sided%20%5C%20RH)%20=%200.5"> where LH and RH stands for left-hand and right-hand, respectively. Once you have the information that I rolled bigger than 3, there are two possible scenarios: Either I rolled bigger than 3 with 12-sided or with 6-sided.</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?P(%3E3%5C:%20%7C%5C%2012%5C%20sided)%20=%200.75"></li>
+<li><img src="https://latex.codecogs.com/png.latex?P(%3E3%5C:%20%7C%5C%206%5C%20sided)%20=%200.5"></li>
+</ul>
+<p>Let’s put those in a tree diagram.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayes Theorem/tree_diagram.png" class="img-fluid figure-img"></p>
+<figcaption>Tree Diagram</figcaption>
+</figure>
+</div>
+<ul>
+<li>The first column (left to the first vertical white bar) represents initial beliefs.</li>
+<li>The second column represents the probabilities given the first column.</li>
+<li>Third column is the multiplication of the three, and represents P(A and B).</li>
+</ul>
+<p>Well, you are not interested in the whole diagram since you have observed some data: I rolled a number bigger than 3. You wonder:</p>
+<p><img src="https://latex.codecogs.com/png.latex?P(12%5C%20sided%5C%20LH%5C:%20%7C%20%3E3)">, which is <img src="https://latex.codecogs.com/png.latex?%5Cdfrac%7BP(12%5C%20sided%5C%20LH%5C:%20,%5C%20%3E3)%7D%7BP(%3E3)%7D">.</p>
+<p>For the numerator, you can track the first row of the tree diagram which leads to 0.375. The denominator consists of two parts, rolling above 3 under two different hypotheses: Following the path of rolling above 3 with 12-sided on the left leads to 0.375, which is the first part. In addition, tracking the other scenario of rolling above 3 with 6-sided on hand leads to 0.25. Hence: <img src="https://latex.codecogs.com/png.latex?%5Cdfrac%7B0.375%7D%7B0.375+0.25%7D%20=%200.6"></p>
+<p>This represents your new belief of having the 12-sided die on my left hand. If you tell me to roll the die again and construct a new tree diagram, the first column will consist of 0.6 and 0.4 and the following columns would be adjusted accordingly.</p>
+</section>
+<section id="derivation" class="level3">
+<h3 class="anchored" data-anchor-id="derivation">DERIVATION</h3>
+<p>Do you have to construct tree diagram each time? After all, even for this simple question the whole process takes a bit of time. With a little bit of algebra, you don’t have to: <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20=%20%5Cdfrac%7BP(A,B)%7D%7BP(B)%7D">. Multiplying both sides by the P(B): <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(A,B)"> and since P(A,B) = P(B,A)<br>
+<img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(B,A)"> which leads to <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(B%5C:%20%7C%5C%20A)%20P%20(A)"></p>
+<p>and voila: <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20=%20%5Cdfrac%7BP(B%5C:%20%7C%5C%20A)%20P(A)%7D%7BP(B)%7D"></p>
+<ul>
+<li>The left hand side is called <em>posterior probability</em>, and you may come across it in the form of P(hypothesis | data).</li>
+<li>The denominator on the right is total probability of the data, sometimes referred to as <em>marginal probability</em>.</li>
+<li>P(A) is your initial belief here, the <em>prior</em>.</li>
+<li>While P(B | A) is called <em>likelihood</em> which is the probability of the data under given the hypothesis.</li>
+</ul>
+<p>For our example: <img src="https://latex.codecogs.com/png.latex?P(12%5C%20sided%5C:%20%7C%5C%20%3E%203)%20=%20%5Cdfrac%7BP(%3E3%5C:%20%7C%5C%2012%5C%20sided)%20P(12%5C%20sided)%7D%7BP(%3E3)%7D"></p>
+</section>
+<section id="about-the-framework" class="level3">
+<h3 class="anchored" data-anchor-id="about-the-framework">ABOUT THE FRAMEWORK</h3>
+<p>You may see versions of this where instead of hypothesis there can be theory or parameters (and instead of data, evidence) but they all are the same initially. This type of approach has its advantages such as incorporating the prior knowledge: If I would roll the die again, you would make those calculations with new priors (learned from the first roll), making use of what you already know. It allows for priors that are subjective: Maybe I am known to favor my left hand so it is possible for you to have an initial belief that is not reflected as 50-50.</p>
+<p>I will talk more about this view in the future posts but if you’re interested, you can check probability and Bayesian chapter in each of the books below:</p>
+<ul>
+<li><em>Learning Statistics with R</em> by Daniel Navarro</li>
+<li><em>Philosophy of Quantitative Methods</em> by Brian D. Haig</li>
+<li><em>Doing Bayesian Data Analysis</em> by John K. Kruschke</li>
+<li><em>Improving Your Statistical Inferences</em> by Daniel Lakens</li>
+<li><em>Think Bayes</em> by Allen B. Downey</li>
+</ul>
+<p>and I believe I remember the example above from Mine Çetinkaya-Rundel.</p>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <category>probability</category>
+  <category>Bayesian</category>
+  <guid>https://yigitasik.github.io/posts/Bayes Theorem/</guid>
+  <pubDate>Sat, 04 Jan 2025 21:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>What Happens to Sample Statistics?</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/what happens to sample statistics/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Let’s start from the basics: The idea is to gather data to make an inference about the population. We use what we know (sample data) to estimate what we don’t (population).</p>
+<p>So, let’s see what happens as one collects more data.</p>
+<div id="cell-2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span></code></pre></div>
+</div>
+<div id="cell-3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> n <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>):</span>
+<span id="cb2-2">    sampled <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>n)</span>
+<span id="cb2-3">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Sampling '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(n) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">' observations'</span>)</span>
+<span id="cb2-4">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Mean: '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.mean(sampled)))</span>
+<span id="cb2-5">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Standard Deviation '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.std(sampled)))</span>
+<span id="cb2-6">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sampling 10 observations
+Mean: 96.54930308046485
+Standard Deviation 17.69744525686926
+
+
+Sampling 20 observations
+Mean: 95.26529645787349
+Standard Deviation 13.557714188035797
+
+
+Sampling 30 observations
+Mean: 99.59631039122944
+Standard Deviation 16.67387851610786
+
+
+Sampling 40 observations
+Mean: 94.76579341950723
+Standard Deviation 18.06257861698366
+
+
+Sampling 50 observations
+Mean: 99.61537083458882
+Standard Deviation 14.897878602988285
+
+
+Sampling 60 observations
+Mean: 98.68203398707892
+Standard Deviation 14.644083079076118
+
+
+Sampling 70 observations
+Mean: 100.36682454658889
+Standard Deviation 15.427573719883997
+
+
+Sampling 80 observations
+Mean: 101.00471630426532
+Standard Deviation 12.678064261146886
+
+
+Sampling 90 observations
+Mean: 102.7631649616841
+Standard Deviation 13.03915710302493
+
+
+Sampling 100 observations
+Mean: 99.17823535292733
+Standard Deviation 14.951583438089918
+
+</code></pre>
+</div>
+</div>
+<p>As one increases the sample size taken from the population, sample statistics will <em>approach</em> towards the <strong>population parameter</strong>.<br>
+<strong>DOES NOT NECESSARILY DECREASE!</strong> (do not confuse std_dev and std_err) As one can see from the example above!</p>
+<p>But <em>standard error</em> <strong>WILL</strong> decrease as the sample size increases. It should make sense intuitively: I have more confidence in my estimates if I know more.</p>
+<div id="cell-6" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> n <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>):</span>
+<span id="cb4-2">    sampled <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>n)</span>
+<span id="cb4-3">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Sampling '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(n) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">' observations'</span>)</span>
+<span id="cb4-4">    std_err <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.std(sampled) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> np.sqrt(n)</span>
+<span id="cb4-5">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Standard error approximation: '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(std_err))</span>
+<span id="cb4-6">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sampling 10 observations
+Standard error approximation: 4.452823707231046
+
+
+Sampling 20 observations
+Standard error approximation: 3.798915557039333
+
+
+Sampling 30 observations
+Standard error approximation: 2.3932757697459746
+
+
+Sampling 40 observations
+Standard error approximation: 2.624220779126406
+
+
+Sampling 50 observations
+Standard error approximation: 2.2840746792281217
+
+
+Sampling 60 observations
+Standard error approximation: 2.015124706208566
+
+
+Sampling 70 observations
+Standard error approximation: 1.7230901229016737
+
+
+Sampling 80 observations
+Standard error approximation: 1.5993946754011168
+
+
+Sampling 90 observations
+Standard error approximation: 1.66349862578967
+
+
+Sampling 100 observations
+Standard error approximation: 1.577820207327762
+
+</code></pre>
+</div>
+</div>
+<p>How close is the approximation? Let’s try it for one sample</p>
+<div id="cell-8" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span></span>
+<span id="cb6-2"></span>
+<span id="cb6-3">pop <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.normal(loc<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, scale<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">15</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">300000</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Population with normal distribution(mean=100, sd=15)</span></span>
+<span id="cb6-4"></span>
+<span id="cb6-5">sampled <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.choice(pop, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>n) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># randomly sampling</span></span>
+<span id="cb6-6">estimated_mean <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.mean(sampled) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># sample mean</span></span>
+<span id="cb6-7">estimated_sd <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.std(sampled) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># sample standard deviation</span></span>
+<span id="cb6-8"></span>
+<span id="cb6-9">estimated_std_err <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.std(sampled) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> n<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">**</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.5</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># estimated standard error, expected variation for my sample statistic.</span></span>
+<span id="cb6-10"></span>
+<span id="cb6-11"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(estimated_mean, estimated_sd, estimated_std_err)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>95.27311481976386 15.960503088053418 2.2349174605268747</code></pre>
+</div>
+</div>
+<div id="cell-9" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Let's take many samples and estimate the mean</span></span>
+<span id="cb8-2"></span>
+<span id="cb8-3">mean_estimates <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb8-4"></span>
+<span id="cb8-5"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000</span>): <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Let's do it 1000 times, sampling 51 in each iteration.</span></span>
+<span id="cb8-6">    sampled <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.choice(pop, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>n)</span>
+<span id="cb8-7">    mean_estimates.append(np.mean(sampled))</span>
+<span id="cb8-8"></span>
+<span id="cb8-9">np.std(mean_estimates)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>2.1480690130242537</code></pre>
+</div>
+</div>
+<p>As one can see, it’s not that far away.</p>
+<div id="cell-11" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb10-2"></span>
+<span id="cb10-3">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.swarmplot(data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>mean_estimates, orient<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"h"</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.8</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"purple"</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>,</span>
+<span id="cb10-4">                 edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/what happens to sample statistics/index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>What happens when one lowers the sample size? More variation, less confidence. As the sample size increases the estimates approach towards the parameter, so with large sample size each sample ends up having similar estimates. However, that’s not the case with low sample size.</p>
+<div id="cell-13" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">n <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span></span>
+<span id="cb11-2">mean_estimates <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb11-3"></span>
+<span id="cb11-4"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000</span>): <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Let's do it 1000 times</span></span>
+<span id="cb11-5">    sampled <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.choice(pop, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>n)</span>
+<span id="cb11-6">    mean_estimates.append(np.mean(sampled))</span>
+<span id="cb11-7"></span>
+<span id="cb11-8">np.std(mean_estimates)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>3.713500386895356</code></pre>
+</div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb13-2"></span>
+<span id="cb13-3">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.swarmplot(data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>mean_estimates, orient<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"h"</span>, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.8</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"purple"</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>,</span>
+<span id="cb13-4">                 edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/what happens to sample statistics/index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Watch out the x-axis, it’s much wider now.</p>
+<div id="cell-16" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">mean_estimates <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> {</span>
+<span id="cb14-2">        <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>:[],</span>
+<span id="cb14-3">        <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">23</span>:[],</span>
+<span id="cb14-4">        <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>:[],</span>
+<span id="cb14-5">        <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>:[],</span>
+<span id="cb14-6">        <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">84</span>:[],</span>
+<span id="cb14-7">        <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>:[]</span>
+<span id="cb14-8">    }</span>
+<span id="cb14-9"></span>
+<span id="cb14-10"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> n <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> [<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">23</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">51</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">84</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>]:</span>
+<span id="cb14-11">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">500</span>):</span>
+<span id="cb14-12">        sampled <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.choice(pop, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>n)</span>
+<span id="cb14-13">        mean_estimates[n].append(np.mean(sampled))</span></code></pre></div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> key <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> mean_estimates.keys():</span>
+<span id="cb15-2">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Sample size: '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(key))</span>
+<span id="cb15-3">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Standard deviation (std_err) around the estimates: '</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.std(mean_estimates[key])))</span>
+<span id="cb15-4">    <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sample size: 16
+Standard deviation (std_err) around the estimates: 3.855337925425897
+
+
+Sample size: 23
+Standard deviation (std_err) around the estimates: 3.1917223557725363
+
+
+Sample size: 30
+Standard deviation (std_err) around the estimates: 2.7639204989190023
+
+
+Sample size: 51
+Standard deviation (std_err) around the estimates: 2.0366022769176806
+
+
+Sample size: 84
+Standard deviation (std_err) around the estimates: 1.736807903528174
+
+
+Sample size: 101
+Standard deviation (std_err) around the estimates: 1.504399688755003
+
+</code></pre>
+</div>
+</div>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <guid>https://yigitasik.github.io/posts/what happens to sample statistics/</guid>
+  <pubDate>Sun, 29 Dec 2024 21:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

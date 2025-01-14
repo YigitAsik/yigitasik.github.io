@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>YIGIT ASIK, Data Scientist</title>
+<link>https://yigitasik.github.io/#category=probability</link>
+<atom:link href="https://yigitasik.github.io/index-probability.xml" rel="self" type="application/rss+xml"/>
+<description>Anything related to statistics, analytics, and data science</description>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Sat, 04 Jan 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>An Intro Example to Bayes’ Theorem</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Bayes Theorem/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="usual-dice-example" class="level2">
+<h2 class="anchored" data-anchor-id="usual-dice-example">USUAL DICE EXAMPLE</h2>
+<p>Imagine that you and I are playing a guessing game. I have two dice, 12-sided and 6-sided, and I am holding them in both of my hands. You are trying to guess which hand has the 12-sided die. At this very moment, there is no information for you. So, it’s not uncommon for a rational agent to think 50-50.</p>
+<p>However, you tell me to roll the die I hold on my left hand, and close your eyes. I inform you that I rolled above 3 (i.e., &gt;= 4). Is it still 50-50? It feels like it’s not, since rolling above 3 is more likely with the 12-sided die, right? So, how should you <em>update</em> your initial belief?</p>
+<p>I emphasized the “update” above, this is what one should think of when one encounters the word <em>Bayesian</em>: Updating the prior beliefs in the light of new data. Let’s go through the example.</p>
+<section id="calculations" class="level3">
+<h3 class="anchored" data-anchor-id="calculations">CALCULATIONS</h3>
+<p>At the beginning, before any information, it’s 50-50: <img src="https://latex.codecogs.com/png.latex?P(12%5C:%20sided%20%5C%20LH)%20=%200.5"> and <img src="https://latex.codecogs.com/png.latex?P(12%5C:%20sided%20%5C%20RH)%20=%200.5"> where LH and RH stands for left-hand and right-hand, respectively. Once you have the information that I rolled bigger than 3, there are two possible scenarios: Either I rolled bigger than 3 with 12-sided or with 6-sided.</p>
+<ul>
+<li><img src="https://latex.codecogs.com/png.latex?P(%3E3%5C:%20%7C%5C%2012%5C%20sided)%20=%200.75"></li>
+<li><img src="https://latex.codecogs.com/png.latex?P(%3E3%5C:%20%7C%5C%206%5C%20sided)%20=%200.5"></li>
+</ul>
+<p>Let’s put those in a tree diagram.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayes Theorem/tree_diagram.png" class="img-fluid figure-img"></p>
+<figcaption>Tree Diagram</figcaption>
+</figure>
+</div>
+<ul>
+<li>The first column (left to the first vertical white bar) represents initial beliefs.</li>
+<li>The second column represents the probabilities given the first column.</li>
+<li>Third column is the multiplication of the three, and represents P(A and B).</li>
+</ul>
+<p>Well, you are not interested in the whole diagram since you have observed some data: I rolled a number bigger than 3. You wonder:</p>
+<p><img src="https://latex.codecogs.com/png.latex?P(12%5C%20sided%5C%20LH%5C:%20%7C%20%3E3)">, which is <img src="https://latex.codecogs.com/png.latex?%5Cdfrac%7BP(12%5C%20sided%5C%20LH%5C:%20,%5C%20%3E3)%7D%7BP(%3E3)%7D">.</p>
+<p>For the numerator, you can track the first row of the tree diagram which leads to 0.375. The denominator consists of two parts, rolling above 3 under two different hypotheses: Following the path of rolling above 3 with 12-sided on the left leads to 0.375, which is the first part. In addition, tracking the other scenario of rolling above 3 with 6-sided on hand leads to 0.25. Hence: <img src="https://latex.codecogs.com/png.latex?%5Cdfrac%7B0.375%7D%7B0.375+0.25%7D%20=%200.6"></p>
+<p>This represents your new belief of having the 12-sided die on my left hand. If you tell me to roll the die again and construct a new tree diagram, the first column will consist of 0.6 and 0.4 and the following columns would be adjusted accordingly.</p>
+</section>
+<section id="derivation" class="level3">
+<h3 class="anchored" data-anchor-id="derivation">DERIVATION</h3>
+<p>Do you have to construct tree diagram each time? After all, even for this simple question the whole process takes a bit of time. With a little bit of algebra, you don’t have to: <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20=%20%5Cdfrac%7BP(A,B)%7D%7BP(B)%7D">. Multiplying both sides by the P(B): <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(A,B)"> and since P(A,B) = P(B,A)<br>
+<img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(B,A)"> which leads to <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(B%5C:%20%7C%5C%20A)%20P%20(A)"></p>
+<p>and voila: <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20=%20%5Cdfrac%7BP(B%5C:%20%7C%5C%20A)%20P(A)%7D%7BP(B)%7D"></p>
+<ul>
+<li>The left hand side is called <em>posterior probability</em>, and you may come across it in the form of P(hypothesis | data).</li>
+<li>The denominator on the right is total probability of the data, sometimes referred to as <em>marginal probability</em>.</li>
+<li>P(A) is your initial belief here, the <em>prior</em>.</li>
+<li>While P(B | A) is called <em>likelihood</em> which is the probability of the data under given the hypothesis.</li>
+</ul>
+<p>For our example: <img src="https://latex.codecogs.com/png.latex?P(12%5C%20sided%5C:%20%7C%5C%20%3E%203)%20=%20%5Cdfrac%7BP(%3E3%5C:%20%7C%5C%2012%5C%20sided)%20P(12%5C%20sided)%7D%7BP(%3E3)%7D"></p>
+</section>
+<section id="about-the-framework" class="level3">
+<h3 class="anchored" data-anchor-id="about-the-framework">ABOUT THE FRAMEWORK</h3>
+<p>You may see versions of this where instead of hypothesis there can be theory or parameters (and instead of data, evidence) but they all are the same initially. This type of approach has its advantages such as incorporating the prior knowledge: If I would roll the die again, you would make those calculations with new priors (learned from the first roll), making use of what you already know. It allows for priors that are subjective: Maybe I am known to favor my left hand so it is possible for you to have an initial belief that is not reflected as 50-50.</p>
+<p>I will talk more about this view in the future posts but if you’re interested, you can check probability and Bayesian chapter in each of the books below:</p>
+<ul>
+<li><em>Learning Statistics with R</em> by Daniel Navarro</li>
+<li><em>Philosophy of Quantitative Methods</em> by Brian D. Haig</li>
+<li><em>Doing Bayesian Data Analysis</em> by John K. Kruschke</li>
+<li><em>Improving Your Statistical Inferences</em> by Daniel Lakens</li>
+<li><em>Think Bayes</em> by Allen B. Downey</li>
+</ul>
+<p>and I believe I remember the example above from Mine Çetinkaya-Rundel.</p>
+
+
+</section>
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <category>probability</category>
+  <category>Bayesian</category>
+  <guid>https://yigitasik.github.io/posts/Bayes Theorem/</guid>
+  <pubDate>Sat, 04 Jan 2025 21:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

@@ -1,0 +1,775 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>YIGIT ASIK, Data Scientist</title>
+<link>https://yigitasik.github.io/#category=Sports%20Analytics</link>
+<atom:link href="https://yigitasik.github.io/index-sports analytics.xml" rel="self" type="application/rss+xml"/>
+<description>Anything related to statistics, analytics, and data science</description>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Thu, 09 Jan 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Bayesian Updating: Poisson &amp; Gamma</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>The following example is taken from Allen Downey’s <em>Think Bayes</em>. I believe this is a great one to show how to update priors.</p>
+<p>Downey takes a match between France and Crotia, played back in 2018 World Cup, that France won 4-2. Then, he aims to answer two questions:</p>
+<ul>
+<li>How confident we are about France being the better team?</li>
+<li>In a rematch, what is the probability that France would win again?</li>
+</ul>
+<p>I’ll only attempt to answer the first question so that you have a reason to check Downey’s book <a href="https://allendowney.github.io/ThinkBayes2/chap08.html"><em>Think Bayes</em></a>.</p>
+<div id="2b765bef-77ed-424a-8c87-5dff1f17fa19" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-6"></span>
+<span id="cb1-7"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> empiricaldist <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> emd</span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> st</span>
+<span id="cb1-9"></span>
+<span id="cb1-10">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.max_columns'</span>, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>)</span>
+<span id="cb1-11">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.width'</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">170</span>)</span>
+<span id="cb1-12">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.max_rows'</span>, <span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>)</span>
+<span id="cb1-13">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.float_format'</span>, <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.3f</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%</span> x)</span></code></pre></div>
+</div>
+<p>Starting out with certain assumptions:</p>
+<ul>
+<li>There is a goal scoring-rate for every team, goals per game (more specifically, per 90), which we will denote as lambda.</li>
+<li>A goal is equally likely during any minute of the game, regardless of strategy, tempo etc.<br>
+(This is also an assumption under a huge framework in basketball analytics, regularized adjusted plus-minus, wanted to point out just in case you follow my basketball analytics content)</li>
+<li>It isn’t possible for a team to score more than once during a single minute.</li>
+</ul>
+<div id="3ce03495-38c8-43a8-b791-1cf8c2408f35" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">lam <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># lambda, goal scoring rate (i.e. goals per game)</span></span>
+<span id="cb2-2">dist <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lam) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># poisson dist. with lambda = 1.4</span></span></code></pre></div>
+</div>
+<div id="ecb994db-4cf7-453a-8b91-e6b8489d3566" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># probability of scoring "k" goals (4 in this case)</span></span>
+<span id="cb3-2">k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span></span>
+<span id="cb3-3">dist.pmf(k).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># pmf evaluated at 4.</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<pre><code>0.039</code></pre>
+</div>
+</div>
+<p>So, there’s 3.9% chance to observe 4 goals, under the model above.</p>
+<div id="77a06bd9-bf53-4474-81c8-bcc5d13411dd" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">lam <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># goal scoring rate</span></span>
+<span id="cb5-2">goals <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.arange(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># possible values for goals</span></span>
+<span id="cb5-3">probas <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lam).pmf(goals)</span>
+<span id="cb5-4"></span>
+<span id="cb5-5">probas</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<pre><code>array([2.46596964e-01, 3.45235750e-01, 2.41665025e-01, 1.12777012e-01,
+       3.94719540e-02, 1.10521471e-02, 2.57883433e-03, 5.15766866e-04,
+       9.02592015e-05, 1.40403202e-05])</code></pre>
+</div>
+</div>
+<div id="31ed542a-e52e-4ff7-bb86-2b2be18d6284" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb7-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.barplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>goals, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>probas)</span>
+<span id="cb7-3"></span>
+<span id="cb7-4">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goals'</span>)</span>
+<span id="cb7-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>Text(0, 0.5, 'PMF')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-6-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s try to move the other way around: Estimate the goal-scoring rate from given goals.</p>
+<p>Downey has used data from previous World Cups to estimate that the each team scores 1.4 goals per game, approximately. Hence, it is reasonable to make mean of lambda 1.4.</p>
+<p>The goal scoring rate is continuous and it can’t take values below 0, hence a distribution that reflects this features would be great: Gamma distribution. Additionally, it’s easy to construct one since it only takes one parameter which is the mean which we already have value for.</p>
+<div id="3280f8f3-ea3d-424a-8c00-5c2bf56bdafb" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">alpha <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># mean of the distribution</span></span>
+<span id="cb9-2">lams <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># possible values of lam between 0 and 10</span></span>
+<span id="cb9-3">ps <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.gamma(alpha).pdf(lams) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># probability densities</span></span></code></pre></div>
+</div>
+<div id="d196d0a4-1eb6-43fd-9aab-7fa212078370" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">prior <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emd.Pmf(ps, lams)</span>
+<span id="cb10-2">prior.normalize() <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Pmf offers "normalize" method, which divides by the total probability of the data (i.e., probability under any parameter/hypothesis)</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>9.889360237140306</code></pre>
+</div>
+</div>
+<div id="0596370f-0ff6-4964-a0c7-ad2d4e5f3da3" class="cell" data-scrolled="true" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">df_prior <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame(prior.ps, prior.qs).rename(columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>{<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>:<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>})</span></code></pre></div>
+</div>
+<div id="168058b3-5ebb-4cd7-9167-a7ce99914f37" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb13-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.probas, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'orange'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>, linewidth<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb13-3"></span>
+<span id="cb13-4">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Prior Distribution'</span>)</span>
+<span id="cb13-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb13-6">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goals'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<pre><code>Text(0.5, 0, 'Goals')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-10-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="3f82f247-511c-4cad-9008-0ce51970a3ce" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(df_prior.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_prior.probas) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># mean of the distribution</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>1.4140818156118378</code></pre>
+</div>
+</div>
+<section id="updating-with-new-data" class="level3">
+<h3 class="anchored" data-anchor-id="updating-with-new-data">Updating with new data</h3>
+<p>So, our initial belief for France’s goal scoring rate (in this example, for other teams as well), goals per 90 mins, was 1.4. Then we observed 4 goals from France, should we still think that France’s goal scoring rate is 1.4? If not, how much should it change?</p>
+<div id="16a37c3c-c82c-4a72-908a-a5c32a3fee2f" class="cell" data-scrolled="true" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">lambdas <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> lams <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># different lambdas (different goal scoring rates)</span></span>
+<span id="cb17-2">k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># observed data</span></span>
+<span id="cb17-3">likelihood <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lambdas).pmf(k) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># for each lambda (for each parameter), how likely we are to see 4 goals</span></span>
+<span id="cb17-4">likelihood[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>array([0.00000000e+00, 3.77015591e-06, 5.45820502e-05, 2.50026149e-04])</code></pre>
+</div>
+</div>
+<div id="afa90707-a567-4ac3-8360-3ea0ac0d880a" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> likelihood</span>
+<span id="cb19-2">df_prior.head(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">probas</th>
+<th data-quarto-table-cell-role="th">likelihood</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.000</td>
+<td>0.000</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0.100</td>
+<td>0.041</td>
+<td>0.000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.200</td>
+<td>0.049</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0.300</td>
+<td>0.052</td>
+<td>0.000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="f6e1bdd7-d6ea-4534-87e1-d1f881af1228" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1">p_norm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emd.Pmf(df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>], df_prior.index)</span>
+<span id="cb20-2">p_norm.normalize()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>0.05015532557804499</code></pre>
+</div>
+</div>
+<div id="ec709091-cde2-42a7-8f4d-645cc73fb116" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1">df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> p_norm</span></code></pre></div>
+</div>
+<div id="ea0b4d07-dd92-4c2f-9235-2d903c9b872c" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb23-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.posterior, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'blue'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb23-3"></span>
+<span id="cb23-4">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goal scoring rate'</span>)</span>
+<span id="cb23-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb23-6">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'France'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>Text(0.5, 1.0, 'France')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-16-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Same steps for Crotia:</p>
+<div id="fbfb7066-e937-4665-a21b-132c741ecae8" class="cell" data-scrolled="true" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1">df_crotia <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df_prior[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>]].copy()</span>
+<span id="cb25-2">df_crotia.head(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">probas</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.000</td>
+<td>0.000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0.100</td>
+<td>0.041</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0.200</td>
+<td>0.049</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="d450c69e-8333-4e71-9ff6-4e40d568a39b" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1">k <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Crotia's number of goals in the match</span></span>
+<span id="cb26-2">likelihood_cro <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.poisson(lams).pmf(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb26-3">likelihood_cro[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>array([0.        , 0.00452419, 0.01637462, 0.03333682])</code></pre>
+</div>
+</div>
+<div id="dd30b773-feba-4e71-aea6-c7be522552c6" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1">df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> likelihood_cro</span></code></pre></div>
+</div>
+<div id="075dfbba-7d6c-4472-94dd-fedc08e95398" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1">p_norm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> emd.Pmf(df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'probas'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'likelihood'</span>], df_crotia.index)</span>
+<span id="cb29-2">p_norm.normalize()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>0.1609321178598705</code></pre>
+</div>
+</div>
+<div id="2f2e8fbc-9458-4e28-8fcf-f943869eddaa" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1">df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> p_norm</span></code></pre></div>
+</div>
+<div id="90473ed7-46ea-41f2-b9f7-c8deea14e2bc" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb32-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>], color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>, linestyle<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>)</span>
+<span id="cb32-3"></span>
+<span id="cb32-4">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goal scoring rate'</span>)</span>
+<span id="cb32-5">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb32-6">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Crotia'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>Text(0.5, 1.0, 'Crotia')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-22-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>How confident we are that France is the better team?</p>
+<div id="78210691" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(</span>
+<span id="cb34-2">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Mean of France: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(df_prior.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_prior.posterior).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span></span>
+<span id="cb34-3">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Mean of Crotia: '</span>, <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">str</span>(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">sum</span>(df_crotia.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_crotia.posterior).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb34-4">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean of France:  2.7 
+Mean of Crotia:  1.7</code></pre>
+</div>
+</div>
+<div id="b3f10805-123e-4c3d-9aab-50ce33beaa39" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb36-2">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_crotia[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>], color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Crotia'</span>)</span>
+<span id="cb36-3">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.lineplot(x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior.index, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df_prior[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>], color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'blue'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'France'</span>)</span>
+<span id="cb36-4"></span>
+<span id="cb36-5">g.set_xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Goals'</span>)</span>
+<span id="cb36-6">g.set_ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'PMF'</span>)</span>
+<span id="cb36-7">g.set_title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'France vs Crotia'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>Text(0.5, 1.0, 'France vs Crotia')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index_files/figure-html/cell-24-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Probability of superiority is a way to express an <em>effect size</em>. Here’s a great visualization tool that you can play with to make expression of effect sizes more intuitive: <a href="https://rpsychologist.com/cohend/">Interpreting Effect Sizes: An Interactive Visualization</a></p>
+<div id="7b91b63c-17cc-4767-8525-2e4fae7291bb" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Probability of superiority.</span></span>
+<span id="cb38-2"></span>
+<span id="cb38-3">france_proba <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb38-4"></span>
+<span id="cb38-5"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> df_prior.index.tolist():</span>
+<span id="cb38-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> j <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> df_crotia.index.tolist():</span>
+<span id="cb38-7">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> i <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> j:</span>
+<span id="cb38-8">            france_proba <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+=</span> df_prior.loc[i, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df_crotia.loc[j, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>]</span>
+<span id="cb38-9">        <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>:</span>
+<span id="cb38-10">            <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">continue</span></span>
+<span id="cb38-11"></span>
+<span id="cb38-12">france_proba.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<pre><code>0.75</code></pre>
+</div>
+</div>
+<p>Probability of superiority feels very intuitive: It is the probability of randomly sampled lambda for France being higher than randomly sampled lambda for Crotia. If there isn’t much overlap between two distributions, we are more confident that the one group (in this example, a team) is higher/lower than the other: Probability of superiority reflects that. You can use any tool (Python, R etc.) to simulate this, and I highly suggest it if you are not currently able to wrap your head around. Just generate different distributions and play with the idea.</p>
+<p>I didn’t include but there is one more reason why we used poisson and gamma distributions, it is related to something called <a href="https://www.sciencedirect.com/topics/computer-science/conjugate-prior"><em>conjugates</em></a> that I first came across while I was going through Daniel Lakens’ <a href="https://lakens.github.io/statistical_inferences/04-bayes.html">Improving Your Statistical Inferences: Bayesian statistics</a>. They make things computationally more feasible compared to the <em>grid</em> approach here.</p>
+<p>Examples (like this one) from many books can be found on my <a href="https://github.com/YigitAsik/learn-stats-with-sims">GitHub repo</a>, and I highly suggest you to go through Allen Downey’s books. Have a nice weekend.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Bayesian</category>
+  <category>Sports Analytics</category>
+  <guid>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/</guid>
+  <pubDate>Thu, 09 Jan 2025 21:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>
