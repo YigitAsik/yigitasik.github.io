@@ -6,7 +6,6 @@ website:
   title: "YIGIT ASIK, Data Scientist"
   site-url: https://yigitasik.github.io
   description: "Anything related to statistics, analytics, and data science"
-  margin-header: subscribe.html
   navbar:
     right:
       - about.qmd
