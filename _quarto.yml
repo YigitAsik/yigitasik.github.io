@@ -4,6 +4,8 @@ project:
 
 website:
   title: "YIGIT ASIK, Data Scientist"
+  site-url: https://yigitasik.github.io/
+  description: "Anything related to statistics, analytics, and data science"
   navbar:
     right:
       - about.qmd
@@ -15,6 +17,8 @@ website:
         href: https://bsky.app/profile/yigas.bsky.social
       - icon: youtube
         href: https://www.youtube.com/@yigasIRL
+      - icon: rss
+        href: index.xml
 format:
   html:
     theme:
