@@ -4,7 +4,6 @@ project:
 
 website:
   title: "YIGIT ASIK, Data Scientist"
-  site-url: https://yigitasik.github.io/
   description: "Anything related to statistics, analytics, and data science"
   navbar:
     right:
