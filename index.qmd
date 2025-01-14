@@ -1,4 +1,5 @@
 ---
+title: "YIGIT ASIK, Data Scientist"
 listing:
   contents: posts
   sort: "date desc"
@@ -6,6 +7,7 @@ listing:
   categories: true
   sort-ui: true
   filter-ui: true
+  feed: true
 page-layout: full
 title-block-banner: true
 ---
