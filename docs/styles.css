@@ -33,4 +33,5 @@ figcaption {
 input[value='Subscribe'] {
     font-size: 15px !important;
     background-color: rgb(26, 26, 26) !important;
+    border-color: #000000 !important;
 }
