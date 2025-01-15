@@ -27,10 +27,10 @@ figcaption {
 }
 
 #field_0::placeholder {
-    font-size: 13px;
+    font-size: 13px !important;
 }
 
 input[value='Subscribe'] {
-    font-size: 15px;
-    background-color: rgb(26, 26, 26)
+    font-size: 15px !important;
+    background-color: rgb(26, 26, 26) !important;
 }
