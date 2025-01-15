@@ -21,3 +21,16 @@ h3 {
 figcaption {
     text-align: center;
 }
+
+.quarto-listing-category.category-default, .quarto-listing-category-title {
+    transform: translateY(30px);
+}
+
+#field_0::placeholder {
+    font-size: 13px;
+}
+
+input[value='Subscribe'] {
+    font-size: 15px;
+    background-color: rgb(26, 26, 26)
+}
