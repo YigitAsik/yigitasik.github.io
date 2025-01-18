@@ -1,4 +1,5 @@
 ---
+include-before-body: subscribe.html
 listing:
   contents: posts
   sort: "date desc"

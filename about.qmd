@@ -1,5 +1,6 @@
 ---
 title: "About"
+include-before-body: subscribe.html
 about:
   template: jolla
   links:

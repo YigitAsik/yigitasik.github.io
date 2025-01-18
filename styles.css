@@ -11,18 +11,19 @@ h3 {
 }
 */
 .navbar-title {
-    text-transform:capitalize;
+    text-transform: capitalize;
 }
 
 .no-anchor.listing-title {
-    text-transform:capitalize;
+    text-transform: capitalize;
 }
 
 figcaption {
     text-align: center;
 }
 
-.quarto-listing-category.category-default, .quarto-listing-category-title {
+.quarto-listing-category.category-default,
+.quarto-listing-category-title {
     transform: translateY(30px);
 }
 
@@ -34,4 +35,14 @@ input[value='Subscribe'] {
     font-size: 15px !important;
     background-color: rgb(26, 26, 26) !important;
     border-color: #000000 !important;
+}
+
+main .inline-container {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    main .inline-container {
+        display: block;
+    }
 }
