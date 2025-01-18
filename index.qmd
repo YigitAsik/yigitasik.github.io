@@ -1,4 +1,5 @@
 ---
+margin-header: subscribe.html
 include-before-body: subscribe.html
 listing:
   contents: posts
