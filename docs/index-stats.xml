@@ -10,7 +10,516 @@
 <atom:link href="https://yigitasik.github.io/index-stats.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 11 Jan 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 17 Jan 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Understanding Distribution of log(odds ratio) Through Simulation</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div id="e9f50ba4-bbd2-48ca-a467-6fe5d747be9c" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> matplotlib.pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib.ticker <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> AutoMinorLocator</span>
+<span id="cb1-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-7"></span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> st</span></code></pre></div>
+</div>
+<p>I wanted to put this example out because one of my colleague asked me a question about result table of logistic regression. Back in the day while I was watching the <a href="https://www.youtube.com/watch?v=8nm0G-1uJzA">video</a>, Josh Starmer said distribution of log(odds ratio) is approximately normal and gave an idea of how to simulate. I didn’t end up his way of simulating, if you want that maybe you should follow the approach in the video but we actually both do the same thing.</p>
+<p>Let’s say we have the following information:</p>
+<div id="d0f4e0f8" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">cancer_gene_cb <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.crosstab([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>], [<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>], rownames<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mutated_gene'</span>], colnames<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'has_cancer'</span>])</span>
+<span id="cb2-2">cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">23</span></span>
+<span id="cb2-3">cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">117</span></span>
+<span id="cb2-4">cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">210</span></span>
+<span id="cb2-5">cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span></span>
+<span id="cb2-6"></span>
+<span id="cb2-7">cancer_gene_cb</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">has_cancer</th>
+<th data-quarto-table-cell-role="th">no</th>
+<th data-quarto-table-cell-role="th">yes</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mutated_gene</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">no</td>
+<td>210</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">yes</td>
+<td>117</td>
+<td>23</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Let’s represent the information in a different way. For the ones who are not familiar, <em>odds</em> is ratio of something happening to something not happening. When there’s <em>odds ratio</em>, it actually means <em>ratio of odds</em>.</p>
+<div id="09e7b107" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Given the mutated version of the gene, odds of having cancer</span></span>
+<span id="cb3-2">mutated_gene_odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 23 / 117</span></span>
+<span id="cb3-3"></span>
+<span id="cb3-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Given the wild version of the gene, odds of having cancer</span></span>
+<span id="cb3-5">wild_gene_odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> cancer_gene_cb.loc[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 6 / 210</span></span>
+<span id="cb3-6"></span>
+<span id="cb3-7">odds_ratio <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> mutated_gene_odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> wild_gene_odds <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># 6.88</span></span>
+<span id="cb3-8"></span>
+<span id="cb3-9">log_odds_ratio <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(np.log(odds_ratio), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb3-10"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(log_odds_ratio)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>1.93</code></pre>
+</div>
+</div>
+<p>It seems like people who have the mutated gene have higher odds (i.e., 6.88 times more likely) in terms of having cancer. But I wonder if this is statistically significant.<br>
+So, I want to do a simulation see how often would I see the <em>log(odds ratio)</em> of 1.93 under the assumption of no relationship between the two variables. If I don’t see it very often, I make sense to act as if there’s a difference.<br>
+</p>
+<p>Let’s go through a simulation:</p>
+<div id="cd5e4812-3a2e-4e57-9440-9c538e550fc0" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">li <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> [] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># creating an empty bag</span></span>
+<span id="cb5-2">sample_size <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">356</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># our sample size</span></span></code></pre></div>
+</div>
+<p>Creating 29 “cancer” written cards and putting them in a bag, representing the number of people with cancer in our sample.</p>
+<div id="35f2b2bc-4ed2-4f88-ab7f-f7353f8bbd44" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">29</span>):</span>
+<span id="cb6-2">    li.append(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'cancer'</span>)</span></code></pre></div>
+</div>
+<p>Creating 327 “no cancer” written cards and putting them in a bag, representing the number of people without cancer in our sample.</p>
+<div id="b33cc8bf-c241-4029-bd7a-abb71237ec9e" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> j <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">327</span>):</span>
+<span id="cb7-2">    li.append(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no cancer'</span>)</span></code></pre></div>
+</div>
+<div id="7a16fbdb-a3c6-462d-a980-1f8245d35b2a" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">mutated_version <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span>
+<span id="cb8-2">wild_version <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> []</span></code></pre></div>
+</div>
+<p>There are 140 people with cancer, 216 people without cancer. Under the assumption of no relationship between the cancer and the gene variant, I’d expect no difference between odds of cancer given the mutated gene and given the wild gene. In other words, knowing the gene variant does not provide any meaningful information.</p>
+<div id="df50bdf6-67bf-4b59-83e6-d20a482cff3f" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>):</span>
+<span id="cb9-2">    sampl_all <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.random.choice(li, size<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(li)) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  Shuffling the bag (cards)</span></span>
+<span id="cb9-3"></span>
+<span id="cb9-4">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  Taking 140 of them (representing the number of participants with mutated gene)</span></span>
+<span id="cb9-5">    sampl_mutated_version <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sampl_all[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">140</span>].tolist()</span>
+<span id="cb9-6">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># and calculating the odds in favor of cancer in the mutated gene group</span></span>
+<span id="cb9-7">    mutated_version.append(sampl_mutated_version.count(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'cancer'</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> sampl_mutated_version.count(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no cancer'</span>)) </span>
+<span id="cb9-8"></span>
+<span id="cb9-9">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  Taking rest of the cards (representing the number of participants in the non-mutated gene group)</span></span>
+<span id="cb9-10">    sampl_wild_version <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sampl_all[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">140</span>:].tolist() </span>
+<span id="cb9-11">    <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  and calculating the odds in favor of cancer in the non-mutated gene group</span></span>
+<span id="cb9-12">    wild_version.append(sampl_wild_version.count(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'cancer'</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> sampl_wild_version.count(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no cancer'</span>))</span></code></pre></div>
+</div>
+<div id="6395ba80-0733-4ad3-bc46-907e88526c3d" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">mutated_version_nd <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.array(mutated_version)</span>
+<span id="cb10-2">wild_version_nd <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.array(wild_version)</span></code></pre></div>
+</div>
+<div id="b9526e6c-20db-4541-80ff-406691a2aabd" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">odds_ratio <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> mutated_version_nd <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> wild_version_nd <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  Calculating odds ratio</span></span></code></pre></div>
+</div>
+<div id="6f8c47eb-5153-4122-a226-ac557dd318ca" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">log_odds_ratio <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.log(odds_ratio) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  Calculating log(odds ratio)</span></span></code></pre></div>
+</div>
+<div id="d7ade6ce-6260-4535-b8d9-a15acda905f7" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#  Plotting the distribution of log(odds ratio)</span></span>
+<span id="cb13-2"></span>
+<span id="cb13-3">fig <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>))</span>
+<span id="cb13-4">g <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sns.histplot(data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>log_odds_ratio, bins<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">40</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"orange"</span>, edgecolor<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>)</span>
+<span id="cb13-5"></span>
+<span id="cb13-6">g.xaxis.set_minor_locator(AutoMinorLocator())</span>
+<span id="cb13-7"></span>
+<span id="cb13-8">g.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"both"</span>, width<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb13-9">g.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"major"</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>)</span>
+<span id="cb13-10">g.tick_params(which<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"minor"</span>, length<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>)</span>
+<span id="cb13-11"></span>
+<span id="cb13-12">plt.show(g)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/index_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="63eaa46b" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(np.mean(log_odds_ratio), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span>
+<span id="cb14-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(np.std(log_odds_ratio), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-0.02
+0.42</code></pre>
+</div>
+</div>
+<p>Apparently it can be approximated by normal distribution. It is centered around zero with standard deviation of 0.42. Let’s see how often I would observe a result as or more extreme as 1.93.</p>
+<div id="b853e4a8-078c-46dd-80e6-5af02d3322b5" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> log_odds_ratio <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">abs</span>(val) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.93</span>]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(log_odds_ratio)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>0.0002</code></pre>
+</div>
+</div>
+<p>Since I simulate the whole thing under the assumption of no difference between groups, selected alpha level should correspond to my long-term type I error rate. If alpha = 0.05, I should observe 5% values to fall more than 2 standard deviation (approximately). Let’s check if it’s the case.</p>
+<div id="a6a20116" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>([val <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> val <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> log_odds_ratio <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">abs</span>(val) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> np.std(log_odds_ratio)]) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(log_odds_ratio)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>0.0479</code></pre>
+</div>
+</div>
+<p>I really tried to simplify things here, to not make a huge mess out of this but another approach would be to fit a theoretical distribution, such as normal distribution, since that’s what the Wald Test does and then step to integrating over the area that fall larger than absolute value of 1.93 . It also requires a few extra steps, such as calculating <em>estimated</em> standard deviation. For the ones who would like to play with the idea, here’s the <a href="https://youtu.be/8nm0G-1uJzA?si=9BhhXKQ9kPMZ2c7c">video link</a> again.</p>
+<p>Have a nice weekend.</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Inference</category>
+  <guid>https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/</guid>
+  <pubDate>Fri, 17 Jan 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Which p-values to expect under different realities?</title>
   <dc:creator>Yiğit Aşık</dc:creator>
