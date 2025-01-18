@@ -212,7 +212,7 @@ font-style: inherit;">print</span>(log_odds_ratio)</span></code></pre></div>
 </div>
 </div>
 <p>It seems like people who have the mutated gene have higher odds (i.e., 6.88 times more likely) in terms of having cancer. But I wonder if this is statistically significant.<br>
-So, I want to do a simulation see how often would I see the <em>log(odds ratio)</em> of 1.93 under the assumption of no relationship between the two variables. If I don’t see it very often, I make sense to act as if there’s a difference.<br>
+So, I want to do a simulation see how often would I see the <em>log(odds ratio)</em> of 1.93 under the assumption of no relationship between the two variables. If I don’t see it very often, it makes sense to act as if there’s a difference.<br>
 </p>
 <p>Let’s go through a simulation:</p>
 <div id="cd5e4812-3a2e-4e57-9440-9c538e550fc0" class="cell" data-execution_count="4">
