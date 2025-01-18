@@ -275,7 +275,7 @@ font-style: inherit;">=</span> []</span>
 background-color: null;
 font-style: inherit;">=</span> []</span></code></pre></div>
 </div>
-<p>There are 140 people with cancer, 216 people without cancer. Under the assumption of no relationship between the cancer and the gene variant, I’d expect no difference between odds of cancer given the mutated gene and given the wild gene. In other words, knowing the gene variant does not provide any meaningful information.</p>
+<p>There are 140 people with mutated variant of the gene, 216 people with wild variant. Under the assumption of no relationship between the cancer and the gene variant, I’d expect no difference between odds of cancer given the mutated gene and given the wild gene. In other words, knowing the gene variant does not provide any meaningful information.</p>
 <div id="df50bdf6-67bf-4b59-83e6-d20a482cff3f" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="cf" style="color: #003B4F;
 background-color: null;
