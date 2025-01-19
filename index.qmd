@@ -1,6 +1,6 @@
 ---
 margin-header: subscribe.html
-include-before-body: subscribe.html
+include-before-body: subscription.html
 listing:
   contents: posts
   sort: "date desc"
