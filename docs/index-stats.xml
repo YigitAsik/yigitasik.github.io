@@ -10,7 +10,826 @@
 <atom:link href="https://yigitasik.github.io/index-stats.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Fri, 17 Jan 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 24 Jan 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Understanding Model Fitting with Likelihood</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Model Fitting with Likelihood/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>In daily life, “probability” and “likelihood” are used interchangeably. But, they don’t refer to the same thing. I believe the most intuitive way to distinguish both is by thinking about the information you have while answering questions:</p>
+<ul>
+<li>Probability questions start with <em>known model</em> and <em>unknown data</em>. If someone asks you about the chance of seeing 6 heads in 10 coin tosses, you don’t have any observations. But, you have the model: You know the process that generates “heads” and “tails” and it’s parameter value (usually expressed as theta <em>θ</em>): 0.5.</li>
+<li>Let’s say you did 10 coin tosses and ended up with 9 heads. How likely you were to observe 9 if the coin was fair? In this situation, the data is <em>known</em> and the question refers to the underlying data generating process (i.e., refers to the parameter).</li>
+</ul>
+<p>We can use this type of approach and let the parameter values <em>vary</em> and calculate the likelihood of the data under each value of the parameter(s).</p>
+<div id="cell-2" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-6"></span>
+<span id="cb1-7"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sm</span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> empiricaldist <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> emd</span>
+<span id="cb1-9"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> st</span>
+<span id="cb1-10"></span>
+<span id="cb1-11"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> utils <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> ut</span>
+<span id="cb1-12"></span>
+<span id="cb1-13"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> warnings</span>
+<span id="cb1-14"></span>
+<span id="cb1-15">warnings.filterwarnings(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ignore'</span>)</span></code></pre></div>
+</div>
+<div id="cell-3" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">possum <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.read_csv(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'possum.csv'</span>, usecols<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'pop'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>])</span>
+<span id="cb2-2">df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> possum.copy()</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">pop</th>
+<th data-quarto-table-cell-role="th">tail_l</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Vic</td>
+<td>36.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Vic</td>
+<td>36.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Vic</td>
+<td>39.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Vic</td>
+<td>38.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Vic</td>
+<td>36.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>We’ll use possum data, where each row corresponds to features of a possum from Australia and New Guinea. Let’s attempt to predict which region a possum is from as a function of tail length.</p>
+<p>I assume basic knowledge of logistic regression, which we’ll use to model the relationship between our predictor and the binary target variable.</p>
+<div id="cell-6" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">qs_cept <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">241</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># possible values for intercept (beta_0)</span></span>
+<span id="cb3-2">qs_slope <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">81</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># possible values for slope (beta_1)</span></span></code></pre></div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(qs_cept[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\n</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span>, qs_slope[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[-3.    -2.975 -2.95  -2.925 -2.9  ] 
+ [-1.    -0.975 -0.95  -0.925 -0.9  ]</code></pre>
+</div>
+</div>
+<div id="cell-8" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">df_likeli <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame(index<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(qs_cept)), columns<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">range</span>(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">len</span>(qs_slope)))</span>
+<span id="cb6-2">df_likeli.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> qs_cept</span>
+<span id="cb6-3">df_likeli.columns <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> qs_slope</span></code></pre></div>
+</div>
+<div id="cell-9" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">df_likeli.fillna(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, inplace<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb7-2"></span>
+<span id="cb7-3">df_likeli.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">-1.000</th>
+<th data-quarto-table-cell-role="th">-0.975</th>
+<th data-quarto-table-cell-role="th">-0.950</th>
+<th data-quarto-table-cell-role="th">-0.925</th>
+<th data-quarto-table-cell-role="th">-0.900</th>
+<th data-quarto-table-cell-role="th">-0.875</th>
+<th data-quarto-table-cell-role="th">-0.850</th>
+<th data-quarto-table-cell-role="th">-0.825</th>
+<th data-quarto-table-cell-role="th">-0.800</th>
+<th data-quarto-table-cell-role="th">-0.775</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">0.775</th>
+<th data-quarto-table-cell-role="th">0.800</th>
+<th data-quarto-table-cell-role="th">0.825</th>
+<th data-quarto-table-cell-role="th">0.850</th>
+<th data-quarto-table-cell-role="th">0.875</th>
+<th data-quarto-table-cell-role="th">0.900</th>
+<th data-quarto-table-cell-role="th">0.925</th>
+<th data-quarto-table-cell-role="th">0.950</th>
+<th data-quarto-table-cell-role="th">0.975</th>
+<th data-quarto-table-cell-role="th">1.000</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-3.000</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>...</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">-2.975</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>...</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-2.950</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>...</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">-2.925</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>...</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-2.900</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>...</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 81 columns</p>
+</div>
+</div>
+</div>
+<p>So, what I have done is I created grid of equally spaced values both for intercept and the slope. I put them into a dataframe where columns represent possible values for slope and indices represent possible values for intercept.</p>
+<p>Now, I ask this question: For each pair of intercept and slope, b0 and b1, how likely I am to see the observed data?</p>
+<div id="cell-12" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'pop'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'pop'</span>].<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">apply</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span> x <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Vic'</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span></code></pre></div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Centering data</span></span>
+<span id="cb9-2"></span>
+<span id="cb9-3">offset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>].mean().<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>()</span>
+<span id="cb9-4">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'x'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> offset</span>
+<span id="cb9-5">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'pop'</span>]</span>
+<span id="cb9-6"></span>
+<span id="cb9-7"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># I refer our predictor as x from now on (for convenience), y becomes our target variable which takes 1 if possum is from Victoria region and 0 otherwise.</span></span></code></pre></div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">agg_data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df.groupby(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'x'</span>)[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>].agg([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sum'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'count'</span>])</span>
+<span id="cb10-2">agg_data.head(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>).T</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">x</th>
+<th data-quarto-table-cell-role="th">-5.0</th>
+<th data-quarto-table-cell-role="th">-3.5</th>
+<th data-quarto-table-cell-role="th">-3.0</th>
+<th data-quarto-table-cell-role="th">-2.5</th>
+<th data-quarto-table-cell-role="th">-2.0</th>
+<th data-quarto-table-cell-role="th">-1.5</th>
+<th data-quarto-table-cell-role="th">-1.0</th>
+<th data-quarto-table-cell-role="th">-0.5</th>
+<th data-quarto-table-cell-role="th">0.0</th>
+<th data-quarto-table-cell-role="th">0.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">sum</td>
+<td>2</td>
+<td>1</td>
+<td>4</td>
+<td>2</td>
+<td>6</td>
+<td>6</td>
+<td>9</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">count</td>
+<td>2</td>
+<td>1</td>
+<td>5</td>
+<td>2</td>
+<td>9</td>
+<td>7</td>
+<td>13</td>
+<td>12</td>
+<td>6</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-15" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">ns <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> agg_data[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'count'</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># represents number of observation with corresponding x values</span></span>
+<span id="cb11-2">ks <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> agg_data[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'sum'</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># represents successes, which means Victoria region</span></span></code></pre></div>
+</div>
+<p>People get confused, rightfully, when they hear logistic regression getting mentioned as a linear model since all they see is an S-shaped function in a classic graph where x-axis represents the predictor and y-axis represents the probability. But that squiggle is a result of a transformation of log odds into probabilities. You may have deduced that before if you have taken a look at the equation:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20log_e(%5Cfrac%7Bp_i%7D%7B1%20-%20p_i%7D)%20=%20%5Cbeta_0%20+%20%5Cbeta_1%20x_%7B1i%7D%20+%20...%20+%20%5Cbeta_k%20x_%7Bk_i%7D"></p>
+<p>However, we know that odds can be expressed as probabilities, so we’ll make that transformation.</p>
+<p>For representation let’s select an intercept and a slope:</p>
+<div id="cell-18" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">cept <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb12-2">slope <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span></code></pre></div>
+</div>
+<div id="cell-19" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">x_values <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> agg_data.index</span>
+<span id="cb13-2">log_odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cept <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> slope <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> x_values</span>
+<span id="cb13-3">odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.exp(log_odds)</span>
+<span id="cb13-4">ps <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> (odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb13-5">ps[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>] <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Probabilities coming from the model</span></span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>Index([0.006692850924284856, 0.029312230751356316,  0.04742587317756679,
+        0.07585818002124356,  0.11920292202211755,  0.18242552380635632],
+      dtype='float64', name='x')</code></pre>
+</div>
+</div>
+<p>How likely I am to observe k success in n trials with <img src="https://latex.codecogs.com/png.latex?p_i"> where <img src="https://latex.codecogs.com/png.latex?p_i"> comes from the model above.</p>
+<div id="cell-21" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># How likely I am to observe k success in n trials with p_i where p_i comes from model</span></span>
+<span id="cb15-2">likelis <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.binom.pmf(ks, ns, ps)</span>
+<span id="cb15-3">likelis[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>]</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>array([4.47942535e-05, 2.93122308e-02, 2.40951774e-05, 5.75446348e-03,
+       1.64675234e-04, 2.10930303e-04])</code></pre>
+</div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Taking the product for whole data</span></span>
+<span id="cb17-2">likelis.prod()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>6.58621661515704e-55</code></pre>
+</div>
+</div>
+<p>Let’s take a look at the fit:</p>
+<div id="cell-24" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>))</span>
+<span id="cb19-2"></span>
+<span id="cb19-3">plt.plot(x_values<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>offset, ps, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'model'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'C1'</span>)</span>
+<span id="cb19-4">plt.scatter(df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'x'</span>]<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>offset, df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>], s<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'data'</span>)</span>
+<span id="cb19-5"></span>
+<span id="cb19-6">ut.decorate()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Model Fitting with Likelihood/index_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This was for only one pair of intercept and slope, and it seems like we can do better. We calculated the likelihood for education purposes here but in general, likelihoods by themselves does not mean much (it’s relatively a ). Let’s try other possible pairs for our parameters and compare the likelihoods of each to take the one that maximizes the likelihood of the observed data.</p>
+<div id="cell-26" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> scipy.special <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> expit</span>
+<span id="cb20-2"></span>
+<span id="cb20-3">likelihood <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df_likeli.copy()</span>
+<span id="cb20-4"></span>
+<span id="cb20-5"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> cept <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> likelihood.index:</span>
+<span id="cb20-6">    <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">for</span> slope <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">in</span> likelihood.columns:</span>
+<span id="cb20-7">        probs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> expit(cept <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> slope <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> x_values) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># transformation to probabilities</span></span>
+<span id="cb20-8">        likelis <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> st.binom.pmf(ks, ns, probs) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># likelihood of each observation</span></span>
+<span id="cb20-9">        likelihood.loc[likelihood.index <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> cept, slope] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> likelis.prod() <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># likelihood of the whole data under the selected pair of parameter values</span></span></code></pre></div>
+</div>
+<div id="cell-27" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1">row, col <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> likelihood.stack().idxmax()</span>
+<span id="cb21-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(row, col)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>-0.32499999999999973 -0.7</code></pre>
+</div>
+</div>
+<p>This is the pair that maximizes the likelihood.</p>
+<div id="cell-29" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1">cept <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> row</span>
+<span id="cb23-2">slope <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> col</span>
+<span id="cb23-3"></span>
+<span id="cb23-4">log_odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cept <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> slope <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> x_values</span>
+<span id="cb23-5">odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.exp(log_odds)</span>
+<span id="cb23-6">ps <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> (odds <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span></code></pre></div>
+</div>
+<div id="cell-30" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>))</span>
+<span id="cb24-2"></span>
+<span id="cb24-3">plt.plot(x_values<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>offset, ps, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'model'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'C1'</span>)</span>
+<span id="cb24-4">plt.scatter(df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'x'</span>]<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span>offset, df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y'</span>], s<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'data'</span>)</span>
+<span id="cb24-5"></span>
+<span id="cb24-6">ut.decorate()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Model Fitting with Likelihood/index_files/figure-html/cell-20-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s check our parameter estimates with the help of statsmodels:</p>
+<div id="cell-32" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.formula.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> smf</span>
+<span id="cb25-2"></span>
+<span id="cb25-3">formula <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'y ~ x'</span></span>
+<span id="cb25-4">results <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.logit(formula, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df).fit(disp<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">False</span>)</span>
+<span id="cb25-5">results.params</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>Intercept   -0.320498
+x           -0.699641
+dtype: float64</code></pre>
+</div>
+</div>
+<p>We didn’t get those exact values since we used <em>grid approximation</em>, and the grid that I created didn’t include those exact values. Let’s drop a few details here:</p>
+<ul>
+<li>As the parameter space gets larger, the computational process becomes slower. So, there’s that trade-off between precision and time.</li>
+<li>We only had two parameters to estimate and that’s OK for grid approach. However, once you start to get more than three, number of possible combination for parameters gets incredibly large which makes grid approach infeasible.</li>
+<li>Another thing is related to the number of observation while calculating the likelihood: When you try to take the product of the likelihoods when there are many observations, you may ran into a issue called <em>underflow</em>, where computer has trouble multiplying bunch of values around zero. Hence, <em>log likelihood</em> comes to rescue: Logarithms takes the values around zero away from zero, thus solving the underflow problem.</li>
+</ul>
+<p>I hope this example made likelihoods more intuitive. There’s more to know about them: Are they probability densities? Are they probability masses? Or are they both? That’s for a whole different post, things can get messy in a second. However, it’s important to understand likelihoods in the context above, since they can be used to update our beliefs about parameters which is what we do with Bayesian methods.</p>
+<p>As usual, have a nice weekend :)</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <guid>https://yigitasik.github.io/posts/Model Fitting with Likelihood/</guid>
+  <pubDate>Fri, 24 Jan 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Understanding Distribution of log(odds ratio) Through Simulation</title>
   <dc:creator>Yiğit Aşık</dc:creator>

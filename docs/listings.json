@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Model Fitting with Likelihood/index.html",
       "/posts/Understanding distribution of log(odds ratio) through simulation/index.html",
       "/posts/p-value distribution/index.html",
       "/posts/Bayesian Updating with Poisson and Gamma/index.html",
