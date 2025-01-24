@@ -307,7 +307,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>We’ll use possum data, where each row corresponds to features of a possum from Australia and New Guinea. Let’s attempt to predict which region a possum is from as a function of tail length.</p>
+<p>We’ll use possum data, where each row corresponds to features of a possum from Australia and New Guinea. Let’s attempt to predict which region a possum is from as a function of tail length. (You can get the data from <a href="https://www.openintro.org/data/index.php?data=possum">here</a>)</p>
 <p>I assume basic knowledge of logistic regression, which we’ll use to model the relationship between our predictor and the binary target variable.</p>
 <div id="cell-6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>qs_cept <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">241</span>) <span class="co"># possible values for intercept (beta_0)</span></span>
@@ -603,7 +603,7 @@ window.Quarto = {
 <div id="cell-24" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">4</span>))</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plt.plot(x_values<span class="op">+</span>offset, ps, label<span class="op">=</span><span class="st">'model'</span>, color<span class="op">=</span><span class="st">'C1'</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>plt.plot(x_values<span class="op">+</span>offset, ps, label<span class="op">=</span><span class="st">'random selected model'</span>, color<span class="op">=</span><span class="st">'C1'</span>)</span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>plt.scatter(df[<span class="st">'x'</span>]<span class="op">+</span>offset, df[<span class="st">'y'</span>], s<span class="op">=</span><span class="dv">30</span>, label<span class="op">=</span><span class="st">'data'</span>)</span>
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>ut.decorate()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -615,7 +615,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>This was for only one pair of intercept and slope, and it seems like we can do better. We calculated the likelihood for education purposes here but in general, likelihoods by themselves does not mean much (it’s relatively a ). Let’s try other possible pairs for our parameters and compare the likelihoods of each to take the one that maximizes the likelihood of the observed data.</p>
+<p>This was for only one pair of intercept and slope, and it seems like we can do better. We calculated the likelihood for educational purposes here but in general, likelihoods by themselves does not mean much (I try to choose my words carefully here). Let’s try other possible pairs for our parameters and compare the likelihoods of each to take the one that maximizes the likelihood of the observed data.</p>
 <div id="cell-26" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> expit</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>

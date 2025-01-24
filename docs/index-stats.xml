@@ -143,7 +143,7 @@ font-style: inherit;">=</span> possum.copy()</span>
 </div>
 </div>
 </div>
-<p>We’ll use possum data, where each row corresponds to features of a possum from Australia and New Guinea. Let’s attempt to predict which region a possum is from as a function of tail length.</p>
+<p>We’ll use possum data, where each row corresponds to features of a possum from Australia and New Guinea. Let’s attempt to predict which region a possum is from as a function of tail length. (You can get the data from <a href="https://www.openintro.org/data/index.php?data=possum">here</a>)</p>
 <p>I assume basic knowledge of logistic regression, which we’ll use to model the relationship between our predictor and the binary target variable.</p>
 <div id="cell-6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">qs_cept <span class="op" style="color: #5E5E5E;
@@ -622,7 +622,7 @@ font-style: inherit;">+</span>offset, ps, label<span class="op" style="color: #5
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
-font-style: inherit;">'model'</span>, color<span class="op" style="color: #5E5E5E;
+font-style: inherit;">'random selected model'</span>, color<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="st" style="color: #20794D;
 background-color: null;
@@ -652,7 +652,7 @@ font-style: inherit;">'data'</span>)</span>
 </div>
 </div>
 </div>
-<p>This was for only one pair of intercept and slope, and it seems like we can do better. We calculated the likelihood for education purposes here but in general, likelihoods by themselves does not mean much (it’s relatively a ). Let’s try other possible pairs for our parameters and compare the likelihoods of each to take the one that maximizes the likelihood of the observed data.</p>
+<p>This was for only one pair of intercept and slope, and it seems like we can do better. We calculated the likelihood for educational purposes here but in general, likelihoods by themselves does not mean much (I try to choose my words carefully here). Let’s try other possible pairs for our parameters and compare the likelihoods of each to take the one that maximizes the likelihood of the observed data.</p>
 <div id="cell-26" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><span class="im" style="color: #00769E;
 background-color: null;
