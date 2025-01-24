@@ -675,7 +675,7 @@ dtype: float64</code></pre>
 <ul>
 <li>As the parameter space gets larger, the computational process becomes slower. So, there’s that trade-off between precision and time.</li>
 <li>We only had two parameters to estimate and that’s OK for grid approach. However, once you start to get more than three, number of possible combination for parameters gets incredibly large which makes grid approach infeasible.</li>
-<li>Another thing is related to the number of observation while calculating the likelihood: When you try to take the product of the likelihoods when there are many observations, you may ran into a issue called <em>underflow</em>, where computer has trouble multiplying bunch of values around zero. Hence, <em>log likelihood</em> comes to rescue: Logarithms takes the values around zero away from zero, thus solving the underflow problem.</li>
+<li>Another thing is related to the number of observation while calculating the likelihood for the whole data: When you try to take the product of the likelihoods with many observations, you may ran into an issue called <em>underflow</em>, where computer has trouble multiplying bunch of values around zero. Hence, <em>log likelihood</em> comes to rescue: Logarithms takes the values around zero away from zero, thus solving the underflow problem.</li>
 </ul>
 <p>I hope this example made likelihoods more intuitive. There’s more to know about them: Are they probability densities? Are they probability masses? Or are they both? That’s for a whole different post, things can get messy in a second. However, it’s important to understand likelihoods in the context above, since they can be used to update our beliefs about parameters which is what we do with Bayesian methods.</p>
 <p>As usual, have a nice weekend :)</p>
