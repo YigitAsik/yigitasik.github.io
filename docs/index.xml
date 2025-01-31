@@ -9,8 +9,42 @@
 <link>https://yigitasik.github.io/</link>
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
-<generator>quarto-1.6.39</generator>
-<lastBuildDate>Fri, 24 Jan 2025 21:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.40</generator>
+<lastBuildDate>Thu, 30 Jan 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Man on a Mission: Starting 2025</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Man on a Mission - January 2025/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>As I <a href="https://yigitasik.github.io/posts/Man%20on%20a%20Mission%20-%20Starting%202025/">promised at the start of the year</a>, here’s what I have studied this month.</p>
+<hr>
+<section id="statistics" class="level3">
+<h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
+<p>This month I finished <a href="https://allendowney.github.io/ThinkBayes2/"><em>Think Bayes</em></a> way before than I anticipated. I really enjoyed it but wanted to dive a bit deep so moved on to John Kruschke’s <a href="https://www.sciencedirect.com/book/9780124058880/doing-bayesian-data-analysis#book-info"><em>Doing Bayesian Data Analysis</em></a> and I’m glad I did it. The book starts with main ideas of Bayesian view, <em>“Bayesian inference is reallocation of credibility across possibilities</em> where credibility stands for probability and possibilities stand for possible values that our parameters can take when we attempt to model. After this introduction Kruschke talks about what probabilities are, providing intuitive description for the distinction between <em>probability mass</em> and <em>probability density</em>. If you have trouble understanding probability distributions, you may want to take a look at it.</p>
+<p>Bayesian stuff aside, I really enjoyed the interpretation of mean as minimized variance alongside how we end up with median and mode when we change the distance measure (e.g., l2 norm to l1 etc.). Also, I coded Metropolis Algorithm (1-D) by using the example in the book. It’s included on my GitHub under <em>learn-stats-with-sims</em>.</p>
+<p>I’m currently at chapter 9, going through hierarchical models. We’ll see if the book keeps me engaged throughout the upcoming chapters as well.</p>
+<hr>
+</section>
+<section id="deep-learning-dl" class="level3">
+<h3 class="anchored" data-anchor-id="deep-learning-dl">Deep Learning (DL)</h3>
+<p>Well, I haven’t done much for the DL. Throughout the year, amount of time I spent on statistics will gradually decline to open up space for DL. I’ve just started to <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/"><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em></a>, skimming through Scikit-Learn part to start with Keras and Tensorflow while not missing out on anything (despite using sklearn pretty often, I don’t want to miss a useful thing that may come in handy in the future).</p>
+<hr>
+<p>In terms of sports analytics or production level data science, I haven’t done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle front end, so I count that as a win as well.</p>
+<p>See you next month!</p>
+
+
+</section>
+
+ ]]></description>
+  <category>update</category>
+  <guid>https://yigitasik.github.io/posts/Man on a Mission - January 2025/</guid>
+  <pubDate>Thu, 30 Jan 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Understanding Model Fitting with Likelihood</title>
   <dc:creator>Yiğit Aşık</dc:creator>

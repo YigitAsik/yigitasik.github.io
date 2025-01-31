@@ -9,7 +9,7 @@
 <link>https://yigitasik.github.io/#category=Sports%20Analytics</link>
 <atom:link href="https://yigitasik.github.io/index-sports analytics.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
-<generator>quarto-1.6.39</generator>
+<generator>quarto-1.6.40</generator>
 <lastBuildDate>Thu, 09 Jan 2025 21:00:00 GMT</lastBuildDate>
 <item>
   <title>Bayesian Updating: Poisson &amp; Gamma</title>
