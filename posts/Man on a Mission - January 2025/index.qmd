@@ -25,6 +25,6 @@ Well, I haven't done much for the DL. Throughout the year, amount of time I spen
 
 ---
 
-In terms of sports analytics or production level data science, I haven't done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle front end, so I count that as a win as well.
+In terms of sports analytics or production level data science, I haven't done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle the front-end, so I count that as a win as well.
 
 See you next month!
