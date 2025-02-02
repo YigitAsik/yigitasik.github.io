@@ -1899,6 +1899,7 @@ dtype: float64</code></pre>
 
  ]]></description>
   <category>Stats</category>
+  <category>Bayesian</category>
   <guid>https://yigitasik.github.io/posts/Model Fitting with Likelihood/</guid>
   <pubDate>Fri, 24 Jan 2025 21:00:00 GMT</pubDate>
 </item>
