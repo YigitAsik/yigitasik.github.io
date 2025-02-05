@@ -5,7 +5,7 @@ date: "2025-02-05"
 categories: [Sports Analytics, 2-cents]
 ---
 
-![Excerpt from QA done by The F5 with Mike Beouy](the_f5_inpredictable.png)
+![Excerpt from the Q&A done by The F5 with Mike Beouy](the_f5_inpredictable.png)
 
 ---
 
