@@ -9,8 +9,55 @@
 <link>https://yigitasik.github.io/</link>
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
-<generator>quarto-1.6.40</generator>
-<lastBuildDate>Sat, 01 Feb 2025 21:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Tue, 04 Feb 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>How Basketball Analytics May Have An Effect on Your Analytics Job</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/the_f5_inpredictable.png" class="img-fluid figure-img"></p>
+<figcaption>Excerpt from QA done by The F5 with Mike Beouy</figcaption>
+</figure>
+</div>
+<hr>
+<p>I don’t know if you have watched <a href="https://www.imdb.com/title/tt1210166/"><em>Moneyball</em></a> (if you haven’t, you should), there are great monologues (mainly from Jonah Hill’s character) that point out the main purpose of sports analytics:</p>
+<blockquote class="blockquote">
+<p>People who run ball clubs, they think in terms of buying players. Your goal shouldn’t be to buy players, your goal should be to buy wins. … This is building in all the intelligence that we have to project players. <em>It’s about getting things down to one number.</em></p>
+</blockquote>
+<p>Yes, the holy grail would be a single number that summarizes a player’s contribution to the team. This problem is similar to questions that you may end up trying to find an answer for, during your day to day job as a data scientist.</p>
+<section id="problem-of-dividing-credits" class="level3">
+<h3 class="anchored" data-anchor-id="problem-of-dividing-credits">Problem of Dividing Credits</h3>
+<p>In its core, problem of assigning a number that represents a player’s contribution to the team (when he’s on the court) is about dividing credit among players: We scored 30 points with these 5 players, allowed 20. How should I distribute the net rating of 10 among these 5 players?</p>
+<p>Problem of dividing credit comes up when you’re a data scientist in a company where you try to figure out how much each product contributes to the revenue of a customer: You just replace the players with the products and tie it to revenue instead of points, and it’s essentially the same problem.</p>
+</section>
+<section id="future-projection" class="level3">
+<h3 class="anchored" data-anchor-id="future-projection">Future Projection</h3>
+<p>Not every player is the same when they are drafted to the NBA: Some players have a very high ceiling, and it might be wise to keep them. This type of career projection is relevant in a company setting where it might be beneficial to project customers: Not every customer is the same, since some of them hold more potential in terms of revenue generation. It might be wise to identify them for retention purposes and campaign targeting.</p>
+</section>
+<section id="segmentation" class="level3">
+<h3 class="anchored" data-anchor-id="segmentation">Segmentation</h3>
+<p>Clustering players based on their effectivess and style of play serves variety of purposes that ranges from identifying which players are more fit to certain play types to leading the transfer negotiations (e.g., finding similar players to replace the player that left).</p>
+<hr>
+<p>In summary, trying to solve sport analytics problems may aid the problem solving processes in your daily job (for example, in a banking setting), and you may end up making a difference by adapting approaches that you have learned in sports analytics to your company setting.</p>
+<p>Just in case you don’t want to take my word, take the words from Mike Beuoy (the mind behind <a href="https://www.inpredictable.com/">the Inpredictable</a>). If you’re interested in basketball analytics, you should definitely subscribe to <a href="https://thef5.substack.com/">the F5</a>, where the excerpt above is taken from.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Sports Analytics</category>
+  <category>2-cents</category>
+  <guid>https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/</guid>
+  <pubDate>Tue, 04 Feb 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Bayesian Way - Predictions Out of Posterior Distribution</title>
   <dc:creator>Yiğit Aşık</dc:creator>

@@ -1,0 +1,37 @@
+---
+title: "How Basketball Analytics May Have An Effect on Your Analytics Job"
+author: "Yiğit Aşık"
+date: "2025-02-05"
+categories: [Sports Analytics, 2-cents]
+---
+
+![Excerpt from QA done by The F5 with Mike Beouy](the_f5_inpredictable.png)
+
+---
+
+I don't know if you have watched [*Moneyball*](https://www.imdb.com/title/tt1210166/) (if you haven't, you should), there are great monologues (mainly from Jonah Hill's character) that point out the main purpose of sports analytics:
+
+> People who run ball clubs, they think in terms of buying players. Your goal shouldn't be to buy players, your goal should be to buy wins.
+> ... This is building in all the intelligence that we have to project players. *It's about getting things down to one number.*
+
+Yes, the holy grail would be a single number that summarizes a player's contribution to the team. This problem is similar to questions that you may end up trying to find an answer for, during your day to day job as a data scientist.
+
+### Problem of Dividing Credits
+
+In its core, problem of assigning a number that represents a player's contribution to the team (when he's on the court) is about dividing credit among players: We scored 30 points with these 5 players, allowed 20. How should I distribute the net rating of 10 among these 5 players? 
+
+Problem of dividing credit comes up when you're a data scientist in a company where you try to figure out how much each product contributes to the revenue of a customer: You just replace the players with the products and tie it to revenue instead of points, and it's essentially the same problem.
+
+### Future Projection
+
+Not every player is the same when they are drafted to the NBA: Some players have a very high ceiling, and it might be wise to keep them. This type of career projection is relevant in a company setting where it might be beneficial to project customers: Not every customer is the same, since some of them hold more potential in terms of revenue generation. It might be wise to identify them for retention purposes and campaign targeting.
+
+### Segmentation
+
+Clustering players based on their effectivess and style of play serves variety of purposes that ranges from identifying which players are more fit to certain play types to leading the transfer negotiations (e.g., finding similar players to replace the player that left).
+
+---
+
+In summary, trying to solve sport analytics problems may aid the problem solving processes in your daily job (for example, in a banking setting), and you may end up making a difference by adapting approaches that you have learned in sports analytics to your company setting.
+
+Just in case you don't want to take my word, take the words from Mike Beuoy (the mind behind [the Inpredictable](https://www.inpredictable.com/)). If you're interested in basketball analytics, you should definitely subscribe to [the F5](https://thef5.substack.com/), where the excerpt above is taken from.

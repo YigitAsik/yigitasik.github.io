@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yiğit Aşık">
-<meta name="dcterms.date" content="2024-12-30">
+<meta name="dcterms.date" content="2025-02-05">
 
-<title>What Happens to Sample Statistics? – YIGIT ASIK, Data Scientist</title>
+<title>How Basketball Analytics May Have An Effect on Your Analytics Job – YIGIT ASIK, Data Scientist</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,40 +21,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -164,9 +130,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">What Happens to Sample Statistics?</h1>
+      <h1 class="title">How Basketball Analytics May Have An Effect on Your Analytics Job</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">Stats</div>
+                <div class="quarto-category">Sports Analytics</div>
+                <div class="quarto-category">2-cents</div>
               </div>
                   </div>
   </div>
@@ -184,7 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">December 30, 2024</p>
+        <p class="date">February 5, 2025</p>
       </div>
     </div>
     
@@ -203,249 +170,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p>Let’s start from the basics: The idea is to gather data to make an inference about the population. We use what we know (sample data) to estimate what we don’t (population).</p>
-<p>So, let’s see what happens as one collects more data.</p>
-<div id="cell-2" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="cell-3" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>, <span class="dv">101</span>, <span class="dv">10</span>):</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    sampled <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">100</span>, scale<span class="op">=</span><span class="dv">15</span>, size<span class="op">=</span>n)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Sampling '</span> <span class="op">+</span> <span class="bu">str</span>(n) <span class="op">+</span> <span class="st">' observations'</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Mean: '</span> <span class="op">+</span> <span class="bu">str</span>(np.mean(sampled)))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Standard Deviation '</span> <span class="op">+</span> <span class="bu">str</span>(np.std(sampled)))</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Sampling 10 observations
-Mean: 96.54930308046485
-Standard Deviation 17.69744525686926
-
-
-Sampling 20 observations
-Mean: 95.26529645787349
-Standard Deviation 13.557714188035797
-
-
-Sampling 30 observations
-Mean: 99.59631039122944
-Standard Deviation 16.67387851610786
-
-
-Sampling 40 observations
-Mean: 94.76579341950723
-Standard Deviation 18.06257861698366
-
-
-Sampling 50 observations
-Mean: 99.61537083458882
-Standard Deviation 14.897878602988285
-
-
-Sampling 60 observations
-Mean: 98.68203398707892
-Standard Deviation 14.644083079076118
-
-
-Sampling 70 observations
-Mean: 100.36682454658889
-Standard Deviation 15.427573719883997
-
-
-Sampling 80 observations
-Mean: 101.00471630426532
-Standard Deviation 12.678064261146886
-
-
-Sampling 90 observations
-Mean: 102.7631649616841
-Standard Deviation 13.03915710302493
-
-
-Sampling 100 observations
-Mean: 99.17823535292733
-Standard Deviation 14.951583438089918
-
-</code></pre>
-</div>
-</div>
-<p>As one increases the sample size taken from the population, sample statistics will <em>approach</em> towards the <strong>population parameter</strong>.<br>
-<strong>DOES NOT NECESSARILY DECREASE!</strong> (do not confuse std_dev and std_err) As one can see from the example above!</p>
-<p>But <em>standard error</em> <strong>WILL</strong> decrease as the sample size increases. It should make sense intuitively: I have more confidence in my estimates if I know more.</p>
-<div id="cell-6" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10</span>, <span class="dv">101</span>, <span class="dv">10</span>):</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    sampled <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">100</span>, scale<span class="op">=</span><span class="dv">15</span>, size<span class="op">=</span>n)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Sampling '</span> <span class="op">+</span> <span class="bu">str</span>(n) <span class="op">+</span> <span class="st">' observations'</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    std_err <span class="op">=</span> np.std(sampled) <span class="op">/</span> np.sqrt(n)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Standard error approximation: '</span> <span class="op">+</span> <span class="bu">str</span>(std_err))</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Sampling 10 observations
-Standard error approximation: 4.452823707231046
-
-
-Sampling 20 observations
-Standard error approximation: 3.798915557039333
-
-
-Sampling 30 observations
-Standard error approximation: 2.3932757697459746
-
-
-Sampling 40 observations
-Standard error approximation: 2.624220779126406
-
-
-Sampling 50 observations
-Standard error approximation: 2.2840746792281217
-
-
-Sampling 60 observations
-Standard error approximation: 2.015124706208566
-
-
-Sampling 70 observations
-Standard error approximation: 1.7230901229016737
-
-
-Sampling 80 observations
-Standard error approximation: 1.5993946754011168
-
-
-Sampling 90 observations
-Standard error approximation: 1.66349862578967
-
-
-Sampling 100 observations
-Standard error approximation: 1.577820207327762
-
-</code></pre>
-</div>
-</div>
-<p>How close is the approximation? Let’s try it for one sample</p>
-<div id="cell-8" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">51</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>pop <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">100</span>, scale<span class="op">=</span><span class="dv">15</span>, size<span class="op">=</span><span class="dv">300000</span>) <span class="co"># Population with normal distribution(mean=100, sd=15)</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>sampled <span class="op">=</span> np.random.choice(pop, size<span class="op">=</span>n) <span class="co"># randomly sampling</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>estimated_mean <span class="op">=</span> np.mean(sampled) <span class="co"># sample mean</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>estimated_sd <span class="op">=</span> np.std(sampled) <span class="co"># sample standard deviation</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>estimated_std_err <span class="op">=</span> np.std(sampled) <span class="op">/</span> n<span class="op">**</span><span class="fl">.5</span> <span class="co"># estimated standard error, expected variation for my sample statistic.</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(estimated_mean, estimated_sd, estimated_std_err)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>95.27311481976386 15.960503088053418 2.2349174605268747</code></pre>
-</div>
-</div>
-<div id="cell-9" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's take many samples and estimate the mean</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>mean_estimates <span class="op">=</span> []</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>): <span class="co"># Let's do it 1000 times, sampling 51 in each iteration.</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    sampled <span class="op">=</span> np.random.choice(pop, size<span class="op">=</span>n)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    mean_estimates.append(np.mean(sampled))</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>np.std(mean_estimates)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="5">
-<pre><code>2.1480690130242537</code></pre>
-</div>
-</div>
-<p>As one can see, it’s not that far away.</p>
-<div id="cell-11" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.swarmplot(data<span class="op">=</span>mean_estimates, orient<span class="op">=</span><span class="st">"h"</span>, size<span class="op">=</span><span class="dv">6</span>, alpha<span class="op">=</span><span class="fl">.8</span>, color<span class="op">=</span><span class="st">"purple"</span>, linewidth<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                 edgecolor<span class="op">=</span><span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
+<div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="the_f5_inpredictable.png" class="img-fluid figure-img"></p>
+<figcaption>Excerpt from QA done by The F5 with Mike Beouy</figcaption>
 </figure>
 </div>
-</div>
-</div>
-<p>What happens when one lowers the sample size? More variation, less confidence. As the sample size increases the estimates approach towards the parameter, so with large sample size each sample ends up having similar estimates. However, that’s not the case with low sample size.</p>
-<div id="cell-13" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">16</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>mean_estimates <span class="op">=</span> []</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1000</span>): <span class="co"># Let's do it 1000 times</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    sampled <span class="op">=</span> np.random.choice(pop, size<span class="op">=</span>n)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    mean_estimates.append(np.mean(sampled))</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>np.std(mean_estimates)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="7">
-<pre><code>3.713500386895356</code></pre>
-</div>
-</div>
-<div id="cell-14" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">6</span>))</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.swarmplot(data<span class="op">=</span>mean_estimates, orient<span class="op">=</span><span class="st">"h"</span>, size<span class="op">=</span><span class="dv">6</span>, alpha<span class="op">=</span><span class="fl">.8</span>, color<span class="op">=</span><span class="st">"purple"</span>, linewidth<span class="op">=</span><span class="fl">0.5</span>,</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                 edgecolor<span class="op">=</span><span class="st">"black"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Watch out the x-axis, it’s much wider now.</p>
-<div id="cell-16" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>mean_estimates <span class="op">=</span> {</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>        <span class="dv">16</span>:[],</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="dv">23</span>:[],</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="dv">30</span>:[],</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="dv">51</span>:[],</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>        <span class="dv">84</span>:[],</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>        <span class="dv">101</span>:[]</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> n <span class="kw">in</span> [<span class="dv">16</span>, <span class="dv">23</span>, <span class="dv">30</span>, <span class="dv">51</span>, <span class="dv">84</span>, <span class="dv">101</span>]:</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">500</span>):</span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>        sampled <span class="op">=</span> np.random.choice(pop, size<span class="op">=</span>n)</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>        mean_estimates[n].append(np.mean(sampled))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="cell-17" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key <span class="kw">in</span> mean_estimates.keys():</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Sample size: '</span> <span class="op">+</span> <span class="bu">str</span>(key))</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'Standard deviation (std_err) around the estimates: '</span> <span class="op">+</span> <span class="bu">str</span>(np.std(mean_estimates[key])))</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Sample size: 16
-Standard deviation (std_err) around the estimates: 3.855337925425897
+<hr>
+<p>I don’t know if you have watched <a href="https://www.imdb.com/title/tt1210166/"><em>Moneyball</em></a> (if you haven’t, you should), there are great monologues (mainly from Jonah Hill’s character) that point out the main purpose of sports analytics:</p>
+<blockquote class="blockquote">
+<p>People who run ball clubs, they think in terms of buying players. Your goal shouldn’t be to buy players, your goal should be to buy wins. … This is building in all the intelligence that we have to project players. <em>It’s about getting things down to one number.</em></p>
+</blockquote>
+<p>Yes, the holy grail would be a single number that summarizes a player’s contribution to the team. This problem is similar to questions that you may end up trying to find an answer for, during your day to day job as a data scientist.</p>
+<section id="problem-of-dividing-credits" class="level3">
+<h3 class="anchored" data-anchor-id="problem-of-dividing-credits">Problem of Dividing Credits</h3>
+<p>In its core, problem of assigning a number that represents a player’s contribution to the team (when he’s on the court) is about dividing credit among players: We scored 30 points with these 5 players, allowed 20. How should I distribute the net rating of 10 among these 5 players?</p>
+<p>Problem of dividing credit comes up when you’re a data scientist in a company where you try to figure out how much each product contributes to the revenue of a customer: You just replace the players with the products and tie it to revenue instead of points, and it’s essentially the same problem.</p>
+</section>
+<section id="future-projection" class="level3">
+<h3 class="anchored" data-anchor-id="future-projection">Future Projection</h3>
+<p>Not every player is the same when they are drafted to the NBA: Some players have a very high ceiling, and it might be wise to keep them. This type of career projection is relevant in a company setting where it might be beneficial to project customers: Not every customer is the same, since some of them hold more potential in terms of revenue generation. It might be wise to identify them for retention purposes and campaign targeting.</p>
+</section>
+<section id="segmentation" class="level3">
+<h3 class="anchored" data-anchor-id="segmentation">Segmentation</h3>
+<p>Clustering players based on their effectivess and style of play serves variety of purposes that ranges from identifying which players are more fit to certain play types to leading the transfer negotiations (e.g., finding similar players to replace the player that left).</p>
+<hr>
+<p>In summary, trying to solve sport analytics problems may aid the problem solving processes in your daily job (for example, in a banking setting), and you may end up making a difference by adapting approaches that you have learned in sports analytics to your company setting.</p>
+<p>Just in case you don’t want to take my word, take the words from Mike Beuoy (the mind behind <a href="https://www.inpredictable.com/">the Inpredictable</a>). If you’re interested in basketball analytics, you should definitely subscribe to <a href="https://thef5.substack.com/">the F5</a>, where the excerpt above is taken from.</p>
 
 
-Sample size: 23
-Standard deviation (std_err) around the estimates: 3.1917223557725363
-
-
-Sample size: 30
-Standard deviation (std_err) around the estimates: 2.7639204989190023
-
-
-Sample size: 51
-Standard deviation (std_err) around the estimates: 2.0366022769176806
-
-
-Sample size: 84
-Standard deviation (std_err) around the estimates: 1.736807903528174
-
-
-Sample size: 101
-Standard deviation (std_err) around the estimates: 1.504399688755003
-
-</code></pre>
-</div>
-</div>
-
-
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
