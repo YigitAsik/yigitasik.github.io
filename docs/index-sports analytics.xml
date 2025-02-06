@@ -30,7 +30,10 @@
 <hr>
 <p>I don’t know if you have watched <a href="https://www.imdb.com/title/tt1210166/"><em>Moneyball</em></a> (if you haven’t, you should), there are great monologues (mainly from Jonah Hill’s character) that point out the main purpose of sports analytics:</p>
 <blockquote class="blockquote">
-<p>People who run ball clubs, they think in terms of buying players. Your goal shouldn’t be to buy players, your goal should be to buy wins. … This is building in all the intelligence that we have to project players. <em>It’s about getting things down to one number.</em></p>
+<p>People who run ball clubs, they think in terms of buying players. Your goal shouldn’t be to buy players, your goal should be to buy wins.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>… This is building in all the intelligence that we have to project players. <em>It’s about getting things down to one number.</em></p>
 </blockquote>
 <p>Yes, the holy grail would be a single number that summarizes a player’s contribution to the team. This problem is similar to questions that you may end up trying to find an answer for, during your day to day job as a data scientist, because at the end of the day that’s what everyone’s trying to do: Representing a customer (or an employee etc.) by a number.</p>
 <section id="problem-of-dividing-credit" class="level3">
