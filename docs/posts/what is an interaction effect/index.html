@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yiğit Aşık">
-<meta name="dcterms.date" content="2025-01-31">
+<meta name="dcterms.date" content="2025-02-09">
 
-<title>Man on a Mission: January 2025 – YIGIT ASIK, Data Scientist</title>
+<title>What’s an Interaction Effect? An example – YIGIT ASIK, Data Scientist</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -130,9 +130,10 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Man on a Mission: January 2025</h1>
+      <h1 class="title">What’s an Interaction Effect? An example</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">update</div>
+                <div class="quarto-category">Stats</div>
+                <div class="quarto-category">Inference</div>
               </div>
                   </div>
   </div>
@@ -150,7 +151,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">January 31, 2025</p>
+        <p class="date">February 9, 2025</p>
       </div>
     </div>
     
@@ -169,24 +170,45 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>As I <a href="https://yigitasik.github.io/posts/Man%20on%20a%20Mission%20-%20Starting%202025/">promised at the start of the year</a>, here’s what I have studied this month.</p>
+<p>Some time ago, I had the chance to get my hands on some NBA data from 2013–14 and 2014–15 season. Back in the day SportsVu was the provider for the NBA data (it changed in 2017) and variables such as <code>number of dribbles</code>, <code>touch time</code>, <code>closest defender</code>, <code>closest defender distance</code> were available (these are not publicly accessible anymore). I wanted to leverage that data and attempt to create a new metric that captures players’ ability to shoot the ball better: Idea was to penalize misses that were likely to go in and reward makes that are less likely to go in while weighing 3 pointers as usual. I actually created something along these lines and called it shot proficiency which also takes shot volume into account. I may post about it later.</p>
+<p>I decided to go with two separate models (we are looking at the one made for 2 pointers). I had an idea of how it would look like in certain metrics since I have taken a look at the literature before and was satisfied with the results. I wanted to know if what the model thinks is in line with my intuition of what makes shots more likely to go in so I started with <a href="https://www.datacamp.com/tutorial/introduction-to-shap-values-machine-learning-interpretability">SHAP summary plot</a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="shap_summary_plot1.webp" class="img-fluid figure-img"></p>
+<figcaption>SHAP Summary Plot</figcaption>
+</figure>
+</div>
+<p>If you haven’t seen this plot before, basically it tells how each variables’ values (indicated by the color, check the colorbar) effect the outcome (corresponding horizontal axis) for each observation (observations correspond to data points). For example, looking at the shot distance, the model lowered the prediction as the shot distance gets larger. Overall, it seems intuitive: Shots that are closer to the basket have higher prediction, as the defender distance decreases so does the prediction for that shot to go in etc. However, there are wide range of predictions for similar values of shot distance (specifically for shots that are close to the basket) and closest defender distance. In other words, the effect is not the same across the data. <strong>When an effect of a value on a prediction is not constant, next step is to investigate interactions:</strong> Does the effect get <em>moderated</em> by other variables? In other words, <em>does the effect of one variable depends on the value of another variable?</em></p>
+<p>SHAP offers methods to visualize both the main and interaction effects, an example can be found <a href="https://shap.readthedocs.io/en/latest/example_notebooks/tabular_examples/tree_based_models/NHANES%20I%20Survival%20Model.html#SHAP-Interaction-Value-Summary-Plot">here</a>. For this example, I had domain knowledge (I played organizational basketball for 10+ years) so I progressed with dependence plot.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="shap_interaction_plot1.webp" class="img-fluid figure-img"></p>
+<figcaption>Plot to observe interaction between height difference and closest defender distance</figcaption>
+</figure>
+</div>
+<p>Horizontal axis of the dependence plot represents the real values of <code>diff_in_height</code> while vertical axis corresponds to how it effects the prediction. So, without the color it gives you the main effect of the variable which is pretty intuitive: Higher height differences in favor of the defender lowers the probability of shots to go in.</p>
+<p>However, there is something counterintuitive: Towards the very right side, you can see the predictions being lower for the shots when the defender is far away (and higher when the defender is close). That’s pretty counter-intuitive, I wouldn’t want a defender bothering me while shooting despite having height advantage. At this moment, domain knowledge kicks in.</p>
+<p><img src="shap_interaction_plot2.webp" class="img-fluid"></p>
+<ol type="1">
+<li>I suspected that to be moderated by a third variable, shot distance. Difference in height creates more advantage when the shooter is close to the basket and less so as one gets closer to the 3-pt line. This means the effect of height difference increases as the shot distance decreases.</li>
+<li>Another thing: There are a lot of shots where the difference in height is in favor of the defender (so, looking at the other end of the plot) and the closest defender distance is high. This might be due to defenders swapping who they defend after a play called pick &amp; roll. I do not have play-by-play data that labels those so we are not going to be able to check them directly but indirectly: Switch on a pick &amp; roll usually results in quick ball handler against a slow big guy relatively away from the basket, which forces big guy to take back a step or two to be able to stand in front of the ball handler. This gap creates relatively comfortable space for the ball handler to shoot, hence I suspect those shots to come from distance.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="R_plot.webp" class="img-fluid figure-img"></p>
+<figcaption>Investigating many interactions via scatter plot with color and size parameters</figcaption>
+</figure>
+</div>
+<p>The plot aligns with both hypotheses:</p>
+<ul>
+<li>The model predicts a higher shot probability when height difference favors the shooter <em>and</em> the closest defender is nearby — these are shots close to the basket, confirming the first assumption.</li>
+<li>For shots where the defender is far away despite having a height advantage, the model predicts lower probabilities. While I can’t directly verify if these shots follow a pick &amp; roll, the assumption led to the hypothesis that these shots come from longer distances — which is confirmed in the plot.</li>
+</ul>
 <hr>
-<section id="statistics" class="level3">
-<h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
-<p>This month I finished <a href="https://allendowney.github.io/ThinkBayes2/"><em>Think Bayes</em></a> way before than I anticipated, and played with <a href="https://www.pymc.io/welcome.html">PyMC</a> a bit. I really enjoyed the whole book but wanted to dive a bit deep so moved on to John Kruschke’s <a href="https://www.sciencedirect.com/book/9780124058880/doing-bayesian-data-analysis#book-info"><em>Doing Bayesian Data Analysis</em></a> and I’m glad I did it. The book starts with main ideas of Bayesian view, <em>“Bayesian inference is reallocation of credibility across possibilities”</em> where credibility stands for probability and possibilities stand for possible values that our parameters can take when we attempt to model. After this introduction, Kruschke talks about what probabilities are and provides intuitive description for the distinction between <em>probability mass</em> and <em>probability density</em>. If you have trouble understanding probability distributions, you may want to take a look at it.</p>
-<p>Bayesian stuff aside, I really enjoyed the interpretation of mean as minimized variance alongside how we end up with median and mode when we change the distance measure (e.g., l2 norm to l1 etc.). Also, I coded Metropolis Algorithm (1-D) by using the example in the MCMC chapter. You can find it on my GitHub under <em>learn-stats-with-sims</em>.</p>
-<p>I’m currently at chapter 9, going through hierarchical models. We’ll see if the book keeps me engaged throughout the upcoming chapters as well.</p>
-<hr>
-</section>
-<section id="deep-learning-dl" class="level3">
-<h3 class="anchored" data-anchor-id="deep-learning-dl">Deep Learning (DL)</h3>
-<p>Well, I haven’t done much for the DL. Throughout the year, amount of time I spent on statistics will gradually decline to open up space for DL. I’ve just started to <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/"><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em></a>, skimming through Scikit-Learn part to start with Keras and Tensorflow while not missing out on anything (despite using sklearn pretty often, I don’t want to miss a useful thing that may come in handy in the future).</p>
-<hr>
-<p>In terms of sports analytics or production level data science, I haven’t done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle the front-end, so I count that as a win as well.</p>
-<p>See you next month!</p>
+<p>I like explainable AI methods to understand how the model makes predictions along with some validation: Does the model act in a way that I expect it to? Interactions are huge part of this process, many effects in the real world are not uniform across groups, so it’s something I am always interested in. If you’re like me, a good starting point might be <a href="https://lakens.github.io/statistical_inferences/06-effectsize.html#effect-sizes-for-interactions">this chapter</a> from Lakens’ book.</p>
+<p>Anyway, I hope you enjoyed the read. Have a nice Sunday!</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
