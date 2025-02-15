@@ -9,8 +9,249 @@
 <link>https://yigitasik.github.io/</link>
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
-<generator>quarto-1.6.40</generator>
-<lastBuildDate>Sat, 08 Feb 2025 21:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Sat, 15 Feb 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Nicer Contour Plots</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Nicer Contour Plots/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I’m going to keep it short this week, been studying a lot lately (you may see more deep learning and explainable AI posts from me in the future). Anyway, let’s dive:</p>
+<p>I realized contour plots in my previous post (<a href="https://yigitasik.github.io/posts/Bayesian%20Way%20-%20Predictions%20out%20of%20Posterior%20Distribution/">here</a>) look extremely bad: - There are no labels annotating the contour lines - No colorbar - No fill between contour lines</p>
+<p>So, let’s try to make them better. Before we move on, 2 things: 1. If you are not familiar with what contour plots are, Grant Sanderson (<a href="https://www.3blue1brown.com/">3blue1brown</a>) has a great video on Khan Academy that explains what they are: You can watch it <a href="https://youtu.be/WsZj5Rb6do8?si=Y5Jg3uSjP096bw9g">here</a>. It allows you to plot 2-D functions (<img src="https://latex.codecogs.com/png.latex?f(x,%20y)">) 2. I’m going to skip to the plotting, not showing processes up to that point. If you want to follow along, you can find the previous steps <a href="https://yigitasik.github.io/posts/Bayesian%20Way%20-%20Predictions%20out%20of%20Posterior%20Distribution/">here</a>.</p>
+<div id="cell-2" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">data <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df_likeli.unstack()</span>
+<span id="cb1-2">data.iloc[:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, :<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>].head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">-1.400000</th>
+<th data-quarto-table-cell-role="th">-1.393636</th>
+<th data-quarto-table-cell-role="th">-1.387273</th>
+<th data-quarto-table-cell-role="th">-1.380909</th>
+<th data-quarto-table-cell-role="th">-1.374545</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-1.200000</td>
+<td>4.812632e-15</td>
+<td>5.218338e-15</td>
+<td>5.654017e-15</td>
+<td>6.121460e-15</td>
+<td>6.622520e-15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">-1.192857</td>
+<td>5.117237e-15</td>
+<td>5.550729e-15</td>
+<td>6.016454e-15</td>
+<td>6.516356e-15</td>
+<td>7.052453e-15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-1.185714</td>
+<td>5.437699e-15</td>
+<td>5.900567e-15</td>
+<td>6.398073e-15</td>
+<td>6.932326e-15</td>
+<td>7.505517e-15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">-1.178571</td>
+<td>5.774592e-15</td>
+<td>6.268495e-15</td>
+<td>6.799591e-15</td>
+<td>7.370167e-15</td>
+<td>7.982601e-15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-1.171429</td>
+<td>6.128495e-15</td>
+<td>6.655158e-15</td>
+<td>7.221728e-15</td>
+<td>7.830684e-15</td>
+<td>8.484602e-15</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>This was the joint likelihood from the post that I have mentioned above, and here’s the ugly contour plot:</p>
+<div id="cell-4" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">ut.plot_contour(df_likeli.unstack())</span>
+<span id="cb2-2">ut.decorate(title <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Likelihood'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Nicer Contour Plots/index_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s start by being more explicit. I’ll use matplotlib’s <code>contour</code> for plotting. I provide variables (in this case, column values and indices were corresponding to our model’s parameter spaces), data itself in 2D form, number of lines, and a color map.</p>
+<div id="cell-6" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">plt.contour(data.columns, data.index, data, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, cmap<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'viridis'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Nicer Contour Plots/index_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This looks very similar to our ugly version, lots of information get lost in this one. Let’s play with it, starting by using <code>contourf</code> instead of <code>contour</code> which fills the spaces in between.</p>
+<div id="cell-8" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">plt.contourf(data.columns, data.index, data, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Nicer Contour Plots/index_files/figure-html/cell-5-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now, this was a step forward. However, we have no idea what those colors correspond to.</p>
+<div id="cell-10" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">plt.contourf(data.columns, data.index, data, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>)</span>
+<span id="cb5-2">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Nicer Contour Plots/index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This looks better but is there more room to improve? I don’t like this discreteness between contours, want more of a smooth transition. <code>imshow</code> allows for such transition, but you need to provide extent since the function does not take x and y as inputs. Also, you need to specify the origin because the default origin is top left.</p>
+<div id="cell-12" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">plt.imshow(data, extent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[data.columns.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(), data.columns.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(), data.index.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(), data.index.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>()], origin<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'lower'</span>,</span>
+<span id="cb6-2">cmap<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'viridis'</span>)</span>
+<span id="cb6-3">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Nicer Contour Plots/index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This definitely looks better, but one last touch: Adding contour lines with labels (<code>clabel</code>).</p>
+<div id="cell-14" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">contours <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.contour(data.columns, data.index, data, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>, colors<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>)</span>
+<span id="cb7-2">plt.clabel(contours, inline<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>, fontsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">8</span>)</span>
+<span id="cb7-3"></span>
+<span id="cb7-4">plt.imshow(data, extent<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[data.columns.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(), data.columns.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(), data.index.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(), data.index.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>()], origin<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'lower'</span>,</span>
+<span id="cb7-5">cmap<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'viridis'</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb7-6"></span>
+<span id="cb7-7">plt.colorbar()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Nicer Contour Plots/index_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>That’s a quick guide to make your contour plots better. Hope you enjoyed it. If you did and want more, you may want to take a look at <a href="https://jakevdp.github.io/PythonDataScienceHandbook/"><em>Python Data Science Handbook</em></a> by Jake VanderPlas. I learned some tricks from it.</p>
+<p>Have a nice weekend!</p>
+
+
+
+ ]]></description>
+  <category>Visualization</category>
+  <guid>https://yigitasik.github.io/posts/Nicer Contour Plots/</guid>
+  <pubDate>Sat, 15 Feb 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://yigitasik.github.io/posts/Nicer Contour Plots/output.png" medium="image" type="image/png" height="152" width="144"/>
+</item>
 <item>
   <title>What’s an Interaction Effect? An example</title>
   <dc:creator>Yiğit Aşık</dc:creator>

@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yiğit Aşık">
-<meta name="dcterms.date" content="2025-02-05">
+<meta name="dcterms.date" content="2025-02-16">
 
-<title>How Basketball Analytics May Have An Effect on Your Analytics Job – YIGIT ASIK, Data Scientist</title>
+<title>Nicer Contour Plots – YIGIT ASIK, Data Scientist</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,10 +22,44 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -68,7 +102,39 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
 
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -130,10 +196,9 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">How Basketball Analytics May Have An Effect on Your Analytics Job</h1>
+      <h1 class="title">Nicer Contour Plots</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">Sports Analytics</div>
-                <div class="quarto-category">2-cents</div>
+                <div class="quarto-category">Visualization</div>
               </div>
                   </div>
   </div>
@@ -151,7 +216,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">February 5, 2025</p>
+        <p class="date">February 16, 2025</p>
       </div>
     </div>
     
@@ -170,39 +235,154 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="quarto-figure quarto-figure-center">
+<p>I’m going to keep it short this week, been studying a lot lately (you may see more deep learning and explainable AI posts from me in the future). Anyway, let’s dive:</p>
+<p>I realized contour plots in my previous post (<a href="https://yigitasik.github.io/posts/Bayesian%20Way%20-%20Predictions%20out%20of%20Posterior%20Distribution/">here</a>) look extremely bad: - There are no labels annotating the contour lines - No colorbar - No fill between contour lines</p>
+<p>So, let’s try to make them better. Before we move on, 2 things: 1. If you are not familiar with what contour plots are, Grant Sanderson (<a href="https://www.3blue1brown.com/">3blue1brown</a>) has a great video on Khan Academy that explains what they are: You can watch it <a href="https://youtu.be/WsZj5Rb6do8?si=Y5Jg3uSjP096bw9g">here</a>. It allows you to plot 2-D functions (<span class="math inline">\(f(x, y)\)</span>) 2. I’m going to skip to the plotting, not showing processes up to that point. If you want to follow along, you can find the previous steps <a href="https://yigitasik.github.io/posts/Bayesian%20Way%20-%20Predictions%20out%20of%20Posterior%20Distribution/">here</a>.</p>
+<div id="cell-2" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> df_likeli.unstack()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>data.iloc[:<span class="dv">5</span>, :<span class="dv">5</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">-1.400000</th>
+<th data-quarto-table-cell-role="th">-1.393636</th>
+<th data-quarto-table-cell-role="th">-1.387273</th>
+<th data-quarto-table-cell-role="th">-1.380909</th>
+<th data-quarto-table-cell-role="th">-1.374545</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-1.200000</td>
+<td>4.812632e-15</td>
+<td>5.218338e-15</td>
+<td>5.654017e-15</td>
+<td>6.121460e-15</td>
+<td>6.622520e-15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">-1.192857</td>
+<td>5.117237e-15</td>
+<td>5.550729e-15</td>
+<td>6.016454e-15</td>
+<td>6.516356e-15</td>
+<td>7.052453e-15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-1.185714</td>
+<td>5.437699e-15</td>
+<td>5.900567e-15</td>
+<td>6.398073e-15</td>
+<td>6.932326e-15</td>
+<td>7.505517e-15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">-1.178571</td>
+<td>5.774592e-15</td>
+<td>6.268495e-15</td>
+<td>6.799591e-15</td>
+<td>7.370167e-15</td>
+<td>7.982601e-15</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">-1.171429</td>
+<td>6.128495e-15</td>
+<td>6.655158e-15</td>
+<td>7.221728e-15</td>
+<td>7.830684e-15</td>
+<td>8.484602e-15</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>This was the joint likelihood from the post that I have mentioned above, and here’s the ugly contour plot:</p>
+<div id="cell-4" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>ut.plot_contour(df_likeli.unstack())</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ut.decorate(title <span class="op">=</span> <span class="st">'Likelihood'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
 <figure class="figure">
-<p><img src="the_f5_inpredictable.png" class="img-fluid figure-img"></p>
-<figcaption>Excerpt from the Q&amp;A done by The F5 with Mike Beouy</figcaption>
+<p><img src="index_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
-<hr>
-<p>I don’t know if you have watched <a href="https://www.imdb.com/title/tt1210166/"><em>Moneyball</em></a> (if you haven’t, you should), there are great monologues (mainly from Jonah Hill’s character) that point out the main purpose of sports analytics:</p>
-<blockquote class="blockquote">
-<p>People who run ball clubs, they think in terms of buying players. Your goal shouldn’t be to buy players, your goal should be to buy wins.</p>
-</blockquote>
-<blockquote class="blockquote">
-<p>… This is building in all the intelligence that we have to project players. <em>It’s about getting things down to one number.</em></p>
-</blockquote>
-<p>Yes, the holy grail would be a single number that summarizes a player’s contribution to the team. This problem is similar to questions that you may end up trying to find an answer for, during your day to day job as a data scientist, because at the end of the day that’s what everyone’s trying to do: Representing a customer (or an employee etc.) by a number.</p>
-<section id="problem-of-dividing-credit" class="level3">
-<h3 class="anchored" data-anchor-id="problem-of-dividing-credit">Problem of Dividing Credit</h3>
-<p>In its core, problem of assigning a number that represents a player’s contribution to the team (when he’s on the court) is about dividing credit among players: We scored 30 points with these 5 players, allowed 20. How should I distribute the net rating of 10 among these 5 players?</p>
-<p>Problem of dividing credit comes up when you’re a data scientist in a company where you try to figure out how much each product contributes to the revenue of a customer: You just replace the players with the products and tie it to revenue instead of points, and it’s essentially the same problem.</p>
-</section>
-<section id="future-projection" class="level3">
-<h3 class="anchored" data-anchor-id="future-projection">Future Projection</h3>
-<p>Not every player is the same when they are drafted to the NBA: Some players have a very high ceiling, and it might be wise to keep them. This type of career projection is relevant in a company setting where it might be beneficial to project customers: Not every customer is the same, since some of them hold more potential in terms of revenue generation. It is useful to identify them for retention purposes and campaign targeting.</p>
-</section>
-<section id="segmentation" class="level3">
-<h3 class="anchored" data-anchor-id="segmentation">Segmentation</h3>
-<p>Clustering players based on their effectivess and style of play serves various purposes that ranges from identifying which players are more fit to certain play types to leading the transfer negotiations (e.g., finding similar players to replace the player that left).</p>
-<hr>
-<p>In summary, trying to solve sport analytics problems may aid the problem solving processes in your daily job (for example, in a banking setting), and you may end up making a difference by adapting approaches that you have learned in sports analytics to your company setting.</p>
-<p>Just in case you don’t want to take my word, take the words from Mike Beuoy (the mind behind <a href="https://www.inpredictable.com/">the Inpredictable</a>). If you’re interested in basketball analytics, you should definitely subscribe to <a href="https://thef5.substack.com/">the F5</a>, where the excerpt above is taken from.</p>
+</div>
+</div>
+<p>Let’s start by being more explicit. I’ll use matplotlib’s <code>contour</code> for plotting. I provide variables (in this case, column values and indices were corresponding to our model’s parameter spaces), data itself in 2D form, number of lines, and a color map.</p>
+<div id="cell-6" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plt.contour(data.columns, data.index, data, <span class="dv">10</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This looks very similar to our ugly version, lots of information get lost in this one. Let’s play with it, starting by using <code>contourf</code> instead of <code>contour</code> which fills the spaces in between.</p>
+<div id="cell-8" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>plt.contourf(data.columns, data.index, data, <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-5-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now, this was a step forward. However, we have no idea what those colors correspond to.</p>
+<div id="cell-10" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>plt.contourf(data.columns, data.index, data, <span class="dv">6</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This looks better but is there more room to improve? I don’t like this discreteness between contours, want more of a smooth transition. <code>imshow</code> allows for such transition, but you need to provide extent since the function does not take x and y as inputs. Also, you need to specify the origin because the default origin is top left.</p>
+<div id="cell-12" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.imshow(data, extent<span class="op">=</span>[data.columns.<span class="bu">min</span>(), data.columns.<span class="bu">max</span>(), data.index.<span class="bu">min</span>(), data.index.<span class="bu">max</span>()], origin<span class="op">=</span><span class="st">'lower'</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This definitely looks better, but one last touch: Adding contour lines with labels (<code>clabel</code>).</p>
+<div id="cell-14" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>contours <span class="op">=</span> plt.contour(data.columns, data.index, data, <span class="dv">6</span>, colors<span class="op">=</span><span class="st">'black'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.clabel(contours, inline<span class="op">=</span><span class="va">True</span>, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.imshow(data, extent<span class="op">=</span>[data.columns.<span class="bu">min</span>(), data.columns.<span class="bu">max</span>(), data.index.<span class="bu">min</span>(), data.index.<span class="bu">max</span>()], origin<span class="op">=</span><span class="st">'lower'</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>cmap<span class="op">=</span><span class="st">'viridis'</span>, alpha<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.colorbar()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>That’s a quick guide to make your contour plots better. Hope you enjoyed it. If you did and want more, you may want to take a look at <a href="https://jakevdp.github.io/PythonDataScienceHandbook/"><em>Python Data Science Handbook</em></a> by Jake VanderPlas. I learned some tricks from it.</p>
+<p>Have a nice weekend!</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
