@@ -9,8 +9,48 @@
 <link>https://yigitasik.github.io/</link>
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
-<generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 15 Feb 2025 21:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.40</generator>
+<lastBuildDate>Fri, 21 Feb 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Intuitive Conceptual Framing For Summary Statistics</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Intuitive Approach to Mean and Variance/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>In statistics and data science, there is a pattern of trying to <a href="https://yigitasik.github.io/posts/Basketball%20Analytics%20and%20Daily%20Job/">boil down things into a single number</a>. <em>Mean</em> and <em>variance</em> fit well to that pattern. Let’s take a look at them, but with not-so-common conceptual framing that I learned from Kruschke’s <a href="https://nyu-cdsc.github.io/learningr/assets/kruschke_bayesian_in_R.pdf"><em>Doing Bayesian Data Analysis</em></a>.</p>
+<section id="center-and-variability-basics" class="level3">
+<h3 class="anchored" data-anchor-id="center-and-variability-basics">Center and Variability: Basics</h3>
+<p>Idea with the mean is to represent the center of a <em>probability distribution</em> (series of values and their corresponding probabilities). It’s defined as: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20E%5Bx%5D%20=%20%5Csum%7Bp(x)x%7D">. Don’t get confused by <img src="https://latex.codecogs.com/png.latex?E%5Bx%5D">, which is called <em>expected value</em> (i.e., mean). Well, this equation is only applicable when the values (<em>x</em>s) are discrete, hence <img src="https://latex.codecogs.com/png.latex?p(x)"> corresponds to probability mass. When <em>x</em>s are continuous, you have the following:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20E%5Bx%5D%20=%20%5Cint%20p(x)x%20%5C,%20dx"> where <img src="https://latex.codecogs.com/png.latex?p(x)"> corresponds to probability densities.</p>
+<p>On the other hand, variability of a distribution is also something that we are interested in. There comes the <em>variance</em>, telling us (roughly) how much a typical value stands away from the distribution’s mean. I said <em>roughly</em>, because what I have said is actually the <em>deviance</em>. The variance is the <em>mean squared deviance</em>: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Csigma%5E2%20=%20%5Cfrac%7B1%7D%7Bn%7D%20%5Csum_%7Bi=1%7D%5E%7Bn%7D%20(x%20-%20E%5Bx%5D)%5E2">,</p>
+<p>and for continuous values of <em>x</em>: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Csigma%5E2%20=%20%5Cint%20p(x)%20(x%20-%20E%5Bx%5D)%5E2%20%5C,%20dx"></p>
+</section>
+<section id="conceptual-framing-from-variance-to-mean" class="level3">
+<h3 class="anchored" data-anchor-id="conceptual-framing-from-variance-to-mean">Conceptual Framing: From variance to mean</h3>
+<p>Every book in statistics (at least the ones that I know of) starts with mean and gets to the variance. This conceptual framing is reversed, in the sense that it makes one end with the center of a distribution.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Intuitive Approach to Mean and Variance/stacked_dot.png" class="img-fluid figure-img"></p>
+<figcaption>Stacked dot plot of interest rates of some previous data, with the mean as a red triangle</figcaption>
+</figure>
+</div>
+<p>Think of a distribution: If you thought of a discrete one, let’s represent it in your head with a <em>stacked dot plot</em>. If it’s continuous, then think of a <em>density plot</em>. In either way, we would like to represent center of the distribution with a value that is around the most stacked (for the former) or most dense values (for the latter). So, we are looking for a value M that <em>minimizes the expected distance between it and rest of the values of the distribution, in the long run</em> (as a rule of thumb, always think in long runs when it’s a frequentist method). Most common way of defining the distance is squared difference which gets larger if two quantity is far away from each other: <img src="https://latex.codecogs.com/png.latex?(x%20-%20M)%5E2">. So, we need a value M that minimizes the following: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cint%20p(x)(x-M)%5E2%20%5C,%20dx"></p>
+<p>Guess which value minimizes the equation above? You probably guessed it right, since it’s also available from the preceding section: <img src="https://latex.codecogs.com/png.latex?E%5Bx%5D">. Here’s where things get very interesting for me. If you decide to go with <img src="https://latex.codecogs.com/png.latex?%7Cx%20-%20M%7C"> as the measure for distance, then it is the <em>median</em> that minimizes the expected distance in the long run. If you plug zeros for exact matches and ones for mismatches as a distance, you get the <em>mode</em>.</p>
+<hr>
+<p>The beauty in mathematics or statistics is connection, at least to me. Even while writing this, I like how distances invoke vector norms, and minimization brings up calculus etc. This example connects mean, median, mode in my head, hence making it more intuitive. The book itself is great btw, if you’re interested in Bayesian methods I highly suggest it. Until next time, take care!</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <guid>https://yigitasik.github.io/posts/Intuitive Approach to Mean and Variance/</guid>
+  <pubDate>Fri, 21 Feb 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Nicer Contour Plots</title>
   <dc:creator>Yiğit Aşık</dc:creator>

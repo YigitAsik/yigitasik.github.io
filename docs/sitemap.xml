@@ -1,63 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://yigitasik.github.io/about.html</loc>
-    <lastmod>2025-02-15T20:05:36.434Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.452Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Bayes Theorem/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.451Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/what happens to sample statistics/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.456Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Model Fitting with Likelihood/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.454Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.454Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.450Z</lastmod>
-  </url>
-  <url>
     <loc>https://yigitasik.github.io/posts/what is an interaction effect/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.456Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Bayesian Way - Predictions out of Posterior Distribution/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.453Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Man on a Mission - Starting 2025/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.454Z</lastmod>
+    <lastmod>2025-02-22T16:47:39.840Z</lastmod>
   </url>
   <url>
     <loc>https://yigitasik.github.io/posts/welcome/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.455Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Nicer Contour Plots/index.html</loc>
-    <lastmod>2025-02-15T20:20:02.706Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Man on a Mission - January 2025/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.454Z</lastmod>
+    <lastmod>2025-02-22T16:47:39.838Z</lastmod>
   </url>
   <url>
     <loc>https://yigitasik.github.io/posts/p-value distribution/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.455Z</lastmod>
+    <lastmod>2025-02-22T16:47:39.838Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Model Fitting with Likelihood/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.833Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Man on a Mission - January 2025/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.832Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Bayesian Way - Predictions out of Posterior Distribution/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.831Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Bayes Theorem/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.826Z</lastmod>
   </url>
   <url>
     <loc>https://yigitasik.github.io/index.html</loc>
-    <lastmod>2025-02-15T20:05:36.450Z</lastmod>
+    <lastmod>2025-02-22T16:47:39.824Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/about.html</loc>
+    <lastmod>2025-02-22T16:47:39.786Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.825Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.828Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Intuitive Approach to Mean and Variance/index.html</loc>
+    <lastmod>2025-02-22T16:45:26.075Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Man on a Mission - Starting 2025/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.832Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Nicer Contour Plots/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.835Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.836Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/what happens to sample statistics/index.html</loc>
+    <lastmod>2025-02-22T16:47:39.840Z</lastmod>
   </url>
 </urlset>

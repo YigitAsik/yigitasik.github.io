@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yiğit Aşık">
-<meta name="dcterms.date" content="2025-01-31">
+<meta name="dcterms.date" content="2025-02-22">
 
-<title>Man on a Mission: January 2025 – YIGIT ASIK, Data Scientist</title>
+<title>Intuitive Conceptual Framing For Summary Statistics – YIGIT ASIK, Data Scientist</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -130,9 +159,9 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Man on a Mission: January 2025</h1>
+      <h1 class="title">Intuitive Conceptual Framing For Summary Statistics</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">update</div>
+                <div class="quarto-category">Stats</div>
               </div>
                   </div>
   </div>
@@ -150,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">January 31, 2025</p>
+        <p class="date">February 22, 2025</p>
       </div>
     </div>
     
@@ -169,21 +198,27 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>As I <a href="https://yigitasik.github.io/posts/Man%20on%20a%20Mission%20-%20Starting%202025/">promised at the start of the year</a>, here’s what I have studied this month.</p>
-<hr>
-<section id="statistics" class="level3">
-<h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
-<p>This month I finished <a href="https://allendowney.github.io/ThinkBayes2/"><em>Think Bayes</em></a> way before than I anticipated, and played with <a href="https://www.pymc.io/welcome.html">PyMC</a> a bit. I really enjoyed the whole book but wanted to dive a bit deep so moved on to John Kruschke’s <a href="https://www.sciencedirect.com/book/9780124058880/doing-bayesian-data-analysis#book-info"><em>Doing Bayesian Data Analysis</em></a> and I’m glad I did it. The book starts with main ideas of Bayesian view, <em>“Bayesian inference is reallocation of credibility across possibilities”</em> where credibility stands for probability and possibilities stand for possible values that our parameters can take when we attempt to model. After this introduction, Kruschke talks about what probabilities are and provides intuitive description for the distinction between <em>probability mass</em> and <em>probability density</em>. If you have trouble understanding probability distributions, you may want to take a look at it.</p>
-<p>Bayesian stuff aside, I really enjoyed the interpretation of mean as minimized variance alongside how we end up with median and mode when we change the distance measure (e.g., l2 norm to l1 etc.). Also, I coded Metropolis Algorithm (1-D) by using the example in the MCMC chapter. You can find it on my GitHub under <em>learn-stats-with-sims</em>.</p>
-<p>I’m currently at chapter 9, going through hierarchical models. We’ll see if the book keeps me engaged throughout the upcoming chapters as well.</p>
-<hr>
+<p>In statistics and data science, there is a pattern of trying to <a href="https://yigitasik.github.io/posts/Basketball%20Analytics%20and%20Daily%20Job/">boil down things into a single number</a>. <em>Mean</em> and <em>variance</em> fit well to that pattern. Let’s take a look at them, but with not-so-common conceptual framing that I learned from Kruschke’s <a href="https://nyu-cdsc.github.io/learningr/assets/kruschke_bayesian_in_R.pdf"><em>Doing Bayesian Data Analysis</em></a>.</p>
+<section id="center-and-variability-basics" class="level3">
+<h3 class="anchored" data-anchor-id="center-and-variability-basics">Center and Variability: Basics</h3>
+<p>Idea with the mean is to represent the center of a <em>probability distribution</em> (series of values and their corresponding probabilities). It’s defined as: <span class="math inline">\(\displaystyle E[x] = \sum{p(x)x}\)</span>. Don’t get confused by <span class="math inline">\(E[x]\)</span>, which is called <em>expected value</em> (i.e., mean). Well, this equation is only applicable when the values (<em>x</em>s) are discrete, hence <span class="math inline">\(p(x)\)</span> corresponds to probability mass. When <em>x</em>s are continuous, you have the following:</p>
+<p><span class="math inline">\(\displaystyle E[x] = \int p(x)x \, dx\)</span> where <span class="math inline">\(p(x)\)</span> corresponds to probability densities.</p>
+<p>On the other hand, variability of a distribution is also something that we are interested in. There comes the <em>variance</em>, telling us (roughly) how much a typical value stands away from the distribution’s mean. I said <em>roughly</em>, because what I have said is actually the <em>deviance</em>. The variance is the <em>mean squared deviance</em>: <span class="math inline">\(\displaystyle \sigma^2 = \frac{1}{n} \sum_{i=1}^{n} (x - E[x])^2\)</span>,</p>
+<p>and for continuous values of <em>x</em>: <span class="math inline">\(\displaystyle \sigma^2 = \int p(x) (x - E[x])^2 \, dx\)</span></p>
 </section>
-<section id="deep-learning-dl" class="level3">
-<h3 class="anchored" data-anchor-id="deep-learning-dl">Deep Learning (DL)</h3>
-<p>Well, I haven’t done much for the DL. Throughout the year, amount of time I spent on statistics will gradually decline to open up space for DL. I’ve just started to <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/"><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em></a>, skimming through Scikit-Learn part to start with Keras and Tensorflow while not missing out on anything (despite using sklearn pretty often, I don’t want to miss a useful thing that may come in handy in the future).</p>
+<section id="conceptual-framing-from-variance-to-mean" class="level3">
+<h3 class="anchored" data-anchor-id="conceptual-framing-from-variance-to-mean">Conceptual Framing: From variance to mean</h3>
+<p>Every book in statistics (at least the ones that I know of) starts with mean and gets to the variance. This conceptual framing is reversed, in the sense that it makes one end with the center of a distribution.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="stacked_dot.png" class="img-fluid figure-img"></p>
+<figcaption>Stacked dot plot of interest rates of some previous data, with the mean as a red triangle</figcaption>
+</figure>
+</div>
+<p>Think of a distribution: If you thought of a discrete one, let’s represent it in your head with a <em>stacked dot plot</em>. If it’s continuous, then think of a <em>density plot</em>. In either way, we would like to represent center of the distribution with a value that is around the most stacked (for the former) or most dense values (for the latter). So, we are looking for a value M that <em>minimizes the expected distance between it and rest of the values of the distribution, in the long run</em> (as a rule of thumb, always think in long runs when it’s a frequentist method). Most common way of defining the distance is squared difference which gets larger if two quantity is far away from each other: <span class="math inline">\((x - M)^2\)</span>. So, we need a value M that minimizes the following: <span class="math inline">\(\displaystyle \int p(x)(x-M)^2 \, dx\)</span></p>
+<p>Guess which value minimizes the equation above? You probably guessed it right, since it’s also available from the preceding section: <span class="math inline">\(E[x]\)</span>. Here’s where things get very interesting for me. If you decide to go with <span class="math inline">\(|x - M|\)</span> as the measure for distance, then it is the <em>median</em> that minimizes the expected distance in the long run. If you plug zeros for exact matches and ones for mismatches as a distance, you get the <em>mode</em>.</p>
 <hr>
-<p>In terms of sports analytics or production level data science, I haven’t done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle the front-end, so I count that as a win as well.</p>
-<p>See you next month!</p>
+<p>The beauty in mathematics or statistics is connection, at least to me. Even while writing this, I like how distances invoke vector norms, and minimization brings up calculus etc. This example connects mean, median, mode in my head, hence making it more intuitive. The book itself is great btw, if you’re interested in Bayesian methods I highly suggest it. Until next time, take care!</p>
 
 
 </section>
