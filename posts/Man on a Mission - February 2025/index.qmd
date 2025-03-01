@@ -1,5 +1,5 @@
 ---
-title: "Man on a Mission: January 2025"
+title: "Man on a Mission: February 2025"
 author: "Yiğit Aşık"
 date: "2025-03-01"
 categories: [monthly]

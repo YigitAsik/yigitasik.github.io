@@ -2,7 +2,7 @@
 title: "Man on a Mission: Starting 2025"
 author: "Yiğit Aşık"
 date: "2025-01-01"
-categories: [update]
+categories: [monthly]
 ---
 
 ## Man on a Mission Series
