@@ -10,7 +10,43 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.40</generator>
-<lastBuildDate>Fri, 21 Feb 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 28 Feb 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Man on a Mission: January 2025</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Man on a Mission - February 2025/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Another month has passed. In these monthly posts, I won’t dive deep into every little bit of stuff that I studied during the month (that would be impossible), what I’ll try to convey the taste to increase your appetite.</p>
+<hr>
+<section id="explainable-ai" class="level3">
+<h3 class="anchored" data-anchor-id="explainable-ai">Explainable AI</h3>
+<p>The main focus of the month was on Molnar’s<a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a>:</p>
+<p>I feel like many people miss out on explainable AI, maybe not interested in it as much as making predictions. Before my 9-6, I was more into causal inference and maybe that’s why I get drawn to explaining so-called black box models (since explanations are <em>causal to the model</em>). Even if you’re not into it, it can help you debug the model and some methods (such as SHAP) can be used for feature selection.</p>
+<p>The book starts with generalized linear models (GLMs), including the good old classic linear regression. These are highly interpretable models by design, along with decision trees. This section ends with RuleFit, where you learn interactions through decision tree(s) and use those with a sparse linear model. I didn’t like this approach very much since rules may not be independent (e.g., <img src="https://latex.codecogs.com/png.latex?x_1%20%3E%2020">, <img src="https://latex.codecogs.com/png.latex?x_1%20%3E%2030">).</p>
+<p>The next section covers the model-agnostic methods, methods that are applicable regardless of the model. These mainly consist of permutation importance, partial dependence plots, accumulated local effects, SHAP etc. Some of these methods provide explanations on a local scope (you can use those methods to explain individual predictions) while others (global scope methods) give an expected value.</p>
+<p>Then there are example based explanations, which I like since they are relatively easy to grasp: What would have happen to the prediction if I changed the value of a feature? These explanations are contrastive, making it easier to grasp for anyone.</p>
+<p>The book itself is great, gives you the libraries that you can use to implement the methods.</p>
+</section>
+<section id="statistics" class="level3">
+<h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
+<p>I didn’t make a lot of progress here, other than going over some of the stuff that I’m already familiar with. I focused on explainable AI since I have a problem at work that may require using it. But, I listened to <a href="https://learnbayesstats.com/">Learning Bayesian Statistics</a> podcasts a lot. This brings me to the another point: I read a lot of blog posts this month, related to statistics. I wish I noted them somewhere. From now on, I will note what I listen and read as well and include them in my upcoming monthly blog posts!</p>
+<hr>
+<p>Lastly, I started to become active on my YouTube channel (hoping to keep it up, it takes a lot of time). I’m thinking about doing a “study with me”-like a thing so if you’re interested, don’t forget to subscribe!</p>
+<p>That’s pretty much it for today. See you next week!</p>
+
+
+</section>
+
+ ]]></description>
+  <category>monthly</category>
+  <guid>https://yigitasik.github.io/posts/Man on a Mission - February 2025/</guid>
+  <pubDate>Fri, 28 Feb 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Intuitive Conceptual Framing For Summary Statistics</title>
   <dc:creator>Yiğit Aşık</dc:creator>
@@ -1500,7 +1536,7 @@ font-style: inherit;">3</span>))</span>
 </section>
 
  ]]></description>
-  <category>update</category>
+  <category>monthly</category>
   <guid>https://yigitasik.github.io/posts/Man on a Mission - January 2025/</guid>
   <pubDate>Thu, 30 Jan 2025 21:00:00 GMT</pubDate>
 </item>

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Yiğit Aşık">
-<meta name="dcterms.date" content="2025-01-31">
+<meta name="dcterms.date" content="2025-03-01">
 
 <title>Man on a Mission: January 2025 – YIGIT ASIK, Data Scientist</title>
 <style>
@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -150,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">January 31, 2025</p>
+        <p class="date">March 1, 2025</p>
       </div>
     </div>
     
@@ -169,21 +198,23 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>As I <a href="https://yigitasik.github.io/posts/Man%20on%20a%20Mission%20-%20Starting%202025/">promised at the start of the year</a>, here’s what I have studied this month.</p>
+<p>Another month has passed. In these monthly posts, I won’t dive deep into every little bit of stuff that I studied during the month (that would be impossible), what I’ll try to convey the taste to increase your appetite.</p>
 <hr>
+<section id="explainable-ai" class="level3">
+<h3 class="anchored" data-anchor-id="explainable-ai">Explainable AI</h3>
+<p>The main focus of the month was on Molnar’s<a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a>:</p>
+<p>I feel like many people miss out on explainable AI, maybe not interested in it as much as making predictions. Before my 9-6, I was more into causal inference and maybe that’s why I get drawn to explaining so-called black box models (since explanations are <em>causal to the model</em>). Even if you’re not into it, it can help you debug the model and some methods (such as SHAP) can be used for feature selection.</p>
+<p>The book starts with generalized linear models (GLMs), including the good old classic linear regression. These are highly interpretable models by design, along with decision trees. This section ends with RuleFit, where you learn interactions through decision tree(s) and use those with a sparse linear model. I didn’t like this approach very much since rules may not be independent (e.g., <span class="math inline">\(x_1 &gt; 20\)</span>, <span class="math inline">\(x_1 &gt; 30\)</span>).</p>
+<p>The next section covers the model-agnostic methods, methods that are applicable regardless of the model. These mainly consist of permutation importance, partial dependence plots, accumulated local effects, SHAP etc. Some of these methods provide explanations on a local scope (you can use those methods to explain individual predictions) while others (global scope methods) give an expected value.</p>
+<p>Then there are example based explanations, which I like since they are relatively easy to grasp: What would have happen to the prediction if I changed the value of a feature? These explanations are contrastive, making it easier to grasp for anyone.</p>
+<p>The book itself is great, gives you the libraries that you can use to implement the methods.</p>
+</section>
 <section id="statistics" class="level3">
 <h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
-<p>This month I finished <a href="https://allendowney.github.io/ThinkBayes2/"><em>Think Bayes</em></a> way before than I anticipated, and played with <a href="https://www.pymc.io/welcome.html">PyMC</a> a bit. I really enjoyed the whole book but wanted to dive a bit deep so moved on to John Kruschke’s <a href="https://www.sciencedirect.com/book/9780124058880/doing-bayesian-data-analysis#book-info"><em>Doing Bayesian Data Analysis</em></a> and I’m glad I did it. The book starts with main ideas of Bayesian view, <em>“Bayesian inference is reallocation of credibility across possibilities”</em> where credibility stands for probability and possibilities stand for possible values that our parameters can take when we attempt to model. After this introduction, Kruschke talks about what probabilities are and provides intuitive description for the distinction between <em>probability mass</em> and <em>probability density</em>. If you have trouble understanding probability distributions, you may want to take a look at it.</p>
-<p>Bayesian stuff aside, I really enjoyed the interpretation of mean as minimized variance alongside how we end up with median and mode when we change the distance measure (e.g., l2 norm to l1 etc.). Also, I coded Metropolis Algorithm (1-D) by using the example in the MCMC chapter. You can find it on my GitHub under <em>learn-stats-with-sims</em>.</p>
-<p>I’m currently at chapter 9, going through hierarchical models. We’ll see if the book keeps me engaged throughout the upcoming chapters as well.</p>
+<p>I didn’t make a lot of progress here, other than going over some of the stuff that I’m already familiar with. I focused on explainable AI since I have a problem at work that may require using it. But, I listened to <a href="https://learnbayesstats.com/">Learning Bayesian Statistics</a> podcasts a lot. This brings me to the another point: I read a lot of blog posts this month, related to statistics. I wish I noted them somewhere. From now on, I will note what I listen and read as well and include them in my upcoming monthly blog posts!</p>
 <hr>
-</section>
-<section id="deep-learning-dl" class="level3">
-<h3 class="anchored" data-anchor-id="deep-learning-dl">Deep Learning (DL)</h3>
-<p>Well, I haven’t done much for the DL. Throughout the year, amount of time I spent on statistics will gradually decline to open up space for DL. I’ve just started to <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/"><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em></a>, skimming through Scikit-Learn part to start with Keras and Tensorflow while not missing out on anything (despite using sklearn pretty often, I don’t want to miss a useful thing that may come in handy in the future).</p>
-<hr>
-<p>In terms of sports analytics or production level data science, I haven’t done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle the front-end, so I count that as a win as well.</p>
-<p>See you next month!</p>
+<p>Lastly, I started to become active on my YouTube channel (hoping to keep it up, it takes a lot of time). I’m thinking about doing a “study with me”-like a thing so if you’re interested, don’t forget to subscribe!</p>
+<p>That’s pretty much it for today. See you next week!</p>
 
 
 </section>
