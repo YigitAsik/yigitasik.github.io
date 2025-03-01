@@ -1,0 +1,35 @@
+---
+title: "Man on a Mission: January 2025"
+author: "Yiğit Aşık"
+date: "2025-03-01"
+categories: [monthly]
+---
+
+Another month has passed. In these monthly posts, I won't dive deep into every little bit of stuff that I studied during the month (that would be impossible), what I'll try to convey the taste to increase your appetite.
+
+---
+
+### Explainable AI
+
+The main focus of the month was on Molnar's[*Interpretable ML*](https://christophm.github.io/interpretable-ml-book/):
+
+I feel like many people miss out on explainable AI, maybe not interested in it as much as making predictions. Before my 9-6, I was more into causal inference and maybe that's why I get drawn to explaining so-called black box models (since explanations are *causal to the model*). Even if you're not into it, it can help you debug the model and some methods (such as SHAP) can be used for feature selection.
+
+The book starts with generalized linear models (GLMs), including the good old classic linear regression. These are highly interpretable models by design, along with decision trees. This section ends with RuleFit, where you learn interactions through decision tree(s) and use those with a sparse linear model. I didn't like this approach very much since rules may not be independent (e.g., $x_1 > 20$, $x_1 > 30$).
+
+The next section covers the model-agnostic methods, methods that are applicable regardless of the model. These mainly consist of permutation importance, partial dependence plots, accumulated local effects, SHAP etc. Some of these methods provide explanations on a local scope
+(you can use those methods to explain individual predictions) while others (global scope methods) give an expected value.
+
+Then there are example based explanations, which I like since they are relatively easy to grasp: What would have happen to the prediction if I changed the value of a feature? These explanations are contrastive, making it easier to grasp for anyone.
+
+The book itself is great, gives you the libraries that you can use to implement the methods. 
+
+### Statistics
+
+I didn't make a lot of progress here, other than going over some of the stuff that I'm already familiar with. I focused on explainable AI since I have a problem at work that may require using it. But, I listened to [Learning Bayesian Statistics](https://learnbayesstats.com/) podcasts a lot. This brings me to the another point: I read a lot of blog posts this month, related to statistics. I wish I noted them somewhere. From now on, I will note what I listen and read as well and include them in my upcoming monthly blog posts!
+
+---
+
+Lastly, I started to become active on my YouTube channel (hoping to keep it up, it takes a lot of time). I'm thinking about doing a "study with me"-like a thing so if you're interested, don't forget to subscribe!
+
+That's pretty much it for today. See you next week!

@@ -2,7 +2,7 @@
 title: "Man on a Mission: January 2025"
 author: "Yiğit Aşık"
 date: "2025-01-31"
-categories: [update]
+categories: [monthly]
 ---
 
 As I [promised at the start of the year](https://yigitasik.github.io/posts/Man%20on%20a%20Mission%20-%20Starting%202025/), here's what I have studied this month.
