@@ -9,7 +9,7 @@
 <meta name="author" content="Yiğit Aşık">
 <meta name="dcterms.date" content="2025-03-08">
 
-<title>How To Automatize Your Notebooks – YIGIT ASIK, Data Scientist</title>
+<title>How To Automatize Your Tasks – YIGIT ASIK, Data Scientist</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -130,7 +130,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">How To Automatize Your Notebooks</h1>
+      <h1 class="title">How To Automatize Your Tasks</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">Code</div>
               </div>
@@ -173,17 +173,19 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 <section id="converting-notebooks-to-scripts" class="level3">
 <h3 class="anchored" data-anchor-id="converting-notebooks-to-scripts">Converting Notebooks to Scripts</h3>
-<p>I usually run my codes in python notebooks, cell by cell structure makes it easy to check plots and follow my thoughts when I take a break and come back. If you’re using notebooks as well, to automize you need to turn them into “.py” files. Luckily, with <em>nbconvert</em>, you don’t have to copy-paste all the stuff. With the following command, your notebooks become scripts: <code>jupyter nbconvert --to script notebook_name.ipynb</code> where “notebook_name” is the placeholder for the notebook. If you want to specify the output path along with changing its name: <code>jupyter nbconvert --to script notebook_name.ipynb --output /path/to/dir/script_name.py</code></p>
+<p>I usually run my codes in python notebooks, cell by cell structure makes it easy to check plots and follow my thoughts when I take a break and come back. If you’re using notebooks as well, to automize you need to turn them into “.py” files. Luckily, with <em>nbconvert</em>, you don’t have to copy-paste all the stuff. With the following command, your notebooks become scripts:</p>
+<p><code>jupyter nbconvert --to script notebook_name.ipynb</code></p>
+<p>where “notebook_name” is the placeholder for the notebook. If you want to specify the output path along with changing its name:</p>
+<p><code>jupyter nbconvert --to script notebook_name.ipynb --output /path/to/dir/script_name.py</code></p>
 </section>
 <section id="creating-a-batch-file" class="level3">
 <h3 class="anchored" data-anchor-id="creating-a-batch-file">Creating a Batch File</h3>
 <p>Next step is to create a batch file that you will schedule later with the help of Windows’ Task Scheduler. All you need to do is to open up a text editor and add the following commands:</p>
-<pre><code>@echo off
+<pre class="{bash}"><code>@echo off
 
-"C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
-</code></pre>
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"</code></pre>
 <p>This just runs a single file, but if you’re interested in running more than one sequentially, all you have to do is to add a second line to the code above. Also, if you do so, I suggest you to add <em>pause</em>s in between like the following for the test run:</p>
-<pre><code>@echo off
+<pre class="{bash}"><code>@echo off
 
 "C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
 pause

@@ -1,9 +1,11 @@
 ---
-title: "How To Automatize Your Notebooks"
+title: "How To Automatize Your Tasks"
 image: task_scheduler.png
 author: "Yiğit Aşık"
 date: "2025-03-08"
 categories: [Code]
+execute:
+    enabled: false
 ---
 
 Last Sunday, I spent my whole day automatizing my sports analytics codes to run weekly. During the season, I need to update the data regularly which was holding me back from focusing on the things that I want the most: modeling and analyzing. I ended up not doing anything at all and stepped away from basketball analytics. However, I can finally get back to it since the data gets pulled while I'm sleeping. Here's how I did it.
@@ -13,24 +15,26 @@ Last Sunday, I spent my whole day automatizing my sports analytics codes to run 
 ### Converting Notebooks to Scripts
 
 I usually run my codes in python notebooks, cell by cell structure makes it easy to check plots and follow my thoughts when I take a break and come back. If you're using notebooks as well, to automize you need to turn them into ".py" files. Luckily, with *nbconvert*, you don't have to copy-paste all the stuff. With the following command, your notebooks become scripts:
+
 `jupyter nbconvert --to script notebook_name.ipynb`
+
 where "notebook_name" is the placeholder for the notebook. If you want to specify the output path along with changing its name:
+
 `jupyter nbconvert --to script notebook_name.ipynb --output /path/to/dir/script_name.py`
 
 ### Creating a Batch File
 
 Next step is to create a batch file that you will schedule later with the help of Windows' Task Scheduler. All you need to do is to open up a text editor and add the following commands:
 
-```
+```{bash}
 @echo off
 
 "C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
-
 ```
 
 This just runs a single file, but if you're interested in running more than one sequentially, all you have to do is to add a second line to the code above. Also, if you do so, I suggest you to add *pause*s in between like the following for the test run:
 
-```
+```{bash}
 @echo off
 
 "C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
