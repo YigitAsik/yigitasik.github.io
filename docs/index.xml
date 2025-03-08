@@ -10,7 +10,56 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.40</generator>
-<lastBuildDate>Fri, 28 Feb 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 07 Mar 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>How To Automatize Your Notebooks</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/How to Automatize Your Notebooks/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Last Sunday, I spent my whole day automatizing my sports analytics codes to run weekly. During the season, I need to update the data regularly which was holding me back from focusing on the things that I want the most: modeling and analyzing. I ended up not doing anything at all and stepped away from basketball analytics. However, I can finally get back to it since the data gets pulled while I’m sleeping. Here’s how I did it.</p>
+<hr>
+<section id="converting-notebooks-to-scripts" class="level3">
+<h3 class="anchored" data-anchor-id="converting-notebooks-to-scripts">Converting Notebooks to Scripts</h3>
+<p>I usually run my codes in python notebooks, cell by cell structure makes it easy to check plots and follow my thoughts when I take a break and come back. If you’re using notebooks as well, to automize you need to turn them into “.py” files. Luckily, with <em>nbconvert</em>, you don’t have to copy-paste all the stuff. With the following command, your notebooks become scripts: <code>jupyter nbconvert --to script notebook_name.ipynb</code> where “notebook_name” is the placeholder for the notebook. If you want to specify the output path along with changing its name: <code>jupyter nbconvert --to script notebook_name.ipynb --output /path/to/dir/script_name.py</code></p>
+</section>
+<section id="creating-a-batch-file" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-batch-file">Creating a Batch File</h3>
+<p>Next step is to create a batch file that you will schedule later with the help of Windows’ Task Scheduler. All you need to do is to open up a text editor and add the following commands:</p>
+<pre><code>@echo off
+
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
+</code></pre>
+<p>This just runs a single file, but if you’re interested in running more than one sequentially, all you have to do is to add a second line to the code above. Also, if you do so, I suggest you to add <em>pause</em>s in between like the following for the test run:</p>
+<pre><code>@echo off
+
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
+pause
+
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name_2.py"
+pause</code></pre>
+<p>To test, you just need to run the .bat file that you save with the text editor. Pauses keeps the bash-cmd open anytime it finishes running a script or if it encounters an error. It expects you to press a button to move onto the next file. If it runs smoothly (i.e., if there is no errors), delete the pauses and save the .bat again.</p>
+<p>Additionally, you can give path to your Python interpreter if you’re using any environment. I do so, since my codes depend on certain packages.</p>
+</section>
+<section id="scheduling-with-task-scheduler" class="level3">
+<h3 class="anchored" data-anchor-id="scheduling-with-task-scheduler">Scheduling with Task Scheduler</h3>
+<p>On Windows, search for “Task Scheduler” under <em>Start</em> and open it. From the right panel that is titled as “Actions”, click “Create Basic Task”. Name it appropriately and add a description if you need to. Once you click “Next”, you’ll see trigger options. I’m running my scripts weekly, but there are bunch of different options. Select the one that you want and click next again. For the action you want the task to perform, select “Start a Program” and locate your batch file. Click next and lastly, check the summary. Don’t worry, you can change the triggers later if you change your mind, since they appear under Task Scheduler.</p>
+<hr>
+<p>That’s pretty much it. I hope you make good use of Task Scheduler.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Code</category>
+  <guid>https://yigitasik.github.io/posts/How to Automatize Your Notebooks/</guid>
+  <pubDate>Fri, 07 Mar 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://yigitasik.github.io/posts/How to Automatize Your Notebooks/task_scheduler.png" medium="image" type="image/png" height="61" width="144"/>
+</item>
 <item>
   <title>Man on a Mission: February 2025</title>
   <dc:creator>Yiğit Aşık</dc:creator>

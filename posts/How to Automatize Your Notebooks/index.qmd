@@ -1,0 +1,53 @@
+---
+title: "How To Automatize Your Notebooks"
+image: task_scheduler.png
+author: "Yiğit Aşık"
+date: "2025-03-08"
+categories: [Code]
+---
+
+Last Sunday, I spent my whole day automatizing my sports analytics codes to run weekly. During the season, I need to update the data regularly which was holding me back from focusing on the things that I want the most: modeling and analyzing. I ended up not doing anything at all and stepped away from basketball analytics. However, I can finally get back to it since the data gets pulled while I'm sleeping. Here's how I did it.
+
+---
+
+### Converting Notebooks to Scripts
+
+I usually run my codes in python notebooks, cell by cell structure makes it easy to check plots and follow my thoughts when I take a break and come back. If you're using notebooks as well, to automize you need to turn them into ".py" files. Luckily, with *nbconvert*, you don't have to copy-paste all the stuff. With the following command, your notebooks become scripts:
+`jupyter nbconvert --to script notebook_name.ipynb`
+where "notebook_name" is the placeholder for the notebook. If you want to specify the output path along with changing its name:
+`jupyter nbconvert --to script notebook_name.ipynb --output /path/to/dir/script_name.py`
+
+### Creating a Batch File
+
+Next step is to create a batch file that you will schedule later with the help of Windows' Task Scheduler. All you need to do is to open up a text editor and add the following commands:
+
+```
+@echo off
+
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
+
+```
+
+This just runs a single file, but if you're interested in running more than one sequentially, all you have to do is to add a second line to the code above. Also, if you do so, I suggest you to add *pause*s in between like the following for the test run:
+
+```
+@echo off
+
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name.py"
+pause
+
+"C:\Path\To\Python\python.exe" "C:\Path\To\script_name_2.py"
+pause
+```
+
+To test, you just need to run the .bat file that you save with the text editor. Pauses keeps the bash-cmd open anytime it finishes running a script or if it encounters an error. It expects you to press a button to move onto the next file. If it runs smoothly (i.e., if there is no errors), delete the pauses and save the .bat again.
+
+Additionally, you can give path to your Python interpreter if you're using any environment. I do so, since my codes depend on certain packages.
+
+### Scheduling with Task Scheduler
+
+On Windows, search for "Task Scheduler" under *Start* and open it. From the right panel that is titled as "Actions", click "Create Basic Task". Name it appropriately and add a description if you need to. Once you click "Next", you'll see trigger options. I'm running my scripts weekly, but there are bunch of different options. Select the one that you want and click next again. For the action you want the task to perform, select "Start a Program" and locate your batch file. Click next and lastly, check the summary. Don't worry, you can change the triggers later if you change your mind, since they appear under Task Scheduler.
+
+---
+
+That's pretty much it. I hope you make good use of Task Scheduler.
