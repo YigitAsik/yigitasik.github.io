@@ -9,8 +9,46 @@
 <link>https://yigitasik.github.io/</link>
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
-<generator>quarto-1.6.40</generator>
-<lastBuildDate>Sat, 15 Mar 2025 21:00:00 GMT</lastBuildDate>
+<generator>quarto-1.6.39</generator>
+<lastBuildDate>Sat, 26 Apr 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Man on a Mission: March-April 2025</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Man on a Mission - March-April 2025/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Another month has passed. In these monthly posts, I won’t dive deep into every little bit of stuff that I studied during the month (that would be impossible), what I’ll try to convey the taste to increase your appetite.</p>
+<p>I haven’t been around for the last month and a half since there are more important things in life other than a blog. Due to the situations in Turkey, which you can read more <a href="https://www.bbc.com/news/topics/c207p54mdq3t">here</a>, it was extremely hard to focus on anything other than politics or law (there is also earthquake threat) which I spent most of my time with during last month.</p>
+<p>Other than these, I personally try to focus on Statistics nowadays which I’ll be giving more information below.</p>
+<hr>
+<section id="gelmans-regression-and-other-stories-ros" class="level3">
+<h3 class="anchored" data-anchor-id="gelmans-regression-and-other-stories-ros">Gelman’s <em>Regression and Other Stories (ROS)</em></h3>
+<p>Gelman’s ROS is the book that I’ve read a lot lately and really liked it. The book goes through Statistics but mainly from Bayesian perspective and uses simulations to facilitate understanding. The book uses R’s <code>stanarm</code> package but there is port of it in Python called <code>Bambi</code> which I already started exploring. It felt a bit counterintuitive at first but played around with it and now it makes more sense.</p>
+<p>Generally, I have been focusing on simulations and methods related to Bayesian framework which made me dive into MCMCs a bit (just the general ones, such as Metropolis or Gibbs). Alongside that, I have developed interest in hierarchical modeling which I think about using for my basketball analytics projects.</p>
+</section>
+<section id="explainable-ai" class="level3">
+<h3 class="anchored" data-anchor-id="explainable-ai">Explainable AI</h3>
+<p>I’ve finished Molnar’s <a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a> a couple of months ago but he updated the book, so I have that opened in one of my tabs and will go through it soon.</p>
+</section>
+<section id="sports-analytics" class="level3">
+<h3 class="anchored" data-anchor-id="sports-analytics">Sports Analytics</h3>
+<p>I have two Shiny Apps now related to Euroleague analytics: - https://hooplytics.shinyapps.io/EL_Player_Stats - https://hooplytics.shinyapps.io/EL_Team_Stats</p>
+<p>I wanted to include the defensive related stats but Turkey’s agenda got in the way, so I’m thinking about getting it done during May. I’ll also write a blog post (or maybe even a YT video) about how to navigate through the apps.</p>
+<hr>
+<p>That’s pretty much all for now, I read/watched/listened a lot of politics and law related content but hoping to dial it down a bit to create more time for data science related topics (if Turkey allows me to focus on those things)…</p>
+
+
+</section>
+
+ ]]></description>
+  <category>monthly</category>
+  <guid>https://yigitasik.github.io/posts/Man on a Mission - March-April 2025/</guid>
+  <pubDate>Sat, 26 Apr 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>How To Structure A Shiny App: Brief Overview</title>
   <dc:creator>Yiğit Aşık</dc:creator>
