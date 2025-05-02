@@ -10,7 +10,70 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 26 Apr 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 02 May 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Navigating Through Euroleague Shiny App</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I recently shared my shiny app related to Euroleague Basketball on <a href="https://www.linkedin.com/posts/yigitasik_euroleague-basketballanalytics-sportsdata-activity-7308151137877000194-MKUW?utm_source=share&amp;utm_medium=member_desktop&amp;rcm=ACoAADIO1CkB0CZ4_GE2sGKiSVqqK5dL8Ewir28">LinkedIn</a>. Now, I want to elaborate a bit on its sections.</p>
+<p>Before going on, I’d like to point out that the site includes <strong>GLOSSARY</strong> which basically has everything I have got to say here. Despite that, I realized many people do not check it and that’s why I’m writing this. If glossary is for you, you can go directly to the site and check it there but if it’s not, you may want to stick here.</p>
+<section id="offense-defense" class="level3">
+<h3 class="anchored" data-anchor-id="offense-defense">Offense-Defense</h3>
+<p>Under the offense and defense sections, there are 4 tabs: Traditional, Advanced, Scoring, By Zone.</p>
+<p>Traditional, as the name implies, includes traditional statistics such as total games played, total points, total assists etc. I included games played so it’s possible to turn them into per-game stats, if anyone wants to.</p>
+<hr>
+<p>Advanced tab consists of advanced statistics and stuff that you may not be able to find anywhere else for Euroleague data. <em>POSS_IMP</em>, possession importance, is one of them which attempts to quantify possession importance: <em>How much a possession can change the win probability for the home team?</em> This allows you to filter out <em>garbage time</em>, time of the match where the winner is already decided, while looking at the stats. In aggregate, it’s impossible to distinguish if a player’s 10 points came when it mattered or not.</p>
+<p>There is also <em>USG_RATE</em>, shows fraction of possessions that the player used (e.g., taking a shot, turning the ball over) while he is on the court. If I was on the court for 10 offensive possessions and I used 2 of them, it means my usg_rate is 0.2. Total possession counts are also there, under <em>POSS</em>, which allows you to solve for total possessions if you need to.</p>
+<p>Per possession stats are the ones that have <em>PP</em> at the end of their variable name. These are important to understand how effective players are. Because there is a difference between scoring 2 points in 10 possessions or scoring 2 points in 20 possessions.</p>
+<hr>
+<p>Scoring tab is related to scoring stats. It also includes possession importance. In addition to field goal percentages, it also includes <em>assisted percentages</em>, which shows how many of those baskets were assisted. Rather than given it in aggregate, I divide that into 2s and 3s to provide more information. Also, it shows percentage of baskets that came from fastbreaks, second chance, and turnover.</p>
+<hr>
+<p>By zone includes these scoring stats broken down into different shot zones and shot areas. This allows you to see where, on the court, a player drives his scoring from along with his efficiency from there and how much he depends on other creators (fraction of assisted field goals).</p>
+<hr>
+</section>
+<section id="tools" class="level3">
+<h3 class="anchored" data-anchor-id="tools">Tools</h3>
+<p>Under tools, I have two tabs: Shot-chart, xPTS (expected points).</p>
+<p>Shot-chart is probably the most fun tool for anyone to use.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/Larkin-sc.png" class="img-fluid figure-img"></p>
+<figcaption>Shane Larkin’s Regular Season Shot Chart</figcaption>
+</figure>
+</div>
+<p>This tool plots a shot graph but allows for a lot more information and filtering options: Plot itself includes hexagons, which quantifies the shot volume from where the hexagon is with its size. In addition to that, it’s colored, which shows the percentage from there relative to league average. Raw percentages are included on top of those hexagons inside the boxes.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/shot-chart-opts.png" class="img-fluid figure-img"></p>
+<figcaption>Shot chart options</figcaption>
+</figure>
+</div>
+<p>Options of plotting allows you to filter the shots based on possession importance, who is on/off the court with the shot taker, and relative to league/team/position shot average. This provides you with a starting point to investigate player interactions: How a player gets affected from other player(s).</p>
+<hr>
+<p>Under the xPTS tab, I’d say most important columns are <em>PTS_ABOVE_X</em> and <em>PTS_ADDED</em>. Former means how many points a player provides above league average shot per his shot attempt. Latter is the total of that, which gets affected by shot volume. While looking at these stats, do not forget the fact that it’s hard to stay efficient if you’re a high usage guy: The defenders look out for you all the time. With that being said, coaches allow only certain players to use that many shots because they have the capacity of being good despite that much attraction from defense.</p>
+<p>I have more ideas for this tool, hoping to add them in the future.</p>
+<hr>
+<p>I hope you enjoy the app and feel free to reach out to me for the features that you may want to see in it. Here are the links for the apps:</p>
+<ul>
+<li><a href="https://hooplytics.shinyapps.io/EL_Player_Stats/">Euroleague Player Stats App</a></li>
+<li><a href="https://hooplytics.shinyapps.io/EL_Team_Stats/">Euroleague Team Stats App</a></li>
+</ul>
+
+
+</section>
+
+ ]]></description>
+  <category>Sports Analytics</category>
+  <guid>https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/</guid>
+  <pubDate>Fri, 02 May 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/Larkin-sc.png" medium="image" type="image/png" height="147" width="144"/>
+</item>
 <item>
   <title>Man on a Mission: March-April 2025</title>
   <dc:creator>Yiğit Aşık</dc:creator>
