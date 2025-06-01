@@ -3,8 +3,11 @@ title: "About"
 about:
   template: jolla
   links:
-    - icon: twitter
-      text: Twitter
+    - icon: substack
+      text: Substack
+      href: https://thereadstep.substack.com/
+    - icon: bluesky
+      text: Bluesky
       href: https://bsky.app/profile/yigas.bsky.social
     - icon: linkedin
       text: LinkedIn
