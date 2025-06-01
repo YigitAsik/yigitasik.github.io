@@ -9,11 +9,13 @@ website:
   navbar:
     right:
       - about.qmd
+      - icon: substack
+        href: https://thereadstep.substack.com/
       - icon: github
         href: https://github.com/YigitAsik
       - icon: linkedin
         href: https://www.linkedin.com/in/yigitasik/
-      - icon: twitter
+      - icon: bluesky
         href: https://bsky.app/profile/yigas.bsky.social
       - icon: youtube
         href: https://www.youtube.com/@yigasIRL
