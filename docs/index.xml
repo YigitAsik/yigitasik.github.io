@@ -10,7 +10,31 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Fri, 02 May 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 19 Jun 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Man on a Mission: May-June 2025</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Man on a Mission - May-June 2025/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Another month has passed. In these monthly posts, I won’t dive deep into every little bit of stuff that I studied during the month (that would be impossible), what I’ll try to convey the taste to increase your appetite.</p>
+<p>For the last two months, majority of my time was spent on basketball analytics. I started a newsletter, called <a href="https://thereadstep.substack.com/"><em>The Read Step</em></a>, which I post about EuroLeague analytics and basketball analytics in general. Don’t forget to subscribe if you’re interested.</p>
+<p>I’ve been interested in Bayesian modeling for the last 3 months, and I was using <code>Bambi</code>, which is a port of R’s <code>stanarm</code>. However, it has its limitations so I got much more familiar with <code>PyMC</code> in the last month which I used to build a Bayesian hierarchical model to estimate <em>home-court advantage</em> in EuroLeague. <a href="https://thereadstep.substack.com/p/openfloor-2-estimating-home-court">Here’s the post</a> to it, if you wonder about it.</p>
+<p>I’ll be starting the classic, <em>Statistical Rethinking</em>, thinking about following the book while going through the videos on YouTube as well.</p>
+<p>Other than these, I bought Asimov’s <em>I, Robot</em> and can’t wait to get to it! During the vacation I read Sinan Alper’s and Onurcan Yilmaz’s <em>Komplo Teorilerine Neden İnanırız?</em> (Why Do We Believe In Conspiracies). It felt nice to get back to reading some social science stuff.</p>
+<hr>
+
+
+
+ ]]></description>
+  <category>monthly</category>
+  <guid>https://yigitasik.github.io/posts/Man on a Mission - May-June 2025/</guid>
+  <pubDate>Thu, 19 Jun 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Navigating Through Euroleague Shiny App</title>
   <dc:creator>Yiğit Aşık</dc:creator>

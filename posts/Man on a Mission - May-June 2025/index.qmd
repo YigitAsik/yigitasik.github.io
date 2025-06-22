@@ -1,0 +1,18 @@
+---
+title: "Man on a Mission: May-June 2025"
+author: "Yiğit Aşık"
+date: "2025-06-20"
+categories: [monthly]
+---
+
+Another month has passed. In these monthly posts, I won't dive deep into every little bit of stuff that I studied during the month (that would be impossible), what I'll try to convey the taste to increase your appetite.
+
+For the last two months, majority of my time was spent on basketball analytics. I started a newsletter, called [*The Read Step*](https://thereadstep.substack.com/), which I post about EuroLeague analytics and basketball analytics in general. Don't forget to subscribe if you're interested.
+
+I've been interested in Bayesian modeling for the last 3 months, and I was using `Bambi`, which is a port of R's `stanarm`. However, it has its limitations so I got much more familiar with `PyMC` in the last month which I used to build a Bayesian hierarchical model to estimate *home-court advantage* in EuroLeague. [Here's the post](https://thereadstep.substack.com/p/openfloor-2-estimating-home-court) to it, if you wonder about it.
+
+I'll be starting the classic, *Statistical Rethinking*, thinking about following the book while going through the videos on YouTube as well.
+
+Other than these, I bought Asimov's *I, Robot* and can't wait to get to it! During the vacation I read Sinan Alper's and Onurcan Yilmaz's *Komplo Teorilerine Neden İnanırız?* (Why Do We Believe In Conspiracies). It felt nice to get back to reading some social science stuff.
+
+---
