@@ -195,7 +195,11 @@ Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
 </div>
 </div>
-<p>In this setting, the coefficient corresponds to the <em>expected difference between two observations, or group of observations, that only differ on the interested predictor by 1.</em></p>
+<p>In this setting, the coefficient corresponds to the <em>expected difference between two observations, or group of observations, that only differ on the interested predictor by 1.</em> Very simple way of showing it is like below:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_2X_2"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbeta_0%20+%20%5Cbeta_1(X_1+1)%20+%20%5Cbeta_2X_2%20=%20%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_1%20+%20%5Cbeta_2X_2"></p>
+<p>if I take the difference: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20(%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_1%20+%20%5Cbeta_2X_2)%20-%20(%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_2X_2)%20=%20%5Cbeta_1"></p>
+<p>This also points out the problem with collinearity. If <img src="https://latex.codecogs.com/png.latex?X_1"> and <img src="https://latex.codecogs.com/png.latex?X_2"> changes together, how am I gonna be left with <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> alone since others won’t cancel each other. Hence, we won’t be able to attribute the change to a single variable.</p>
 <p>With these interpretations from the table in mind, we can also make use of plots which are more intuitive.</p>
 <div id="cell-13" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">mean_kid_by_mom <span class="op" style="color: #5E5E5E;

@@ -362,7 +362,11 @@ Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
 </div>
 </div>
-<p>In this setting, the coefficient corresponds to the <em>expected difference between two observations, or group of observations, that only differ on the interested predictor by 1.</em></p>
+<p>In this setting, the coefficient corresponds to the <em>expected difference between two observations, or group of observations, that only differ on the interested predictor by 1.</em> Very simple way of showing it is like below:</p>
+<p><span class="math inline">\(\displaystyle \beta_0 + \beta_1X_1 + \beta_2X_2\)</span></p>
+<p><span class="math inline">\(\displaystyle \beta_0 + \beta_1(X_1+1) + \beta_2X_2 = \beta_0 + \beta_1X_1 + \beta_1 + \beta_2X_2\)</span></p>
+<p>if I take the difference: <span class="math inline">\(\displaystyle (\beta_0 + \beta_1X_1 + \beta_1 + \beta_2X_2) - (\beta_0 + \beta_1X_1 + \beta_2X_2) = \beta_1\)</span></p>
+<p>This also points out the problem with collinearity. If <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span> changes together, how am I gonna be left with <span class="math inline">\(\beta_1\)</span> alone since others won’t cancel each other. Hence, we won’t be able to attribute the change to a single variable.</p>
 <p>With these interpretations from the table in mind, we can also make use of plots which are more intuitive.</p>
 <div id="cell-13" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>mean_kid_by_mom <span class="op">=</span> cognitive.groupby(<span class="st">'mom_iq'</span>)[<span class="st">'kid_score'</span>].mean()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
