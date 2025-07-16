@@ -21,7 +21,11 @@
 
 
 
-<p>Welcome to a new series on interpretability where I’ll go through methods to interpret models, starting from the linear regression to so called black-box ensembles. I wanted to start this series for a while, due to two reasons: 1. I feel like anything I write is helpful for me, like I’m explaining to my future self. So, anytime I can’t recall something my own blog becomes my go-to source. 2. There seems to be a lot of confusions within the ML field in terms of interpretability (at least among the new comers), where most of the time wording suggest causality when it shouldn’t. I think I learned a few approaches to be helpful for that as well.</p>
+<p>Welcome to a new series on interpretability where I’ll go through methods to interpret models, starting from the linear regression to so called black-box ensembles. I wanted to start this series for a while, due to two reasons:</p>
+<ol type="1">
+<li>I feel like anything I write is helpful for me, like I’m explaining to my future self. So, anytime I can’t recall something my own blog becomes my go-to source.</li>
+<li>There seems to be a lot of confusions within the ML field in terms of interpretability (at least among the new comers), where most of the time wording suggest causality when it shouldn’t. I think I learned a few approaches to be helpful for that as well.</li>
+</ol>
 <p>If you want a book to find everything in one place your go-to source should be <a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a> by Christoph Molnar. Most of the approaches that I learned is from there. I should also give credit to <a href="https://avehtari.github.io/ROS-Examples/"><em>Regression and Other Stories</em></a>.</p>
 <p>By the way, throughout the series I won’t dive much into how to fit models. So, I assume some familiarity with GLMs, decision tree, and bagging and boosting methods in general. For example, I won’t walk through the summary table below, assuming you already know how to read it.</p>
 <p>Let’s start with a <em>simple linear regression</em> where we only have predictor show a simple trick that aids the interpretability.</p>
