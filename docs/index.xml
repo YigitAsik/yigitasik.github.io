@@ -10,608 +10,9 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Tue, 15 Jul 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 02 Aug 2025 21:00:00 GMT</lastBuildDate>
 <item>
-  <title>Interpretablog - Fire &amp; Forget</title>
-  <dc:creator>Yiğit Aşık</dc:creator>
-  <link>https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Welcome to a new series on interpretability where I’ll go through methods to interpret models, starting from the linear regression to so called black-box ensembles. I wanted to start this series for a while, due to two reasons:</p>
-<ol type="1">
-<li>I feel like anything I write is helpful for me, like I’m explaining to my future self. So, anytime I can’t recall something my own blog becomes my go-to source.</li>
-<li>There seems to be a lot of confusions within the ML field in terms of interpretability (at least among the new comers), where most of the time wording suggest causality when it shouldn’t. I think I learned a few approaches to be helpful for that as well.</li>
-</ol>
-<p>If you want a book to find everything in one place your go-to source should be <a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a> by Christoph Molnar. Most of the approaches that I learned is from there. I should also give credit to <a href="https://avehtari.github.io/ROS-Examples/"><em>Regression and Other Stories</em></a>.</p>
-<p>By the way, throughout the series I won’t dive much into how to fit models. So, I assume some familiarity with GLMs, decision tree, and bagging and boosting methods in general. For example, I won’t walk through the summary table below, assuming you already know how to read it.</p>
-<p>Let’s start with a <em>simple linear regression</em> where we only have predictor show a simple trick that aids the interpretability.</p>
-<div id="cell-3" class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">model <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score ~ mom_iq'</span>, data<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>cognitive)</span>
-<span id="cb1-2">results <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> model.fit()</span>
-<span id="cb1-3"></span>
-<span id="cb1-4"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:              kid_score   R-squared:                       0.201
-Model:                            OLS   Adj. R-squared:                  0.199
-Method:                 Least Squares   F-statistic:                     108.6
-Date:                Wed, 16 Jul 2025   Prob (F-statistic):           7.66e-23
-Time:                        15:08:03   Log-Likelihood:                -1875.6
-No. Observations:                 434   AIC:                             3755.
-Df Residuals:                     432   BIC:                             3763.
-Df Model:                           1                                         
-Covariance Type:            nonrobust                                         
-==============================================================================
-                 coef    std err          t      P&gt;|t|      [0.025      0.975]
-------------------------------------------------------------------------------
-Intercept     25.7998      5.917      4.360      0.000      14.169      37.430
-mom_iq         0.6100      0.059     10.423      0.000       0.495       0.725
-==============================================================================
-Omnibus:                        7.545   Durbin-Watson:                   1.645
-Prob(Omnibus):                  0.023   Jarque-Bera (JB):                7.735
-Skew:                          -0.324   Prob(JB):                       0.0209
-Kurtosis:                       2.919   Cond. No.                         682.
-==============================================================================
-
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
-</div>
-</div>
-<p>What the table above tells us is that: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BE%5Bkid's%20score%20%7C%20mom's%20iq%5D%7D%20=%2025.7998%20+%200.61%20%5Ccdot%20%5Ctext%7Bmom's%20iq%7D"></p>
-<p>Which implies the intercept, 25.7998, is the expected value of kid’s score when the mom’s iq is 0. That doesn’t make sense, right? Nobody has an IQ score of 0.</p>
-<p>So, a way to make it make sense is via centering the predictor so that the intercept corresponds to the mean. Let me show.</p>
-<div id="cell-6" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">offset <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> np.mean(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>])</span>
-<span id="cb3-2">cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq_c'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> offset</span>
-<span id="cb3-3"></span>
-<span id="cb3-4">model <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score ~ mom_iq_c'</span>, data<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>cognitive)</span>
-<span id="cb3-5">results <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> model.fit()</span>
-<span id="cb3-6"></span>
-<span id="cb3-7"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:              kid_score   R-squared:                       0.201
-Model:                            OLS   Adj. R-squared:                  0.199
-Method:                 Least Squares   F-statistic:                     108.6
-Date:                Wed, 16 Jul 2025   Prob (F-statistic):           7.66e-23
-Time:                        15:08:03   Log-Likelihood:                -1875.6
-No. Observations:                 434   AIC:                             3755.
-Df Residuals:                     432   BIC:                             3763.
-Df Model:                           1                                         
-Covariance Type:            nonrobust                                         
-==============================================================================
-                 coef    std err          t      P&gt;|t|      [0.025      0.975]
-------------------------------------------------------------------------------
-Intercept     86.7972      0.877     98.993      0.000      85.074      88.521
-mom_iq_c       0.6100      0.059     10.423      0.000       0.495       0.725
-==============================================================================
-Omnibus:                        7.545   Durbin-Watson:                   1.645
-Prob(Omnibus):                  0.023   Jarque-Bera (JB):                7.735
-Skew:                          -0.324   Prob(JB):                       0.0209
-Kurtosis:                       2.919   Cond. No.                         15.0
-==============================================================================
-
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
-</div>
-</div>
-<p>As you can see, intercept has changed since now it corresponds to the expected value of kid’s score when the <em>mom_iq</em> is the average.</p>
-<div id="cell-8" class="cell" data-execution_count="5">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(np.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">round</span>(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score'</span>].mean(), <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>86.7972</code></pre>
-</div>
-</div>
-<p>What about the slope? Isn’t it interpreted as <em>one unit increase in mom’s IQ is associated with 0.61 increase of kid’s score</em>?</p>
-<p>I suggest you to stay away from such interpretation. The model does <em>not</em> provide information about changes <em>within</em> units but about <em>comparisons between units</em>. So, the most secure way of interpretation is as follows: <em>Under the model, a kid with a mom’s score of x+1 will be, on average, 0.61 IQ higher compared to a kid with a mom’s score of x.</em></p>
-<p>Let’s extend this to a more general setting where there’s more than 1 variable.</p>
-<div id="cell-10" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">model <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score ~ mom_iq + mom_hs'</span>, data<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>cognitive)</span>
-<span id="cb7-2">results <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> model.fit()</span>
-<span id="cb7-3"></span>
-<span id="cb7-4"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:              kid_score   R-squared:                       0.214
-Model:                            OLS   Adj. R-squared:                  0.210
-Method:                 Least Squares   F-statistic:                     58.72
-Date:                Wed, 16 Jul 2025   Prob (F-statistic):           2.79e-23
-Time:                        15:08:03   Log-Likelihood:                -1872.0
-No. Observations:                 434   AIC:                             3750.
-Df Residuals:                     431   BIC:                             3762.
-Df Model:                           2                                         
-Covariance Type:            nonrobust                                         
-=================================================================================
-                    coef    std err          t      P&gt;|t|      [0.025      0.975]
----------------------------------------------------------------------------------
-Intercept        25.7315      5.875      4.380      0.000      14.184      37.279
-mom_hs[T.yes]     5.9501      2.212      2.690      0.007       1.603      10.297
-mom_iq            0.5639      0.061      9.309      0.000       0.445       0.683
-==============================================================================
-Omnibus:                        7.327   Durbin-Watson:                   1.625
-Prob(Omnibus):                  0.026   Jarque-Bera (JB):                7.530
-Skew:                          -0.313   Prob(JB):                       0.0232
-Kurtosis:                       2.845   Cond. No.                         683.
-==============================================================================
-
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
-</div>
-</div>
-<p>In this setting, the coefficient corresponds to the <em>expected difference between two observations, or group of observations, that only differ on the interested predictor by 1.</em> Very simple way of showing it is like below:</p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_2X_2"></p>
-<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbeta_0%20+%20%5Cbeta_1(X_1+1)%20+%20%5Cbeta_2X_2%20=%20%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_1%20+%20%5Cbeta_2X_2"></p>
-<p>if I take the difference: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20(%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_1%20+%20%5Cbeta_2X_2)%20-%20(%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_2X_2)%20=%20%5Cbeta_1"></p>
-<p>This also points out the problem with collinearity. If <img src="https://latex.codecogs.com/png.latex?X_1"> and <img src="https://latex.codecogs.com/png.latex?X_2"> changes together, how am I gonna be left with <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> alone since others won’t cancel each other. Hence, we won’t be able to attribute the change to a single variable.</p>
-<p>With these interpretations from the table in mind, we can also make use of plots which are more intuitive.</p>
-<div id="cell-13" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">mean_kid_by_mom <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> cognitive.groupby(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>)[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score'</span>].mean()</span></code></pre></div>
-</div>
-<div id="cell-14" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">low_end, high_end <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>].<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">min</span>(), cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>].<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">max</span>()</span>
-<span id="cb10-2">qs <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> np.linspace(low_end, high_end, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">101</span>)</span></code></pre></div>
-</div>
-<div id="cell-15" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">newdata_yes <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb11-2"></span>
-<span id="cb11-3">newdata_yes[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> qs</span>
-<span id="cb11-4">newdata_yes[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'yes'</span></span>
-<span id="cb11-5">newdata_yes[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'preds'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> results.predict(newdata_yes)</span></code></pre></div>
-</div>
-<div id="cell-16" class="cell" data-execution_count="10">
-<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">newdata_no <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb12-2"></span>
-<span id="cb12-3">newdata_no[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> qs</span>
-<span id="cb12-4">newdata_no[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'no'</span></span>
-<span id="cb12-5">newdata_no[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'preds'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> results.predict(newdata_no)</span></code></pre></div>
-</div>
-<div id="cell-17" class="cell" data-execution_count="11">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">6</span>,<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4</span>))</span>
-<span id="cb13-2"></span>
-<span id="cb13-3">plt.plot(mean_kid_by_mom, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'o'</span>, alpha<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.43</span>)</span>
-<span id="cb13-4">plt.plot(newdata_yes[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>], newdata_yes[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'preds'</span>], label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'HS_Yes'</span>, color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'C1'</span>, lw<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span>
-<span id="cb13-5">plt.plot(newdata_no[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>], newdata_no[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'preds'</span>], label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'HS_No'</span>, color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'C3'</span>, lw<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span>
-<span id="cb13-6"></span>
-<span id="cb13-7">plt.xlabel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom</span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">\'</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">s iq'</span>)</span>
-<span id="cb13-8">plt.ylabel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid score'</span>)</span>
-<span id="cb13-9">plt.title(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'Kid_score ~ mom_iq + mom_hs'</span>)</span>
-<span id="cb13-10"></span>
-<span id="cb13-11">plt.legend()</span></code></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>With plots, it’s very easy to understand the model and its assumptions. By looking at the plot, for example, it’s apparent that coefficient of <em>mom’s iq</em> does not depend on high school variable — the slope is the same for both levels of high school.</p>
-<p>We can include an interaction term in the model specification, so that it can depend on the level of high school.</p>
-<div id="cell-19" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">model <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score ~ mom_iq + mom_hs + mom_iq:mom_hs'</span>, data<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>cognitive)</span>
-<span id="cb14-2">results <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> model.fit()</span>
-<span id="cb14-3"><span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                            OLS Regression Results                            
-==============================================================================
-Dep. Variable:              kid_score   R-squared:                       0.230
-Model:                            OLS   Adj. R-squared:                  0.225
-Method:                 Least Squares   F-statistic:                     42.84
-Date:                Wed, 16 Jul 2025   Prob (F-statistic):           3.07e-24
-Time:                        15:08:04   Log-Likelihood:                -1867.5
-No. Observations:                 434   AIC:                             3743.
-Df Residuals:                     430   BIC:                             3759.
-Df Model:                           3                                         
-Covariance Type:            nonrobust                                         
-========================================================================================
-                           coef    std err          t      P&gt;|t|      [0.025      0.975]
-----------------------------------------------------------------------------------------
-Intercept              -11.4820     13.758     -0.835      0.404     -38.523      15.559
-mom_hs[T.yes]           51.2682     15.338      3.343      0.001      21.122      81.414
-mom_iq                   0.9689      0.148      6.531      0.000       0.677       1.260
-mom_iq:mom_hs[T.yes]    -0.4843      0.162     -2.985      0.003      -0.803      -0.165
-==============================================================================
-Omnibus:                        8.014   Durbin-Watson:                   1.660
-Prob(Omnibus):                  0.018   Jarque-Bera (JB):                8.258
-Skew:                          -0.333   Prob(JB):                       0.0161
-Kurtosis:                       2.887   Cond. No.                     3.10e+03
-==============================================================================
-
-Notes:
-[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
-[2] The condition number is large, 3.1e+03. This might indicate that there are
-strong multicollinearity or other numerical problems.</code></pre>
-</div>
-</div>
-<p>Just like that, we allowed the coefficient of mom_iq to change depending on the level of mom_hs. But how do we interpret them now?</p>
-<p>The most intuitive way is via the plot:</p>
-<div id="cell-21" class="cell" data-execution_count="13">
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1">newdata_hs <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb16-2"></span>
-<span id="cb16-3">newdata_hs[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> np.linspace(np.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">min</span>(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>]), np.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">max</span>(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>]), <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">101</span>)</span>
-<span id="cb16-4">newdata_hs[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'yes'</span></span>
-<span id="cb16-5"></span>
-<span id="cb16-6">pred_hs <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> results.predict(newdata_hs)</span></code></pre></div>
-</div>
-<div id="cell-22" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">newdata_nohs <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pd.DataFrame()</span>
-<span id="cb17-2"></span>
-<span id="cb17-3">newdata_nohs[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> np.linspace(np.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">min</span>(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>]), np.<span class="bu" style="color: null;
-background-color: null;
-font-style: inherit;">max</span>(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>]), <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">101</span>)</span>
-<span id="cb17-4">newdata_nohs[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'no'</span></span>
-<span id="cb17-5"></span>
-<span id="cb17-6">pred_nohs <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> results.predict(newdata_nohs)</span></code></pre></div>
-</div>
-<div id="cell-23" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">6</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4</span>))</span>
-<span id="cb18-2"></span>
-<span id="cb18-3">plt.plot(cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>], cognitive[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score'</span>], <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'o'</span>, alpha<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.43</span>)</span>
-<span id="cb18-4">plt.plot(newdata_hs[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>], pred_hs, label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'HS_yes'</span>, color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'C1'</span>, ls<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'-'</span>, lw<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span>
-<span id="cb18-5">plt.plot(newdata_nohs[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>], pred_nohs, label<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'HS_no'</span>, color<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'C3'</span>, ls<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'-'</span>, lw<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span>
-<span id="cb18-6"></span>
-<span id="cb18-7">plt.xlabel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'Mom</span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">\'</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">s iq'</span>)</span>
-<span id="cb18-8">plt.ylabel(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'Kid</span><span class="ch" style="color: #20794D;
-background-color: null;
-font-style: inherit;">\'</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">s score'</span>)</span>
-<span id="cb18-9">plt.legend()</span></code></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Seaborn makes quick plotting available.</p>
-<div id="cell-25" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">sns.lmplot(</span>
-<span id="cb19-2">    data<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>cognitive, x<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_iq'</span>, y<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'kid_score'</span>, hue<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mom_hs'</span>, </span>
-<span id="cb19-3">    ci<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="va" style="color: #111111;
-background-color: null;
-font-style: inherit;">None</span>, scatter_kws<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>{<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'alpha'</span>:<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">.4</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'s'</span>:<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">20</span>},</span>
-<span id="cb19-4">    height<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4</span>, aspect<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1.23</span></span>
-<span id="cb19-5">)</span></code></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Plots show that the lines are not parallel, so coefficients are not the same for both levels of high school variable.</p>
-<p>I want to emphasize this, interaction effect is ADDITIVE to the main effect. Since interpretation of “while holding all other variables constant” is meaningless - we can’t hold mom_iq constant while increasing the interaction variable.</p>
-<p>What it means to be additive? Well, think of it this way. The coefficient of interaction is negative. When the high school level is yes, we add -0.4843 to the slope of the <em>mom_iq</em>. Since the coefficient of <em>mom_iq</em> positive, it means that mom_iq matters less when the level of high school is “yes”.</p>
-<p>I hope this post clarified some aspects of interpretation of linear models. Of course, there are extensions of the classic linear regression, called Generalized Linear Models (GLMs). Actually, linear regression itself is a special case in GLM framework where the link function is identity function.</p>
-<p>Anyway, I believe I’ll follow this up with model agnostic methods since most of you go for ML models. However, make no mistake, you may actually need these parametric approaches since you don’t always end up with a lot of data.</p>
-<p>Until then, take care!</p>
-
-
-
- ]]></description>
-  <category>Stats</category>
-  <category>Interpretability</category>
-  <guid>https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/</guid>
-  <pubDate>Tue, 15 Jul 2025 21:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Interpretablog - Fire &amp; Forget</title>
+  <title>Interpretablog - Partial Dependence</title>
   <dc:creator>Yiğit Aşık</dc:creator>
   <link>https://yigitasik.github.io/posts/Interpretablog - Partial Dependence/</link>
   <description><![CDATA[ 
@@ -1721,9 +1122,607 @@ font-style: inherit;">'cum_P3A'</span>])</span></code></pre></div>
 
 
  ]]></description>
-  <category>Stats</category>
   <category>Interpretability</category>
   <guid>https://yigitasik.github.io/posts/Interpretablog - Partial Dependence/</guid>
+  <pubDate>Sat, 02 Aug 2025 21:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Interpretablog - Fire &amp; Forget</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Welcome to a new series on interpretability where I’ll go through methods to interpret models, starting from the linear regression to so called black-box ensembles. I wanted to start this series for a while, due to two reasons:</p>
+<ol type="1">
+<li>I feel like anything I write is helpful for me, like I’m explaining to my future self. So, anytime I can’t recall something my own blog becomes my go-to source.</li>
+<li>There seems to be a lot of confusions within the ML field in terms of interpretability (at least among the new comers), where most of the time wording suggest causality when it shouldn’t. I think I learned a few approaches to be helpful for that as well.</li>
+</ol>
+<p>If you want a book to find everything in one place your go-to source should be <a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a> by Christoph Molnar. Most of the approaches that I learned is from there. I should also give credit to <a href="https://avehtari.github.io/ROS-Examples/"><em>Regression and Other Stories</em></a>.</p>
+<p>By the way, throughout the series I won’t dive much into how to fit models. So, I assume some familiarity with GLMs, decision tree, and bagging and boosting methods in general. For example, I won’t walk through the summary table below, assuming you already know how to read it.</p>
+<p>Let’s start with a <em>simple linear regression</em> where we only have predictor show a simple trick that aids the interpretability.</p>
+<div id="cell-3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score ~ mom_iq'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>cognitive)</span>
+<span id="cb1-2">results <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model.fit()</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:              kid_score   R-squared:                       0.201
+Model:                            OLS   Adj. R-squared:                  0.199
+Method:                 Least Squares   F-statistic:                     108.6
+Date:                Wed, 16 Jul 2025   Prob (F-statistic):           7.66e-23
+Time:                        15:08:03   Log-Likelihood:                -1875.6
+No. Observations:                 434   AIC:                             3755.
+Df Residuals:                     432   BIC:                             3763.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     25.7998      5.917      4.360      0.000      14.169      37.430
+mom_iq         0.6100      0.059     10.423      0.000       0.495       0.725
+==============================================================================
+Omnibus:                        7.545   Durbin-Watson:                   1.645
+Prob(Omnibus):                  0.023   Jarque-Bera (JB):                7.735
+Skew:                          -0.324   Prob(JB):                       0.0209
+Kurtosis:                       2.919   Cond. No.                         682.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+</div>
+</div>
+<p>What the table above tells us is that: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BE%5Bkid's%20score%20%7C%20mom's%20iq%5D%7D%20=%2025.7998%20+%200.61%20%5Ccdot%20%5Ctext%7Bmom's%20iq%7D"></p>
+<p>Which implies the intercept, 25.7998, is the expected value of kid’s score when the mom’s iq is 0. That doesn’t make sense, right? Nobody has an IQ score of 0.</p>
+<p>So, a way to make it make sense is via centering the predictor so that the intercept corresponds to the mean. Let me show.</p>
+<div id="cell-6" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">offset <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.mean(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>])</span>
+<span id="cb3-2">cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq_c'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> offset</span>
+<span id="cb3-3"></span>
+<span id="cb3-4">model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score ~ mom_iq_c'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>cognitive)</span>
+<span id="cb3-5">results <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model.fit()</span>
+<span id="cb3-6"></span>
+<span id="cb3-7"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:              kid_score   R-squared:                       0.201
+Model:                            OLS   Adj. R-squared:                  0.199
+Method:                 Least Squares   F-statistic:                     108.6
+Date:                Wed, 16 Jul 2025   Prob (F-statistic):           7.66e-23
+Time:                        15:08:03   Log-Likelihood:                -1875.6
+No. Observations:                 434   AIC:                             3755.
+Df Residuals:                     432   BIC:                             3763.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     86.7972      0.877     98.993      0.000      85.074      88.521
+mom_iq_c       0.6100      0.059     10.423      0.000       0.495       0.725
+==============================================================================
+Omnibus:                        7.545   Durbin-Watson:                   1.645
+Prob(Omnibus):                  0.023   Jarque-Bera (JB):                7.735
+Skew:                          -0.324   Prob(JB):                       0.0209
+Kurtosis:                       2.919   Cond. No.                         15.0
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+</div>
+</div>
+<p>As you can see, intercept has changed since now it corresponds to the expected value of kid’s score when the <em>mom_iq</em> is the average.</p>
+<div id="cell-8" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score'</span>].mean(), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>86.7972</code></pre>
+</div>
+</div>
+<p>What about the slope? Isn’t it interpreted as <em>one unit increase in mom’s IQ is associated with 0.61 increase of kid’s score</em>?</p>
+<p>I suggest you to stay away from such interpretation. The model does <em>not</em> provide information about changes <em>within</em> units but about <em>comparisons between units</em>. So, the most secure way of interpretation is as follows: <em>Under the model, a kid with a mom’s score of x+1 will be, on average, 0.61 IQ higher compared to a kid with a mom’s score of x.</em></p>
+<p>Let’s extend this to a more general setting where there’s more than 1 variable.</p>
+<div id="cell-10" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score ~ mom_iq + mom_hs'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>cognitive)</span>
+<span id="cb7-2">results <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model.fit()</span>
+<span id="cb7-3"></span>
+<span id="cb7-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:              kid_score   R-squared:                       0.214
+Model:                            OLS   Adj. R-squared:                  0.210
+Method:                 Least Squares   F-statistic:                     58.72
+Date:                Wed, 16 Jul 2025   Prob (F-statistic):           2.79e-23
+Time:                        15:08:03   Log-Likelihood:                -1872.0
+No. Observations:                 434   AIC:                             3750.
+Df Residuals:                     431   BIC:                             3762.
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+=================================================================================
+                    coef    std err          t      P&gt;|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+Intercept        25.7315      5.875      4.380      0.000      14.184      37.279
+mom_hs[T.yes]     5.9501      2.212      2.690      0.007       1.603      10.297
+mom_iq            0.5639      0.061      9.309      0.000       0.445       0.683
+==============================================================================
+Omnibus:                        7.327   Durbin-Watson:                   1.625
+Prob(Omnibus):                  0.026   Jarque-Bera (JB):                7.530
+Skew:                          -0.313   Prob(JB):                       0.0232
+Kurtosis:                       2.845   Cond. No.                         683.
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+</div>
+</div>
+<p>In this setting, the coefficient corresponds to the <em>expected difference between two observations, or group of observations, that only differ on the interested predictor by 1.</em> Very simple way of showing it is like below:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_2X_2"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cbeta_0%20+%20%5Cbeta_1(X_1+1)%20+%20%5Cbeta_2X_2%20=%20%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_1%20+%20%5Cbeta_2X_2"></p>
+<p>if I take the difference: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20(%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_1%20+%20%5Cbeta_2X_2)%20-%20(%5Cbeta_0%20+%20%5Cbeta_1X_1%20+%20%5Cbeta_2X_2)%20=%20%5Cbeta_1"></p>
+<p>This also points out the problem with collinearity. If <img src="https://latex.codecogs.com/png.latex?X_1"> and <img src="https://latex.codecogs.com/png.latex?X_2"> changes together, how am I gonna be left with <img src="https://latex.codecogs.com/png.latex?%5Cbeta_1"> alone since others won’t cancel each other. Hence, we won’t be able to attribute the change to a single variable.</p>
+<p>With these interpretations from the table in mind, we can also make use of plots which are more intuitive.</p>
+<div id="cell-13" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">mean_kid_by_mom <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cognitive.groupby(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>)[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score'</span>].mean()</span></code></pre></div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">low_end, high_end <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>].<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(), cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>].<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>()</span>
+<span id="cb10-2">qs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(low_end, high_end, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>)</span></code></pre></div>
+</div>
+<div id="cell-15" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">newdata_yes <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame()</span>
+<span id="cb11-2"></span>
+<span id="cb11-3">newdata_yes[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> qs</span>
+<span id="cb11-4">newdata_yes[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span></span>
+<span id="cb11-5">newdata_yes[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'preds'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> results.predict(newdata_yes)</span></code></pre></div>
+</div>
+<div id="cell-16" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">newdata_no <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame()</span>
+<span id="cb12-2"></span>
+<span id="cb12-3">newdata_no[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> qs</span>
+<span id="cb12-4">newdata_no[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span></span>
+<span id="cb12-5">newdata_no[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'preds'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> results.predict(newdata_no)</span></code></pre></div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>))</span>
+<span id="cb13-2"></span>
+<span id="cb13-3">plt.plot(mean_kid_by_mom, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'o'</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.43</span>)</span>
+<span id="cb13-4">plt.plot(newdata_yes[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>], newdata_yes[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'preds'</span>], label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'HS_Yes'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'C1'</span>, lw<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb13-5">plt.plot(newdata_no[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>], newdata_no[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'preds'</span>], label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'HS_No'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'C3'</span>, lw<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb13-6"></span>
+<span id="cb13-7">plt.xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s iq'</span>)</span>
+<span id="cb13-8">plt.ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid score'</span>)</span>
+<span id="cb13-9">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Kid_score ~ mom_iq + mom_hs'</span>)</span>
+<span id="cb13-10"></span>
+<span id="cb13-11">plt.legend()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>With plots, it’s very easy to understand the model and its assumptions. By looking at the plot, for example, it’s apparent that coefficient of <em>mom’s iq</em> does not depend on high school variable — the slope is the same for both levels of high school.</p>
+<p>We can include an interaction term in the model specification, so that it can depend on the level of high school.</p>
+<div id="cell-19" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score ~ mom_iq + mom_hs + mom_iq:mom_hs'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>cognitive)</span>
+<span id="cb14-2">results <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model.fit()</span>
+<span id="cb14-3"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(results.summary())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:              kid_score   R-squared:                       0.230
+Model:                            OLS   Adj. R-squared:                  0.225
+Method:                 Least Squares   F-statistic:                     42.84
+Date:                Wed, 16 Jul 2025   Prob (F-statistic):           3.07e-24
+Time:                        15:08:04   Log-Likelihood:                -1867.5
+No. Observations:                 434   AIC:                             3743.
+Df Residuals:                     430   BIC:                             3759.
+Df Model:                           3                                         
+Covariance Type:            nonrobust                                         
+========================================================================================
+                           coef    std err          t      P&gt;|t|      [0.025      0.975]
+----------------------------------------------------------------------------------------
+Intercept              -11.4820     13.758     -0.835      0.404     -38.523      15.559
+mom_hs[T.yes]           51.2682     15.338      3.343      0.001      21.122      81.414
+mom_iq                   0.9689      0.148      6.531      0.000       0.677       1.260
+mom_iq:mom_hs[T.yes]    -0.4843      0.162     -2.985      0.003      -0.803      -0.165
+==============================================================================
+Omnibus:                        8.014   Durbin-Watson:                   1.660
+Prob(Omnibus):                  0.018   Jarque-Bera (JB):                8.258
+Skew:                          -0.333   Prob(JB):                       0.0161
+Kurtosis:                       2.887   Cond. No.                     3.10e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 3.1e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.</code></pre>
+</div>
+</div>
+<p>Just like that, we allowed the coefficient of mom_iq to change depending on the level of mom_hs. But how do we interpret them now?</p>
+<p>The most intuitive way is via the plot:</p>
+<div id="cell-21" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1">newdata_hs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame()</span>
+<span id="cb16-2"></span>
+<span id="cb16-3">newdata_hs[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>]), np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>]), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>)</span>
+<span id="cb16-4">newdata_hs[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'yes'</span></span>
+<span id="cb16-5"></span>
+<span id="cb16-6">pred_hs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> results.predict(newdata_hs)</span></code></pre></div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">newdata_nohs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.DataFrame()</span>
+<span id="cb17-2"></span>
+<span id="cb17-3">newdata_nohs[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> np.linspace(np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">min</span>(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>]), np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">max</span>(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>]), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">101</span>)</span>
+<span id="cb17-4">newdata_nohs[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_hs'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'no'</span></span>
+<span id="cb17-5"></span>
+<span id="cb17-6">pred_nohs <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> results.predict(newdata_nohs)</span></code></pre></div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>))</span>
+<span id="cb18-2"></span>
+<span id="cb18-3">plt.plot(cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>], cognitive[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score'</span>], <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'o'</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.43</span>)</span>
+<span id="cb18-4">plt.plot(newdata_hs[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>], pred_hs, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'HS_yes'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'C1'</span>, ls<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'-'</span>, lw<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb18-5">plt.plot(newdata_nohs[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>], pred_nohs, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'HS_no'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'C3'</span>, ls<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'-'</span>, lw<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb18-6"></span>
+<span id="cb18-7">plt.xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Mom</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s iq'</span>)</span>
+<span id="cb18-8">plt.ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Kid</span><span class="ch" style="color: #20794D;
+background-color: null;
+font-style: inherit;">\'</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">s score'</span>)</span>
+<span id="cb18-9">plt.legend()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Seaborn makes quick plotting available.</p>
+<div id="cell-25" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1">sns.lmplot(</span>
+<span id="cb19-2">    data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>cognitive, x<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_iq'</span>, y<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kid_score'</span>, hue<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'mom_hs'</span>, </span>
+<span id="cb19-3">    ci<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">None</span>, scatter_kws<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>{<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'alpha'</span>:<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.4</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'s'</span>:<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>},</span>
+<span id="cb19-4">    height<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>, aspect<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.23</span></span>
+<span id="cb19-5">)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Plots show that the lines are not parallel, so coefficients are not the same for both levels of high school variable.</p>
+<p>I want to emphasize this, interaction effect is ADDITIVE to the main effect. Since interpretation of “while holding all other variables constant” is meaningless - we can’t hold mom_iq constant while increasing the interaction variable.</p>
+<p>What it means to be additive? Well, think of it this way. The coefficient of interaction is negative. When the high school level is yes, we add -0.4843 to the slope of the <em>mom_iq</em>. Since the coefficient of <em>mom_iq</em> positive, it means that mom_iq matters less when the level of high school is “yes”.</p>
+<p>I hope this post clarified some aspects of interpretation of linear models. Of course, there are extensions of the classic linear regression, called Generalized Linear Models (GLMs). Actually, linear regression itself is a special case in GLM framework where the link function is identity function.</p>
+<p>Anyway, I believe I’ll follow this up with model agnostic methods since most of you go for ML models. However, make no mistake, you may actually need these parametric approaches since you don’t always end up with a lot of data.</p>
+<p>Until then, take care!</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Interpretability</category>
+  <guid>https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/</guid>
   <pubDate>Tue, 15 Jul 2025 21:00:00 GMT</pubDate>
 </item>
 <item>
