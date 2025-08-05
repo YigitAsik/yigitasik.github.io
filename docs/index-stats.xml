@@ -23,10 +23,10 @@
 
 <p>I wanted to introduce <em>partial regression plots</em> (or added variable plots, or predictor residual plots etc.), before moving any further down this <a href="https://yigitasik.github.io/#category=Interpretability">series</a>.</p>
 <p>In the <a href="https://yigitasik.github.io/posts/Interpretablog%20-%20Fire%20and%20Forget/">first post of this series</a>, I showed a relationship by plotting <img src="https://latex.codecogs.com/png.latex?X_j"> vs <img src="https://latex.codecogs.com/png.latex?y">. In a multivariate setting, that doesn’t tell us much since if there seems to be a relationship, it might be due to shared effects with other variables that are not <img src="https://latex.codecogs.com/png.latex?X_j">. What will we do is to plot what exactly the regression coefficient tells us: Marginal effect of <img src="https://latex.codecogs.com/png.latex?X_j">, adjusted for other variables.</p>
-<p>Idea is pretty nice:</p>
+<p>The idea is quite nice:</p>
 <ul>
 <li>We have a variable <img src="https://latex.codecogs.com/png.latex?X_j">. We fit a model to predict it with other variables.</li>
-<li>Residuals (<img src="https://latex.codecogs.com/png.latex?r_%7BXj%7D">) from that model represent the part of <img src="https://latex.codecogs.com/png.latex?X_j"> that cannot be explained by other variables.</li>
+<li>Residuals (<img src="https://latex.codecogs.com/png.latex?r_%7BXj%7D">) from that model represent the portion of <img src="https://latex.codecogs.com/png.latex?X_j"> that cannot be explained by the other variables.</li>
 <li>Plot it against <img src="https://latex.codecogs.com/png.latex?y"> (or residuals of <img src="https://latex.codecogs.com/png.latex?y">).</li>
 </ul>
 <p>If you’re interested in the contribution of <img src="https://latex.codecogs.com/png.latex?X_j"> to prediction, after the contribution of all the other variables, you should plot against residuals of <img src="https://latex.codecogs.com/png.latex?y">.</p>
@@ -237,12 +237,12 @@ font-style: inherit;">-</span> model_y_resid.predict(df[[<span class="st" style=
 background-color: null;
 font-style: inherit;">'tail_l'</span>]])</span></code></pre></div>
 </div>
-<div id="5495f35d" class="cell" data-execution_count="8">
+<div id="5495f35d" class="cell">
 <div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">X_v2 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> sm.add_constant(head_resids) <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># don't need it here actually, but wanted to keep things similar.</span></span>
+font-style: inherit;"># don't need it here actually, but wanted to keep things consistent.</span></span>
 <span id="cb8-2"></span>
 <span id="cb8-3">model_v2 <span class="op" style="color: #5E5E5E;
 background-color: null;
@@ -339,8 +339,8 @@ Version 2 (resid y ~ resid X): 0.695</code></pre>
 </div>
 </div>
 <p>Which one is better?</p>
-<p>Well, the first version is easier to interpret since <code>y</code> is in its raw. However, spread of it contains the influence of other predictors as well. Hence, although the slope reflects the contribution after knowing the others, the vertical scatter is not corresponding to the full model.</p>
-<p>In the second one, axes are purged from the influence of other variables. So, visually, we’re looking through the lens of “holding-others-constant” (literally).</p>
+<p>Well, the first version is easier to interpret since <code>y</code> is in its raw. However, spread of it still contains the influence of other predictors as well. Hence, although the slope reflects the contribution after knowing the others, the vertical scatter is not corresponding to the full model.</p>
+<p>In the second one, both axes have been purged of the influence of other variables. So, visually, we’re looking through the lens of “holding-others-constant” (literally).</p>
 <p>This approach is beneficial for diagnostics as well, it seems to me, since:</p>
 <ol type="1">
 <li>It’s easier to see if a particular point is pulling the slope strongly.</li>
@@ -348,6 +348,7 @@ Version 2 (resid y ~ resid X): 0.695</code></pre>
 <li>The pattern is apparent, and if it shows different kind you may think about transformations.</li>
 <li>It’s much easier to communicate compared to giving out the coefficient only.</li>
 </ol>
+<p>To sum up, in a multivariate setting partial regression plots/predictor residual plots are useful for both interpretability, communication, and diagnostics.</p>
 
 
 
