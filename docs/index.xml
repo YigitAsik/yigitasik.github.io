@@ -10,7 +10,353 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 02 Aug 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 05 Aug 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Partial Regression/Added Variable/Predictor Residual Plots</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Interpretablog - Partial Regression Plots/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I wanted to introduce <em>partial regression plots</em> (or added variable plots, or predictor residual plots etc.), before moving any further down this series.</p>
+<p>In the first post of this series, I showed a relationship by plotting <img src="https://latex.codecogs.com/png.latex?X_j"> vs <img src="https://latex.codecogs.com/png.latex?y">. In a multivariate setting, that doesn’t tell us much since if there seems to be a relationship, it might be due to shared effects with other variables that are not <img src="https://latex.codecogs.com/png.latex?X_j">. What will we do is to plot what exactly the regression coefficient tells us: Marginal effect of <img src="https://latex.codecogs.com/png.latex?X_j">, adjusted for other variables.</p>
+<p>Idea is pretty nice:</p>
+<ul>
+<li>We have a variable <img src="https://latex.codecogs.com/png.latex?X_j">. We fit a model to predict it with other variables.</li>
+<li>Residuals (<img src="https://latex.codecogs.com/png.latex?r_%7BXj%7D">) from that model represent the part of <img src="https://latex.codecogs.com/png.latex?X_j"> that cannot be explained by other variables.</li>
+<li>Plot it against <img src="https://latex.codecogs.com/png.latex?y"> (or residuals of <img src="https://latex.codecogs.com/png.latex?y">).</li>
+</ul>
+<p>If you’re interested in the contribution of <img src="https://latex.codecogs.com/png.latex?X_j"> to prediction, after the contribution of all the other variables, you should plot against residuals of <img src="https://latex.codecogs.com/png.latex?y">.</p>
+<p>Let’s exemplify this:</p>
+<div id="271bd1f8" class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> warnings</span>
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-7"></span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sm</span>
+<span id="cb1-9"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.formula.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> smf</span>
+<span id="cb1-10"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> empiricaldist <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> emd</span>
+<span id="cb1-11"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> st</span>
+<span id="cb1-12"></span>
+<span id="cb1-13"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> sklearn.linear_model <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> LinearRegression</span>
+<span id="cb1-14"></span>
+<span id="cb1-15"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> thinkstats <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> ts</span>
+<span id="cb1-16"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> utils <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> ut</span>
+<span id="cb1-17"></span>
+<span id="cb1-18">warnings.filterwarnings(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ignore'</span>)</span></code></pre></div>
+</div>
+<p>We are here with our good old possum data, which I used in different examples as well.</p>
+<div id="6dc948fa" class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.read_csv(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'possum.csv'</span>, usecols<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'head_l'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>])</span>
+<span id="cb2-2">df.head()</span></code></pre></div>
+</div>
+<div id="57d8976c" class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">X_full <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.add_constant(df[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'head_l'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>]])</span>
+<span id="cb3-2">model_full <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.OLS(df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>], X_full).fit()</span>
+<span id="cb3-3"></span>
+<span id="cb3-4"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Coefficient for `head_l`: '</span>, np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(model_full.params[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'head_l'</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span></code></pre></div>
+</div>
+<p>Here we have the full model with intercept, and note the coefficient of the head_l.</p>
+<p>Now, I’m going to show both versions with raw values of <img src="https://latex.codecogs.com/png.latex?y"> and residuals of <img src="https://latex.codecogs.com/png.latex?y"> (<img src="https://latex.codecogs.com/png.latex?r_y">).</p>
+<div id="c942c166" class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Regressing head_l ~ tail_l</span></span>
+<span id="cb4-2"></span>
+<span id="cb4-3">model_head_resid <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> LinearRegression().fit(df[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>]], df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'head_l'</span>])</span>
+<span id="cb4-4">head_resids <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'head_l'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> model_head_resid.predict(df[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>]]) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># residualized head_l</span></span></code></pre></div>
+</div>
+<div id="f73d249b" class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">X_v1 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.add_constant(head_resids) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># intercept</span></span>
+<span id="cb5-2">model_v1 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.OLS(df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>], X_v1).fit()</span>
+<span id="cb5-3">pred_v1 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model_v1.predict(X_v1)</span></code></pre></div>
+</div>
+<div id="0c4a3d3d" class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb6-2"></span>
+<span id="cb6-3">plt.scatter(head_resids, df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>], label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Data'</span>)</span>
+<span id="cb6-4">plt.plot(head_resids, pred_v1, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Fitted Line'</span>)</span>
+<span id="cb6-5"></span>
+<span id="cb6-6">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'V1: total_l ~ $r_</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">{head_l}</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">$'</span>)</span>
+<span id="cb6-7"></span>
+<span id="cb6-8">plt.xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'residualized head_l'</span>)</span>
+<span id="cb6-9">plt.ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>)</span>
+<span id="cb6-10"></span>
+<span id="cb6-11">plt.legend()</span>
+<span id="cb6-12">plt.grid(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span></code></pre></div>
+</div>
+<div id="baa22c38" class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">model_y_resid <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> LinearRegression().fit(df[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>]], df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>])</span>
+<span id="cb7-2">y_resids <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'total_l'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> model_y_resid.predict(df[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'tail_l'</span>]])</span></code></pre></div>
+</div>
+<div id="5495f35d" class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">X_v2 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.add_constant(head_resids) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># don't need it here actually, but wanted to keep things similar.</span></span>
+<span id="cb8-2"></span>
+<span id="cb8-3">model_v2 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.OLS(y_resids, X_v2).fit()</span>
+<span id="cb8-4">pred_v2 <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> model_v2.predict(X_v2)</span></code></pre></div>
+</div>
+<div id="c630484d" class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb9-2"></span>
+<span id="cb9-3">plt.scatter(head_resids, y_resids, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Data'</span>)</span>
+<span id="cb9-4">plt.plot(head_resids, pred_v2, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'orange'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Fitted Line'</span>)</span>
+<span id="cb9-5"></span>
+<span id="cb9-6">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'V2: residualized y ~ residualized head_l'</span>)</span>
+<span id="cb9-7"></span>
+<span id="cb9-8">plt.xlabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'residualized head_l'</span>)</span>
+<span id="cb9-9">plt.ylabel(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'residualized total_l'</span>)</span>
+<span id="cb9-10"></span>
+<span id="cb9-11">plt.legend()</span>
+<span id="cb9-12">plt.grid(<span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span></code></pre></div>
+</div>
+<div id="52a323a1" class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Coefficient for `head_l`: '</span>, np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(model_full.params[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'head_l'</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb10-2"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Version 1 (y ~ residualized X):'</span>, np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(model_v1.params[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb10-3"><span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Version 2 (resid y ~ resid X):'</span>, np.<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">round</span>(model_v2.params[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span></code></pre></div>
+</div>
+<p>Which one is better?</p>
+<p>Well, the first version is easier to interpret since <code>y</code> is in its raw. However, spread of it contains the influence of other predictors as well. Hence, although the slope reflects the contribution after knowing the others, the vertical scatter is not corresponding to the full model.</p>
+<p>In the second one, axes are purged from the influence of other variables. So, visually, we’re looking through the lens of “holding-others-constant” (literally).</p>
+<p>This approach is beneficial for diagnostics as well, it seems to me, since:</p>
+<ol type="1">
+<li>It’s easier to see if a particular point is pulling the slope strongly.</li>
+<li>If there’s high multicollinearity, <img src="https://latex.codecogs.com/png.latex?r_%7BX_j%7D"> would show a very low variance since most of it gets explained by other variables.</li>
+<li>The pattern is apparent, and if it shows different kind you may think about transformations.</li>
+<li>It’s much easier to communicate compared to giving out the coefficient only.</li>
+</ol>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Interpretability</category>
+  <guid>https://yigitasik.github.io/posts/Interpretablog - Partial Regression Plots/</guid>
+  <pubDate>Tue, 05 Aug 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Interpretablog - Partial Dependence</title>
   <dc:creator>Yiğit Aşık</dc:creator>
@@ -7925,83 +8271,6 @@ font-style: inherit;">2</span>)</span></code></pre></div>
   <category>Bayesian</category>
   <guid>https://yigitasik.github.io/posts/Bayes Theorem/</guid>
   <pubDate>Sat, 04 Jan 2025 21:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Man on a Mission: Starting 2025</title>
-  <dc:creator>Yiğit Aşık</dc:creator>
-  <link>https://yigitasik.github.io/posts/Man on a Mission - Starting 2025/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<section id="man-on-a-mission-series" class="level2">
-<h2 class="anchored" data-anchor-id="man-on-a-mission-series">Man on a Mission Series</h2>
-<p>Some time ago, I stumbled upon the website <a href="https://darrylblackport.com/"><em>Less Certainty, More Inquiry</em></a>. If you click on the link, you’ll see that Darryl Blackport shares what he listens to or reads every week of the year. I found the concept intriguing and thought it would be a great fit for me, as I’m often immersed in studying or reading something.</p>
-<p>This year, I’m taking inspiration from his approach. I’ll share what I study each month, providing a brief overview of the topics I’ve explored, focusing on what I found particularly interesting or useful. To kick things off, here are my learning goals for 2025. Let’s dive in.<br>
-<br>
-<br>
-</p>
-<hr>
-<section id="what-to-learn-in-2025-deep-learning" class="level3">
-<h3 class="anchored" data-anchor-id="what-to-learn-in-2025-deep-learning">What to Learn in 2025: Deep Learning</h3>
-<p>For most of my data science journey, I’ve taken a theory-first approach, focusing heavily on statistics. However, with recent advancements in tools like LLMs, I think it’s time for a shift. In 2025, I plan to delve into deep learning (a domain I’ve avoided so far) with a hands-on approach.</p>
-<p>Here’s my roadmap for deep learning:</p>
-<ul>
-<li><a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/"><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em></a><br>
-</li>
-<li><a href="https://www.coursera.org/learn/advanced-learning-algorithms?specialization=machine-learning-introduction">Advanced Learning Algorithms</a><br>
-</li>
-<li><a href="https://www.coursera.org/specializations/deep-learning">Deep Learning Specialization</a><br>
-<br>
-<br>
-</li>
-</ul>
-</section>
-<section id="what-to-learn-in-2025-sports-analytics" class="level3">
-<h3 class="anchored" data-anchor-id="what-to-learn-in-2025-sports-analytics">What to Learn in 2025: Sports Analytics</h3>
-<p>I’ve been passionate about sports analytics for nearly a year now and have made significant strides in basketball analytics. (You can check out some of my work <a href="https://www.linkedin.com/in/yigitasik/">here</a>.)</p>
-<p>This year, I aim to expand my focus by creating videos on football (soccer) analytics, in addition to basketball, on my <a href="https://www.youtube.com/@yigasIRL">YouTube channel</a>. To prepare for this, I’ve started the following specialization:</p>
-<ul>
-<li><a href="https://www.coursera.org/specializations/sports-analytics">Sports Performance Analytics Specialization</a></li>
-</ul>
-<p>Also, Dean Oliver’s new book, <a href="https://www.amazon.com/Basketball-beyond-Paper-Analytics-Revolution/dp/1496240499"><em>Basketball Beyond Paper</em></a>, is on my reading list—it’s a must-read for anyone in this space.<br>
-<br>
-<br>
-</p>
-</section>
-<section id="what-to-learn-in-2025-statistics" class="level3">
-<h3 class="anchored" data-anchor-id="what-to-learn-in-2025-statistics">What to Learn in 2025: Statistics</h3>
-<p>I consider statistics to be one of my stronger skills compared to other data scientists in the industry (at least in Turkey), but there’s always room for growth.</p>
-<p>Currently, I’m halfway through <a href="https://allendowney.github.io/ThinkBayes2/"><em>Think Bayes</em></a>, and I’m looking forward to Tom Faulkenberry’s <a href="https://www.routledge.com/Bayesian-Statistics-The-Basics/Faulkenberry/p/book/9781032744001">upcoming book</a> when it’s released.</p>
-<p>There are specific topics, like meta-analysis, that I want to strengthen, but I don’t plan to tackle them systematically. Instead, I’ll explore them as curiosity strikes.<br>
-<br>
-<br>
-</p>
-</section>
-<section id="what-to-learn-in-2025-production-level-data-science-maybe" class="level3">
-<h3 class="anchored" data-anchor-id="what-to-learn-in-2025-production-level-data-science-maybe">What to Learn in 2025: Production-Level Data Science (Maybe)</h3>
-<p>This one’s a “maybe.” Deep learning and LLMs are higher priorities, and the list is already packed. However, gaining production-level data science expertise could be beneficial in the long run.</p>
-<p>For now, it’s something I’ll keep on the back burner, but we’ll see how the year unfolds.<br>
-<br>
-<br>
-</p>
-<hr>
-</section>
-<section id="a-final-note" class="level3">
-<h3 class="anchored" data-anchor-id="a-final-note">A Final Note</h3>
-<p>This blog post was polished with help of ChatGPT! I write the whole piece and feed it to ChatGPT to improve the flow.</p>
-<p>And that’s pretty much it for my 2025 learning goals. Stay tuned for updates!</p>
-
-
-</section>
-</section>
-
- ]]></description>
-  <category>monthly</category>
-  <guid>https://yigitasik.github.io/posts/Man on a Mission - Starting 2025/</guid>
-  <pubDate>Tue, 31 Dec 2024 21:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
