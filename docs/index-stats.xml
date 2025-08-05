@@ -21,8 +21,8 @@
 
 
 
-<p>I wanted to introduce <em>partial regression plots</em> (or added variable plots, or predictor residual plots etc.), before moving any further down this series.</p>
-<p>In the first post of this series, I showed a relationship by plotting <img src="https://latex.codecogs.com/png.latex?X_j"> vs <img src="https://latex.codecogs.com/png.latex?y">. In a multivariate setting, that doesn’t tell us much since if there seems to be a relationship, it might be due to shared effects with other variables that are not <img src="https://latex.codecogs.com/png.latex?X_j">. What will we do is to plot what exactly the regression coefficient tells us: Marginal effect of <img src="https://latex.codecogs.com/png.latex?X_j">, adjusted for other variables.</p>
+<p>I wanted to introduce <em>partial regression plots</em> (or added variable plots, or predictor residual plots etc.), before moving any further down this <a href="https://yigitasik.github.io/#category=Interpretability">series</a>.</p>
+<p>In the <a href="https://yigitasik.github.io/posts/Interpretablog%20-%20Fire%20and%20Forget/">first post of this series</a>, I showed a relationship by plotting <img src="https://latex.codecogs.com/png.latex?X_j"> vs <img src="https://latex.codecogs.com/png.latex?y">. In a multivariate setting, that doesn’t tell us much since if there seems to be a relationship, it might be due to shared effects with other variables that are not <img src="https://latex.codecogs.com/png.latex?X_j">. What will we do is to plot what exactly the regression coefficient tells us: Marginal effect of <img src="https://latex.codecogs.com/png.latex?X_j">, adjusted for other variables.</p>
 <p>Idea is pretty nice:</p>
 <ul>
 <li>We have a variable <img src="https://latex.codecogs.com/png.latex?X_j">. We fit a model to predict it with other variables.</li>
@@ -30,80 +30,9 @@
 <li>Plot it against <img src="https://latex.codecogs.com/png.latex?y"> (or residuals of <img src="https://latex.codecogs.com/png.latex?y">).</li>
 </ul>
 <p>If you’re interested in the contribution of <img src="https://latex.codecogs.com/png.latex?X_j"> to prediction, after the contribution of all the other variables, you should plot against residuals of <img src="https://latex.codecogs.com/png.latex?y">.</p>
-<p>Let’s exemplify this:</p>
-<div id="271bd1f8" class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> warnings</span>
-<span id="cb1-2"></span>
-<span id="cb1-3"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> pd</span>
-<span id="cb1-4"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> np</span>
-<span id="cb1-5"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> plt</span>
-<span id="cb1-6"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> sns</span>
-<span id="cb1-7"></span>
-<span id="cb1-8"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> statsmodels.api <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> sm</span>
-<span id="cb1-9"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> statsmodels.formula.api <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> smf</span>
-<span id="cb1-10"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> empiricaldist <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> emd</span>
-<span id="cb1-11"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> scipy.stats <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> st</span>
-<span id="cb1-12"></span>
-<span id="cb1-13"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">from</span> sklearn.linear_model <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> LinearRegression</span>
-<span id="cb1-14"></span>
-<span id="cb1-15"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> thinkstats <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> ts</span>
-<span id="cb1-16"><span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">import</span> utils <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> ut</span>
-<span id="cb1-17"></span>
-<span id="cb1-18">warnings.filterwarnings(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'ignore'</span>)</span></code></pre></div>
-</div>
-<p>We are here with our good old possum data, which I used in different examples as well.</p>
-<div id="6dc948fa" class="cell">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">df <span class="op" style="color: #5E5E5E;
+<p>Let’s exemplify this: We are here with our good old possum data, which I used in <a href="https://yigitasik.github.io/#category=Bayesian">different</a> examples as well.</p>
+<div id="6dc948fa" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1">df <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> pd.read_csv(<span class="st" style="color: #20794D;
 background-color: null;
@@ -116,23 +45,72 @@ background-color: null;
 font-style: inherit;">'tail_l'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'total_l'</span>])</span>
-<span id="cb2-2">df.head()</span></code></pre></div>
+<span id="cb1-2">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">head_l</th>
+<th data-quarto-table-cell-role="th">total_l</th>
+<th data-quarto-table-cell-role="th">tail_l</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>94.1</td>
+<td>89.0</td>
+<td>36.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>92.5</td>
+<td>91.5</td>
+<td>36.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>94.0</td>
+<td>95.5</td>
+<td>39.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>93.2</td>
+<td>92.0</td>
+<td>38.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>91.5</td>
+<td>85.5</td>
+<td>36.0</td>
+</tr>
+</tbody>
+</table>
+
 </div>
-<div id="57d8976c" class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">X_full <span class="op" style="color: #5E5E5E;
+</div>
+</div>
+<div id="57d8976c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">X_full <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> sm.add_constant(df[[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'head_l'</span>, <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'tail_l'</span>]])</span>
-<span id="cb3-2">model_full <span class="op" style="color: #5E5E5E;
+<span id="cb2-2">model_full <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> sm.OLS(df[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'total_l'</span>], X_full).fit()</span>
-<span id="cb3-3"></span>
-<span id="cb3-4"><span class="bu" style="color: null;
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -143,10 +121,13 @@ background-color: null;
 font-style: inherit;">'head_l'</span>], <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">3</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coefficient for `head_l`:  0.695</code></pre>
+</div>
 </div>
 <p>Here we have the full model with intercept, and note the coefficient of the head_l.</p>
 <p>Now, I’m going to show both versions with raw values of <img src="https://latex.codecogs.com/png.latex?y"> and residuals of <img src="https://latex.codecogs.com/png.latex?y"> (<img src="https://latex.codecogs.com/png.latex?r_y">).</p>
-<div id="c942c166" class="cell">
+<div id="c942c166" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># Regressing head_l ~ tail_l</span></span>
@@ -170,7 +151,7 @@ font-style: inherit;">'tail_l'</span>]]) <span class="co" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;"># residualized head_l</span></span></code></pre></div>
 </div>
-<div id="f73d249b" class="cell">
+<div id="f73d249b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">X_v1 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> sm.add_constant(head_resids) <span class="co" style="color: #5E5E5E;
@@ -185,7 +166,7 @@ font-style: inherit;">'total_l'</span>], X_v1).fit()</span>
 background-color: null;
 font-style: inherit;">=</span> model_v1.predict(X_v1)</span></code></pre></div>
 </div>
-<div id="0c4a3d3d" class="cell">
+<div id="0c4a3d3d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
@@ -230,8 +211,15 @@ font-style: inherit;">'total_l'</span>)</span>
 <span id="cb6-12">plt.grid(<span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">True</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Interpretablog - Partial Regression Plots/index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
-<div id="baa22c38" class="cell">
+</div>
+</div>
+<div id="baa22c38" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">model_y_resid <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> LinearRegression().fit(df[[<span class="st" style="color: #20794D;
@@ -249,7 +237,7 @@ font-style: inherit;">-</span> model_y_resid.predict(df[[<span class="st" style=
 background-color: null;
 font-style: inherit;">'tail_l'</span>]])</span></code></pre></div>
 </div>
-<div id="5495f35d" class="cell">
+<div id="5495f35d" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">X_v2 <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> sm.add_constant(head_resids) <span class="co" style="color: #5E5E5E;
@@ -263,7 +251,7 @@ font-style: inherit;">=</span> sm.OLS(y_resids, X_v2).fit()</span>
 background-color: null;
 font-style: inherit;">=</span> model_v2.predict(X_v2)</span></code></pre></div>
 </div>
-<div id="c630484d" class="cell">
+<div id="c630484d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
@@ -302,8 +290,15 @@ font-style: inherit;">'residualized total_l'</span>)</span>
 <span id="cb9-12">plt.grid(<span class="va" style="color: #111111;
 background-color: null;
 font-style: inherit;">True</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Interpretablog - Partial Regression Plots/index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
-<div id="52a323a1" class="cell">
+</div>
+</div>
+<div id="52a323a1" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>(<span class="st" style="color: #20794D;
@@ -337,6 +332,11 @@ background-color: null;
 font-style: inherit;">1</span>], <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">3</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coefficient for `head_l`:  0.695
+Version 1 (y ~ residualized X): 0.695
+Version 2 (resid y ~ resid X): 0.695</code></pre>
+</div>
 </div>
 <p>Which one is better?</p>
 <p>Well, the first version is easier to interpret since <code>y</code> is in its raw. However, spread of it contains the influence of other predictors as well. Hence, although the slope reflects the contribution after knowing the others, the vertical scatter is not corresponding to the full model.</p>

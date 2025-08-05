@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
 <script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
@@ -102,6 +102,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -238,8 +241,8 @@ window.Quarto = {
 
 
 
-<p>I wanted to introduce <em>partial regression plots</em> (or added variable plots, or predictor residual plots etc.), before moving any further down this series.</p>
-<p>In the first post of this series, I showed a relationship by plotting <span class="math inline">\(X_j\)</span> vs <span class="math inline">\(y\)</span>. In a multivariate setting, that doesn’t tell us much since if there seems to be a relationship, it might be due to shared effects with other variables that are not <span class="math inline">\(X_j\)</span>. What will we do is to plot what exactly the regression coefficient tells us: Marginal effect of <span class="math inline">\(X_j\)</span>, adjusted for other variables.</p>
+<p>I wanted to introduce <em>partial regression plots</em> (or added variable plots, or predictor residual plots etc.), before moving any further down this <a href="https://yigitasik.github.io/#category=Interpretability">series</a>.</p>
+<p>In the <a href="https://yigitasik.github.io/posts/Interpretablog%20-%20Fire%20and%20Forget/">first post of this series</a>, I showed a relationship by plotting <span class="math inline">\(X_j\)</span> vs <span class="math inline">\(y\)</span>. In a multivariate setting, that doesn’t tell us much since if there seems to be a relationship, it might be due to shared effects with other variables that are not <span class="math inline">\(X_j\)</span>. What will we do is to plot what exactly the regression coefficient tells us: Marginal effect of <span class="math inline">\(X_j\)</span>, adjusted for other variables.</p>
 <p>Idea is pretty nice:</p>
 <ul>
 <li>We have a variable <span class="math inline">\(X_j\)</span>. We fit a model to predict it with other variables.</li>
@@ -247,52 +250,83 @@ window.Quarto = {
 <li>Plot it against <span class="math inline">\(y\)</span> (or residuals of <span class="math inline">\(y\)</span>).</li>
 </ul>
 <p>If you’re interested in the contribution of <span class="math inline">\(X_j\)</span> to prediction, after the contribution of all the other variables, you should plot against residuals of <span class="math inline">\(y\)</span>.</p>
-<p>Let’s exemplify this:</p>
-<div id="271bd1f8" class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib <span class="im">import</span> pyplot <span class="im">as</span> plt</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> empiricaldist <span class="im">as</span> emd</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> scipy.stats <span class="im">as</span> st</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> thinkstats <span class="im">as</span> ts</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> utils <span class="im">as</span> ut</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">'ignore'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Let’s exemplify this: We are here with our good old possum data, which I used in <a href="https://yigitasik.github.io/#category=Bayesian">different</a> examples as well.</p>
+<div id="6dc948fa" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'possum.csv'</span>, usecols<span class="op">=</span>[<span class="st">'head_l'</span>, <span class="st">'tail_l'</span>, <span class="st">'total_l'</span>])</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">head_l</th>
+<th data-quarto-table-cell-role="th">total_l</th>
+<th data-quarto-table-cell-role="th">tail_l</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>94.1</td>
+<td>89.0</td>
+<td>36.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>92.5</td>
+<td>91.5</td>
+<td>36.5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>94.0</td>
+<td>95.5</td>
+<td>39.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>93.2</td>
+<td>92.0</td>
+<td>38.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>91.5</td>
+<td>85.5</td>
+<td>36.0</td>
+</tr>
+</tbody>
+</table>
+
 </div>
-<p>We are here with our good old possum data, which I used in different examples as well.</p>
-<div id="6dc948fa" class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'possum.csv'</span>, usecols<span class="op">=</span>[<span class="st">'head_l'</span>, <span class="st">'tail_l'</span>, <span class="st">'total_l'</span>])</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="57d8976c" class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X_full <span class="op">=</span> sm.add_constant(df[[<span class="st">'head_l'</span>, <span class="st">'tail_l'</span>]])</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>model_full <span class="op">=</span> sm.OLS(df[<span class="st">'total_l'</span>], X_full).fit()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Coefficient for `head_l`: '</span>, np.<span class="bu">round</span>(model_full.params[<span class="st">'head_l'</span>], <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="57d8976c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X_full <span class="op">=</span> sm.add_constant(df[[<span class="st">'head_l'</span>, <span class="st">'tail_l'</span>]])</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>model_full <span class="op">=</span> sm.OLS(df[<span class="st">'total_l'</span>], X_full).fit()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Coefficient for `head_l`: '</span>, np.<span class="bu">round</span>(model_full.params[<span class="st">'head_l'</span>], <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coefficient for `head_l`:  0.695</code></pre>
+</div>
 </div>
 <p>Here we have the full model with intercept, and note the coefficient of the head_l.</p>
 <p>Now, I’m going to show both versions with raw values of <span class="math inline">\(y\)</span> and residuals of <span class="math inline">\(y\)</span> (<span class="math inline">\(r_y\)</span>).</p>
-<div id="c942c166" class="cell">
+<div id="c942c166" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Regressing head_l ~ tail_l</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>model_head_resid <span class="op">=</span> LinearRegression().fit(df[[<span class="st">'tail_l'</span>]], df[<span class="st">'head_l'</span>])</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>head_resids <span class="op">=</span> df[<span class="st">'head_l'</span>] <span class="op">-</span> model_head_resid.predict(df[[<span class="st">'tail_l'</span>]]) <span class="co"># residualized head_l</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="f73d249b" class="cell">
+<div id="f73d249b" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>X_v1 <span class="op">=</span> sm.add_constant(head_resids) <span class="co"># intercept</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>model_v1 <span class="op">=</span> sm.OLS(df[<span class="st">'total_l'</span>], X_v1).fit()</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>pred_v1 <span class="op">=</span> model_v1.predict(X_v1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="0c4a3d3d" class="cell">
+<div id="0c4a3d3d" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>))</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(head_resids, df[<span class="st">'total_l'</span>], label<span class="op">=</span><span class="st">'Data'</span>)</span>
@@ -305,18 +339,25 @@ window.Quarto = {
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
-<div id="baa22c38" class="cell">
+</div>
+</div>
+<div id="baa22c38" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>model_y_resid <span class="op">=</span> LinearRegression().fit(df[[<span class="st">'tail_l'</span>]], df[<span class="st">'total_l'</span>])</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>y_resids <span class="op">=</span> df[<span class="st">'total_l'</span>] <span class="op">-</span> model_y_resid.predict(df[[<span class="st">'tail_l'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="5495f35d" class="cell">
+<div id="5495f35d" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>X_v2 <span class="op">=</span> sm.add_constant(head_resids) <span class="co"># don't need it here actually, but wanted to keep things similar.</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>model_v2 <span class="op">=</span> sm.OLS(y_resids, X_v2).fit()</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>pred_v2 <span class="op">=</span> model_v2.predict(X_v2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="c630484d" class="cell">
+<div id="c630484d" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">7</span>,<span class="dv">5</span>))</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>plt.scatter(head_resids, y_resids, label<span class="op">=</span><span class="st">'Data'</span>)</span>
@@ -329,11 +370,23 @@ window.Quarto = {
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>plt.grid(<span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
-<div id="52a323a1" class="cell">
+</div>
+</div>
+<div id="52a323a1" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Coefficient for `head_l`: '</span>, np.<span class="bu">round</span>(model_full.params[<span class="st">'head_l'</span>], <span class="dv">3</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Version 1 (y ~ residualized X):'</span>, np.<span class="bu">round</span>(model_v1.params[<span class="dv">1</span>], <span class="dv">3</span>))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Version 2 (resid y ~ resid X):'</span>, np.<span class="bu">round</span>(model_v2.params[<span class="dv">1</span>], <span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Coefficient for `head_l`:  0.695
+Version 1 (y ~ residualized X): 0.695
+Version 2 (resid y ~ resid X): 0.695</code></pre>
+</div>
 </div>
 <p>Which one is better?</p>
 <p>Well, the first version is easier to interpret since <code>y</code> is in its raw. However, spread of it contains the influence of other predictors as well. Hence, although the slope reflects the contribution after knowing the others, the vertical scatter is not corresponding to the full model.</p>
