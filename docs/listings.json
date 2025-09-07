@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Diff-in-diffs/index.html",
       "/posts/Interpretablog - Partial Regression Plots/index.html",
       "/posts/Interpretablog - Partial Dependence/index.html",
       "/posts/Interpretablog - Fire and Forget/index.html",

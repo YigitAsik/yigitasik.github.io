@@ -10,7 +10,1089 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Tue, 05 Aug 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 06 Sep 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Quasi Stuff - Difference in Differences</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Diff-in-diffs/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="introduction-to-difference-in-differences-did" class="level3">
+<h3 class="anchored" data-anchor-id="introduction-to-difference-in-differences-did">Introduction to Difference in Differences (DiD)</h3>
+<p>In a classic causal inference setting, at the end of the day what we are interested in and would like to know is <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BE%7D%5BY_1%20-%20Y_0%20%7C%20%5Ctext%7BD%7D=1%5D"> where D is the treatment.</p>
+<p>When we have an intervention (e.g., policy changes, marketing campaign etc), what we end up with is a time period before and after the intervention. Hence, average treatment effect on treated (ATET): <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Ctext%7BATET%7D%7D%20=%20%5Ctext%7BE%7D%5BY_1(1)%20-%20Y_0(1)%20%7C%C2%A0%5Ctext%7BD%7D=1%5D"> where <img src="https://latex.codecogs.com/png.latex?Y_D(T)"> is the potential outcome for treatment D on time T. To make things a bit clear with the word “potential”: We either observe the treated or untreated, can’t observe both at once for any individual since we can’t turn back time and do it the other way. Okay, since we got that out of the way, let’s continue.</p>
+<p>You may have thought about different approaches to this ATET, like doing a <em>before vs after</em>: <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Ctext%7BATET%7D%7D%20=%20%5Ctext%7BE%7D%5BY(1)%20%7C%20%5Ctext%7BD%7D=1%5D%20-%20%5Ctext%7BE%7D%5BY(0)%20%7C%20%5Ctext%7BD%7D=1%5D"></p>
+<p>Well, this one assumes <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BE%7D%5BY_0(1)%20%7C%20%5Ctext%7BD%7D=1%5D%20=%20%5Ctext%7BE%7D%5BY_0(0)%20%7C%20%5Ctext%7BD%7D=1%5D">. In plain English, it says that the Y before and after the intervention would be equal, in the case of no intervention. This might sound reasonable at first but imagine a line plot with any kind of trend (positive or negative) – in either of them, it’s problematic since there’s some temporal effect on Y. So, cutting the line plot vertically in any point and looking at both sides wouldn’t yield the same y values.</p>
+<p>One other approach is: <img src="https://latex.codecogs.com/png.latex?%5Chat%7B%5Ctext%7BATET%7D%7D%20=%20%5Ctext%7BE%7D%5BY(1)%20%7C%20%5Ctext%7BD%7D=1%5D%20-%20%5Ctext%7BE%7D%5BY(1)%20%7C%20%5Ctext%7BD%7D=0%5D">. So, comparing the treated group to untreated group. We assume that the counterfactual can be replaced: <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BE%7D%5BY_0(1)%20%7C%20%5Ctext%7BD%7D=0%5D%20=%20%5Ctext%7BE%7D%5BY_0(1)%20%7C%20%5Ctext%7BD%7D=1%5D">. This requires a similar baseline level, which is sometimes accomplished by stratifying or propensity matching (they have their own issues).</p>
+<p>DiD solves this by:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BE%7D%5BY_0(1)%20%7C%20%5Ctext%7BD%7D=1%5D%20=%20%5Ctext%7BE%7D%5BY_0(0)%20%7C%C2%A0%5Ctext%7BD%7D=1%5D%20+%20(%5Ctext%7BE%7D%5BY_0(1)%20%7C%20%5Ctext%7BD=0%7D%5D%20-%20%5Ctext%7BE%7D%5BY_0(0)%20%7C%20%5Ctext%7BD%7D=0%5D)"></p>
+<p>It states that <strong>the counterfactual, <em>the version of the treated had it not been treated</em>, after the intervention, is equal to the <em>treated before the treatment plus the trend of the control</em>.</strong> Hence, an another assumption: Trends are the same between the treatment and the control. <img src="https://latex.codecogs.com/png.latex?%5Ctext%7BE%7D%5BY_0(1)%20-%20Y_0(0)%20%7C%20%5Ctext%7BD%7D=1%5D%20=%20%5Ctext%7BE%7D%5BY_0(1)%20-%20Y_0(0)%20%7C%20%5Ctext%7BD%7D=0%5D"></p>
+<p>Alright, let’s put everything together then (alongside some algebraic arrangements):</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Chat%7B%5Ctext%7BATET%7D%7D%20=%20(%5Ctext%7BE%7D%5BY(1)%20%7C%20%5Ctext%7BD%7D=1%5D%20-%20%5Ctext%7BE%7D%5BY(1)%20%7C%20%5Ctext%7BD%7D=0%5D)%20-%20(%5Ctext%7BE%7D%5BY(0)%20%7C%20%5Ctext%7BD%7D=1%5D%20-%20%5Ctext%7BE%7D%5BY(0)%20%7C%20%5Ctext%7BD%7D=0%5D)"></p>
+<p>Thus the name, <em>difference in differences,</em> since what we have is the <strong>difference between the treatment and control before and after the intervention.</strong></p>
+<p>Let’s see it in action.</p>
+<div id="defaf2a7" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> duckdb <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> db</span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-7"></span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sm</span>
+<span id="cb1-9"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.formula.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> smf</span>
+<span id="cb1-10"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> linearmodels.panel <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> PanelOLS</span>
+<span id="cb1-11"></span>
+<span id="cb1-12"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> warnings</span>
+<span id="cb1-13"></span>
+<span id="cb1-14">warnings.filterwarnings(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ignore'</span>)</span>
+<span id="cb1-15"></span>
+<span id="cb1-16">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.float_format'</span>, <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.3f</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%</span> x)</span></code></pre></div>
+</div>
+<div id="83d3b96e" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># amazon = pd.read_excel('amazon.xlsx')</span></span>
+<span id="cb2-2">amazon <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> db.query(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SELECT * FROM read_csv_auto('am_did.csv', IGNORE_ERRORS=TRUE)"</span>).to_df()</span>
+<span id="cb2-3">goodreads <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> db.query(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SELECT * FROM read_csv_auto('gr_did.csv', IGNORE_ERRORS=TRUE)"</span>).to_df()</span></code></pre></div>
+</div>
+<div id="825e0bf3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">amazon.drop([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'column0'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'reviewerID'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'reviewText'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'summary'</span>], axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, inplace<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb3-2">goodreads.drop([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'column0'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'book_id'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'review_id'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'review_text'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date_updated'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'user_id'</span>], axis<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, inplace<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span></code></pre></div>
+</div>
+<p>We have Amazon and Goodreads data. Goodreads added a new feature on May 21, 2014 which allows users to post questions to others (including authors). Let’s find out this feature’s effect on book ratings.</p>
+<div id="a57036cd" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">amazon[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.to_datetime(amazon[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'unixReviewTime'</span>])</span>
+<span id="cb4-2">goodreads[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.to_datetime(goodreads[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>])</span></code></pre></div>
+</div>
+<div id="65f8aa13" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">first_date <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.to_datetime(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'1996-11-14'</span>)</span></code></pre></div>
+</div>
+<div id="f0b304c1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1">amazon[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (amazon[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'unixReviewTime'</span>].dt.to_period(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'M'</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> first_date.to_period(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'M'</span>)).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">apply</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: x.n)</span>
+<span id="cb6-2">goodreads[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (goodreads[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>].dt.to_period(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'M'</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> first_date.to_period(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'M'</span>)).<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">apply</span>(<span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: x.n)</span></code></pre></div>
+</div>
+<div id="2b54494d" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">goodreads.loc[goodreads[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year_month'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'May 2014'</span>, :].head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">rating</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">year_month</th>
+<th data-quarto-table-cell-role="th">asin</th>
+<th data-quarto-table-cell-role="th">t</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">105</td>
+<td>5</td>
+<td>2014-05-26</td>
+<td>May 2014</td>
+<td>1855496593</td>
+<td>210</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">531</td>
+<td>5</td>
+<td>2014-05-27</td>
+<td>May 2014</td>
+<td>1855496593</td>
+<td>210</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">733</td>
+<td>5</td>
+<td>2014-05-06</td>
+<td>May 2014</td>
+<td>1855496593</td>
+<td>210</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">972</td>
+<td>5</td>
+<td>2014-05-12</td>
+<td>May 2014</td>
+<td>1855496593</td>
+<td>210</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">977</td>
+<td>5</td>
+<td>2014-05-10</td>
+<td>May 2014</td>
+<td>1855496593</td>
+<td>210</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="e1977bb2" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">amazon[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span></span>
+<span id="cb8-2">goodreads[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span></span></code></pre></div>
+</div>
+<div id="d3756d1b" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.concat(</span>
+<span id="cb9-2">    [amazon[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year_month'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'asin'</span>]], goodreads[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year_month'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'asin'</span>]]],</span>
+<span id="cb9-3">    ignore_index<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span></span>
+<span id="cb9-4">)</span>
+<span id="cb9-5">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">goodr</th>
+<th data-quarto-table-cell-role="th">year_month</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">rating</th>
+<th data-quarto-table-cell-role="th">t</th>
+<th data-quarto-table-cell-role="th">asin</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>Jan 2007</td>
+<td>2007-01-03</td>
+<td>4</td>
+<td>122</td>
+<td>000100039X</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0</td>
+<td>Apr 2015</td>
+<td>2015-04-16</td>
+<td>5</td>
+<td>221</td>
+<td>000100039X</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>Apr 2015</td>
+<td>2015-04-08</td>
+<td>5</td>
+<td>221</td>
+<td>000100039X</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0</td>
+<td>Jul 2013</td>
+<td>2013-07-03</td>
+<td>5</td>
+<td>200</td>
+<td>000100039X</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0</td>
+<td>Nov 2016</td>
+<td>2016-11-13</td>
+<td>5</td>
+<td>240</td>
+<td>000100039X</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="bdfc7ac0" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'qa'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'date'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;=</span> pd.to_datetime(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'2014-05-21'</span>)).astype(<span class="bu" style="color: null;
+background-color: null;
+font-style: inherit;">int</span>)</span>
+<span id="cb10-2">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">goodr</th>
+<th data-quarto-table-cell-role="th">year_month</th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">rating</th>
+<th data-quarto-table-cell-role="th">t</th>
+<th data-quarto-table-cell-role="th">asin</th>
+<th data-quarto-table-cell-role="th">qa</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>Jan 2007</td>
+<td>2007-01-03</td>
+<td>4</td>
+<td>122</td>
+<td>000100039X</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0</td>
+<td>Apr 2015</td>
+<td>2015-04-16</td>
+<td>5</td>
+<td>221</td>
+<td>000100039X</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>Apr 2015</td>
+<td>2015-04-08</td>
+<td>5</td>
+<td>221</td>
+<td>000100039X</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0</td>
+<td>Jul 2013</td>
+<td>2013-07-03</td>
+<td>5</td>
+<td>200</td>
+<td>000100039X</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0</td>
+<td>Nov 2016</td>
+<td>2016-11-13</td>
+<td>5</td>
+<td>240</td>
+<td>000100039X</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="821dc5b2" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1">df.groupby([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'qa'</span>]).agg(</span>
+<span id="cb11-2">    rating_mean <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating'</span>, np.mean)</span>
+<span id="cb11-3">).reset_index()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">goodr</th>
+<th data-quarto-table-cell-role="th">qa</th>
+<th data-quarto-table-cell-role="th">rating_mean</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>0</td>
+<td>4.255</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0</td>
+<td>1</td>
+<td>4.361</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1</td>
+<td>0</td>
+<td>3.791</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1</td>
+<td>1</td>
+<td>3.801</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>And, here’s the <em>diff-in-diffs</em>.</p>
+<div id="adc33744" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1">(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.801</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.791</span>) <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> (<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.361</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.255</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>-0.09599999999999964</code></pre>
+</div>
+</div>
+<p>Let’s check the parallel trends assumption.</p>
+<div id="7b5359dc" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1">goodr_agg <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> goodr.groupby(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t'</span>).agg(</span>
+<span id="cb14-2">    avg_rating <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating'</span>, np.mean)</span>
+<span id="cb14-3">).reset_index()</span>
+<span id="cb14-4"></span>
+<span id="cb14-5">amaz_agg <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> amaz.groupby(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'t'</span>).agg(</span>
+<span id="cb14-6">    avg_rating <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> (<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating'</span>, np.mean)</span>
+<span id="cb14-7">).reset_index()</span>
+<span id="cb14-8"></span>
+<span id="cb14-9">goodr_agg.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">t</th>
+<th data-quarto-table-cell-role="th">avg_rating</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>125</td>
+<td>3.832</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>126</td>
+<td>3.788</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>127</td>
+<td>3.706</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>128</td>
+<td>3.755</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>129</td>
+<td>3.776</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="78447fcf" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb15-2"></span>
+<span id="cb15-3">plt.plot(goodr_agg.t, goodr_agg.avg_rating, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>)</span>
+<span id="cb15-4">plt.plot(amaz_agg.t, amaz_agg.avg_rating, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'amazon'</span>)</span>
+<span id="cb15-5"></span>
+<span id="cb15-6">plt.plot(np.repeat(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">210</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">201</span>), np.linspace(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">201</span>), ls<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'--'</span>, color<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, label<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'QA release'</span>, alpha<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">.57</span>)</span>
+<span id="cb15-7"></span>
+<span id="cb15-8">plt.ylim(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3.5</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4.5</span>)</span>
+<span id="cb15-9"></span>
+<span id="cb15-10">plt.legend()</span></code></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Diff-in-diffs/index_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>They look pretty similar prior to the treatment, hence it’s fine (DiD would be biased otherwise).</p>
+<p>Well, do we just conclude negative effect? Not really. We would like to <em>control</em> for other variables which is possible via regression. On top of that, we get standard error which helps with quantifying the uncertainty surrounding the estimate.</p>
+<div id="3f67b20f" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1">lm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.ols(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating ~ C(qa)*C(goodr)'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df)</span>
+<span id="cb16-2">res <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> lm.fit()</span>
+<span id="cb16-3">res.summary()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>OLS Regression Results</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>rating</td>
+<td data-quarto-table-cell-role="th">R-squared:</td>
+<td>0.045</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Model:</td>
+<td>OLS</td>
+<td data-quarto-table-cell-role="th">Adj. R-squared:</td>
+<td>0.045</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Method:</td>
+<td>Least Squares</td>
+<td data-quarto-table-cell-role="th">F-statistic:</td>
+<td>2.295e+04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Sun, 07 Sep 2025</td>
+<td data-quarto-table-cell-role="th">Prob (F-statistic):</td>
+<td>0.00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>21:47:22</td>
+<td data-quarto-table-cell-role="th">Log-Likelihood:</td>
+<td>-2.2720e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>1469344</td>
+<td data-quarto-table-cell-role="th">AIC:</td>
+<td>4.544e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Df Residuals:</td>
+<td>1469340</td>
+<td data-quarto-table-cell-role="th">BIC:</td>
+<td>4.544e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Df Model:</td>
+<td>3</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Covariance Type:</td>
+<td>nonrobust</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">coef</td>
+<td data-quarto-table-cell-role="th">std err</td>
+<td data-quarto-table-cell-role="th">t</td>
+<td data-quarto-table-cell-role="th">P&gt;|t|</td>
+<td data-quarto-table-cell-role="th">[0.025</td>
+<td data-quarto-table-cell-role="th">0.975]</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Intercept</td>
+<td>4.2552</td>
+<td>0.002</td>
+<td>2275.194</td>
+<td>0.000</td>
+<td>4.252</td>
+<td>4.259</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(qa)[T.1]</td>
+<td>0.1059</td>
+<td>0.002</td>
+<td>45.324</td>
+<td>0.000</td>
+<td>0.101</td>
+<td>0.110</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(goodr)[T.1]</td>
+<td>-0.4646</td>
+<td>0.003</td>
+<td>-155.565</td>
+<td>0.000</td>
+<td>-0.470</td>
+<td>-0.459</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(qa)[T.1]:C(goodr)[T.1]</td>
+<td>-0.0954</td>
+<td>0.004</td>
+<td>-23.027</td>
+<td>0.000</td>
+<td>-0.104</td>
+<td>-0.087</td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Omnibus:</td>
+<td>364326.390</td>
+<td data-quarto-table-cell-role="th">Durbin-Watson:</td>
+<td>1.825</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Prob(Omnibus):</td>
+<td>0.000</td>
+<td data-quarto-table-cell-role="th">Jarque-Bera (JB):</td>
+<td>740463.435</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Skew:</td>
+<td>-1.501</td>
+<td data-quarto-table-cell-role="th">Prob(JB):</td>
+<td>0.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Kurtosis:</td>
+<td>4.757</td>
+<td data-quarto-table-cell-role="th">Cond. No.</td>
+<td>6.81</td>
+</tr>
+</tbody>
+</table>
+<br><br>Notes:<br>[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</div>
+</div>
+<p>We can also add fixed effects as well. Different model specifications can result in different estimates, hence it’s important to choose right type of model. Here, for convenience, I go for single fixed effect.</p>
+<div id="5f9d7b95" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year_month'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year_month'</span>].astype(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'category'</span>)</span>
+<span id="cb17-2">df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr_qa'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>  df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>] <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'qa'</span>]</span>
+<span id="cb17-3"></span>
+<span id="cb17-4">df.set_index([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year_month'</span>, df.index], inplace<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb17-5"></span>
+<span id="cb17-6">exog <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> sm.add_constant(df[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'qa'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'goodr_qa'</span>]])</span></code></pre></div>
+</div>
+<div id="efedd404" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1">fe_model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> PanelOLS(df[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'rating'</span>], exog, entity_effects<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>).fit()</span>
+<span id="cb18-2">fe_model.summary</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>PanelOLS Estimation Summary</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>rating</td>
+<td data-quarto-table-cell-role="th">R-squared:</td>
+<td>0.0375</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Estimator:</td>
+<td>PanelOLS</td>
+<td data-quarto-table-cell-role="th">R-squared (Between):</td>
+<td>0.1461</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>1469344</td>
+<td data-quarto-table-cell-role="th">R-squared (Within):</td>
+<td>0.0375</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Sun, Sep 07 2025</td>
+<td data-quarto-table-cell-role="th">R-squared (Overall):</td>
+<td>0.0433</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>21:47:23</td>
+<td data-quarto-table-cell-role="th">Log-likelihood</td>
+<td>-2.27e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Cov. Estimator:</td>
+<td>Unadjusted</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th">F-statistic:</td>
+<td>1.908e+04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Entities:</td>
+<td>258</td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td>0.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Avg Obs:</td>
+<td>5695.1</td>
+<td data-quarto-table-cell-role="th">Distribution:</td>
+<td>F(3,1469083)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min Obs:</td>
+<td>1.0000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max Obs:</td>
+<td>2.768e+04</td>
+<td data-quarto-table-cell-role="th">F-statistic (robust):</td>
+<td>1.908e+04</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td>0.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time periods:</td>
+<td>1469344</td>
+<td data-quarto-table-cell-role="th">Distribution:</td>
+<td>F(3,1469083)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Avg Obs:</td>
+<td>1.0000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Min Obs:</td>
+<td>1.0000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Max Obs:</td>
+<td>1.0000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Parameter Estimates</caption>
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">Parameter</td>
+<td data-quarto-table-cell-role="th">Std. Err.</td>
+<td data-quarto-table-cell-role="th">T-stat</td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td data-quarto-table-cell-role="th">Lower CI</td>
+<td data-quarto-table-cell-role="th">Upper CI</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">const</td>
+<td>4.3027</td>
+<td>0.0106</td>
+<td>406.99</td>
+<td>0.0000</td>
+<td>4.2820</td>
+<td>4.3235</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">goodr</td>
+<td>-0.4520</td>
+<td>0.0032</td>
+<td>-142.57</td>
+<td>0.0000</td>
+<td>-0.4582</td>
+<td>-0.4458</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">qa</td>
+<td>0.0212</td>
+<td>0.0179</td>
+<td>1.1876</td>
+<td>0.2350</td>
+<td>-0.0138</td>
+<td>0.0563</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">goodr_qa</td>
+<td>-0.1070</td>
+<td>0.0043</td>
+<td>-24.868</td>
+<td>0.0000</td>
+<td>-0.1155</td>
+<td>-0.0986</td>
+</tr>
+</tbody>
+</table>
+<br><br>F-test for Poolability: 19.050<br>P-value: 0.0000<br>Distribution: F(257,1469083)<br><br>Included effects: Entity
+</div>
+</div>
+<p>You can see the difference in each results. What else can be done? It’s possible to add <em>two-way fixed effects</em>, adding books to the model, also to cluster standard errors since observation within each book have more similarity compared to others.</p>
+<p>I’m not going to dive further for now, since I haven’t discussed these very explicitly in the blog (yet). However, if you’re interested you can take a look at the following:</p>
+<p>https://tilburgsciencehub.com/topics/Analyze/causal-inference/did/#</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Inference</category>
+  <guid>https://yigitasik.github.io/posts/Diff-in-diffs/</guid>
+  <pubDate>Sat, 06 Sep 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Partial Regression/Added Variable/Predictor Residual Plots</title>
   <dc:creator>Yiğit Aşık</dc:creator>
@@ -8196,82 +9278,6 @@ font-style: inherit;">2</span>)</span></code></pre></div>
   <category>Sports Analytics</category>
   <guid>https://yigitasik.github.io/posts/Bayesian Updating with Poisson and Gamma/</guid>
   <pubDate>Thu, 09 Jan 2025 21:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>An Intro Example to Bayes’ Theorem</title>
-  <dc:creator>Yiğit Aşık</dc:creator>
-  <link>https://yigitasik.github.io/posts/Bayes Theorem/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<section id="usual-dice-example" class="level2">
-<h2 class="anchored" data-anchor-id="usual-dice-example">USUAL DICE EXAMPLE</h2>
-<p>Imagine that you and I are playing a guessing game. I have two dice, 12-sided and 6-sided, and I am holding them in both of my hands. You are trying to guess which hand has the 12-sided die. At this very moment, there is no information for you. So, it’s not uncommon for a rational agent to think 50-50.</p>
-<p>However, you tell me to roll the die I hold on my left hand, and close your eyes. I inform you that I rolled above 3 (i.e., &gt;= 4). Is it still 50-50? It feels like it’s not, since rolling above 3 is more likely with the 12-sided die, right? So, how should you <em>update</em> your initial belief?</p>
-<p>I emphasized the “update” above, this is what one should think of when one encounters the word <em>Bayesian</em>: Updating the prior beliefs in the light of new data. Let’s go through the example.</p>
-<section id="calculations" class="level3">
-<h3 class="anchored" data-anchor-id="calculations">CALCULATIONS</h3>
-<p>At the beginning, before any information, it’s 50-50: <img src="https://latex.codecogs.com/png.latex?P(12%5C:%20sided%20%5C%20LH)%20=%200.5"> and <img src="https://latex.codecogs.com/png.latex?P(12%5C:%20sided%20%5C%20RH)%20=%200.5"> where LH and RH stands for left-hand and right-hand, respectively. Once you have the information that I rolled bigger than 3, there are two possible scenarios: Either I rolled bigger than 3 with 12-sided or with 6-sided.</p>
-<ul>
-<li><img src="https://latex.codecogs.com/png.latex?P(%3E3%5C:%20%7C%5C%2012%5C%20sided)%20=%200.75"></li>
-<li><img src="https://latex.codecogs.com/png.latex?P(%3E3%5C:%20%7C%5C%206%5C%20sided)%20=%200.5"></li>
-</ul>
-<p>Let’s put those in a tree diagram.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://yigitasik.github.io/posts/Bayes Theorem/tree_diagram.png" class="img-fluid figure-img"></p>
-<figcaption>Tree Diagram</figcaption>
-</figure>
-</div>
-<ul>
-<li>The first column (left to the first vertical white bar) represents initial beliefs.</li>
-<li>The second column represents the probabilities given the first column.</li>
-<li>Third column is the multiplication of the three, and represents P(A and B).</li>
-</ul>
-<p>Well, you are not interested in the whole diagram since you have observed some data: I rolled a number bigger than 3. You wonder:</p>
-<p><img src="https://latex.codecogs.com/png.latex?P(12%5C%20sided%5C%20LH%5C:%20%7C%20%3E3)">, which is <img src="https://latex.codecogs.com/png.latex?%5Cdfrac%7BP(12%5C%20sided%5C%20LH%5C:%20,%5C%20%3E3)%7D%7BP(%3E3)%7D">.</p>
-<p>For the numerator, you can track the first row of the tree diagram which leads to 0.375. The denominator consists of two parts, rolling above 3 under two different hypotheses: Following the path of rolling above 3 with 12-sided on the left leads to 0.375, which is the first part. In addition, tracking the other scenario of rolling above 3 with 6-sided on hand leads to 0.25. Hence: <img src="https://latex.codecogs.com/png.latex?%5Cdfrac%7B0.375%7D%7B0.375+0.25%7D%20=%200.6"></p>
-<p>This represents your new belief of having the 12-sided die on my left hand. If you tell me to roll the die again and construct a new tree diagram, the first column will consist of 0.6 and 0.4 and the following columns would be adjusted accordingly.</p>
-</section>
-<section id="derivation" class="level3">
-<h3 class="anchored" data-anchor-id="derivation">DERIVATION</h3>
-<p>Do you have to construct tree diagram each time? After all, even for this simple question the whole process takes a bit of time. With a little bit of algebra, you don’t have to: <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20=%20%5Cdfrac%7BP(A,B)%7D%7BP(B)%7D">. Multiplying both sides by the P(B): <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(A,B)"> and since P(A,B) = P(B,A)<br>
-<img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(B,A)"> which leads to <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20P(B)%20=%20P(B%5C:%20%7C%5C%20A)%20P%20(A)"></p>
-<p>and voila: <img src="https://latex.codecogs.com/png.latex?P(A%5C:%20%7C%5C%20B)%20=%20%5Cdfrac%7BP(B%5C:%20%7C%5C%20A)%20P(A)%7D%7BP(B)%7D"></p>
-<ul>
-<li>The left hand side is called <em>posterior probability</em>, and you may come across it in the form of P(hypothesis | data).</li>
-<li>The denominator on the right is total probability of the data, sometimes referred to as <em>marginal probability</em>.</li>
-<li>P(A) is your initial belief here, the <em>prior</em>.</li>
-<li>While P(B | A) is called <em>likelihood</em> which is the probability of the data under given the hypothesis.</li>
-</ul>
-<p>For our example: <img src="https://latex.codecogs.com/png.latex?P(12%5C%20sided%5C:%20%7C%5C%20%3E%203)%20=%20%5Cdfrac%7BP(%3E3%5C:%20%7C%5C%2012%5C%20sided)%20P(12%5C%20sided)%7D%7BP(%3E3)%7D"></p>
-</section>
-<section id="about-the-framework" class="level3">
-<h3 class="anchored" data-anchor-id="about-the-framework">ABOUT THE FRAMEWORK</h3>
-<p>You may see versions of this where instead of hypothesis there can be theory or parameters (and instead of data, evidence) but they all are the same initially. This type of approach has its advantages such as incorporating the prior knowledge: If I would roll the die again, you would make those calculations with new priors (learned from the first roll), making use of what you already know. It allows for priors that are subjective: Maybe I am known to favor my left hand so it is possible for you to have an initial belief that is not reflected as 50-50.</p>
-<p>I will talk more about this view in the future posts but if you’re interested, you can check probability and Bayesian chapter in each of the books below:</p>
-<ul>
-<li><em>Learning Statistics with R</em> by Daniel Navarro</li>
-<li><em>Philosophy of Quantitative Methods</em> by Brian D. Haig</li>
-<li><em>Doing Bayesian Data Analysis</em> by John K. Kruschke</li>
-<li><em>Improving Your Statistical Inferences</em> by Daniel Lakens</li>
-<li><em>Think Bayes</em> by Allen B. Downey</li>
-</ul>
-<p>and I believe I remember the example above from Mine Çetinkaya-Rundel.</p>
-
-
-</section>
-</section>
-
- ]]></description>
-  <category>Stats</category>
-  <category>probability</category>
-  <category>Bayesian</category>
-  <guid>https://yigitasik.github.io/posts/Bayes Theorem/</guid>
-  <pubDate>Sat, 04 Jan 2025 21:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
