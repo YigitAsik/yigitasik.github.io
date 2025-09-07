@@ -1080,7 +1080,7 @@ font-style: inherit;">True</span>).fit()</span>
 <br><br>F-test for Poolability: 19.050<br>P-value: 0.0000<br>Distribution: F(257,1469083)<br><br>Included effects: Entity
 </div>
 </div>
-<p>You can see the difference in each results. What else can be done? It’s possible to add <em>two-way fixed effects</em>, adding books to the model, also to cluster standard errors since observation within each book have more similarity compared to others.</p>
+<p>You can see the difference in each results. What else can be done? It’s possible to add <em>two-way fixed effects</em>, adding books to the model, also to cluster standard errors since observation within each book have more similarity compared to others which would result in more appropriate standard error estimates.</p>
 <p>I’m not going to dive further for now, since I haven’t discussed these very explicitly in the blog (yet). However, if you’re interested you can take a look at the following:</p>
 <p><a href="https://tilburgsciencehub.com/topics/Analyze/causal-inference/did/#">Tilburg Science Hub - DiD</a></p>
 
