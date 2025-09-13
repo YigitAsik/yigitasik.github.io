@@ -10,7 +10,43 @@
 <atom:link href="https://yigitasik.github.io/index-stats.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 06 Sep 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 12 Sep 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Superiority of Regression in Causal Inference and Relation to Model Specification</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Superiority of Regression/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I’ve came across <a href="https://www.linkedin.com/feed/update/urn:li:activity:7371994972960526336/">this post</a> on LinkedIn yesterday and I wanted to elaborate bit more on why you should <em>not</em> include the ones that predict <em>only</em> treatment, for the purpose of making it more intuitive. It’s hidden in regression…</p>
+<p>In many textbooks, the way to estimate linear regression parameters (without calculus/iterative solutions) is only given in a bivariate setting. When moved to “multivariate”, they let the programming do the job. And I get it, it makes sense, since this is what we’re doing in real life when we’re at the job. However, a simple expression can make things way smoother:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20y_i%20=%20%5Cbeta_0%20+%20%5Cbeta_1%7BX_1%7D%20+%20%5Cbeta_2%7BX_2%7D%20+%20...%20+%20%5Cbeta_p%7BX_p%7D"></p>
+<p>We can get any beta by:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Cfrac%7B%5Ctext%7BCov%7D(Y_i,%20r_p)%7D%7B%5Ctext%7BVar%7D(r_p)%7D"> where <img src="https://latex.codecogs.com/png.latex?r_p"> is residuals from a regression: <img src="https://latex.codecogs.com/png.latex?X_p"> ~ <img src="https://latex.codecogs.com/png.latex?X_%7B-p%7D"></p>
+<p>In plain English, <img src="https://latex.codecogs.com/png.latex?r_p"> is the residuals from a regression of <img src="https://latex.codecogs.com/png.latex?X_p"> onto other predictors that are not <img src="https://latex.codecogs.com/png.latex?X_p">. That’s why the interpretation in regression is as <em>value of variable <img src="https://latex.codecogs.com/png.latex?X_p">, after accounting for all the other predictors</em>. Since <img src="https://latex.codecogs.com/png.latex?r_p"> is the portion of the <img src="https://latex.codecogs.com/png.latex?X_p"> that is <em>purged</em> from other variables (i.e., part of <img src="https://latex.codecogs.com/png.latex?X_p"> that cannot be explained by other predictors).</p>
+<p>Now, let’s think about this throughly (and about how beatiful this is) and I actually mentioned this on the <a href="https://yigitasik.github.io/posts/Interpretablog%20-%20Partial%20Regression%20Plots/">last interpretablog post</a> (actually, stuff above can be understood from that post as well): If there’s high multicollinearity, there wouldn’t be much variance left since most of the variable would get explained by others. Well, if that variable is the <em>treatment</em>, that would cause issue right? Since there isn’t much variance left in the treatment.</p>
+<p>Let’s put it this way: Imagine you want to estimate the effect of a campaign. If every customer has taken the campaign, hence no variance, you’d have hard time estimating its effect, right? Ofc., this is not specific to the “treatment”. You may have actually came across this before, if you have ever looked at a <em>weight plot</em>. When there isn’t much variance in a variable, the weight plot would show its “lines” wider — reflecting its large standard error, in line with how difficult it is to estimate its coefficient. If you haven’t seen one before, here’s one below that I borrowed from Molnar’s <a href="https://christophm.github.io/interpretable-ml-book/"><em>Interpretable ML</em></a>.</p>
+<p align="center">
+<img src="https://christophm.github.io/interpretable-ml-book/limo_files/figure-html/fig-linear-weights-plot-1.png" alt="weight plot" width="60%">
+</p>
+<p>Well, about “including the good predictors of the outcome”: Even if they are not confounders, you should include good predictors of the outcome to reduce its variance. This is not a <em>must</em> but it should help specifically in situations where most of the variance can be explained by other factors that are not the treatment. Hence, you’re trying to understand how much of the <em>leftover</em> variability does your treatment explains, after accounting for the other factors that have <em>BIG</em> say in the outcome.</p>
+<p>I usually think of “gene” related examples: Like estimating the effect of diet on adolescent height. I suspect gene to explain big portion of height, so controlling for gene would help. I am not sure if this is proper in scientific sense, but you got the idea.</p>
+<p>I hope you enjoyed reading this. I believe there are a lot of issues in internalizing the regression so I’ll follow this one up with <em>unidentifiability issue</em>, related to including variables.</p>
+<p>See you next time.</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <category>Inference</category>
+  <category>Interpretablog</category>
+  <guid>https://yigitasik.github.io/posts/Superiority of Regression/</guid>
+  <pubDate>Fri, 12 Sep 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://yigitasik.github.io/posts/Superiority of Regression/dagitty-model.png" medium="image" type="image/png" height="111" width="144"/>
+</item>
 <item>
   <title>Quasi Stuff - Difference in Differences</title>
   <dc:creator>Yiğit Aşık</dc:creator>
