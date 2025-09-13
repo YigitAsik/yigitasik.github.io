@@ -21,6 +21,9 @@
 
 
 
+<p align="center">
+<img src="https://yigitasik.github.io/posts/Regression for Causal Inference/dagitty-model.png" alt="DAG" height="30%" width="40%">
+</p>
 <p>I came across <a href="https://www.linkedin.com/feed/update/urn:li:activity:7371994972960526336/">this post</a> on LinkedIn yesterday and I wanted to elaborate bit more on why you should <em>not</em> include the ones that predict <em>only</em> treatment, for the purpose of making it more intuitive. It’s hidden in regression…</p>
 <p>In many textbooks, the way to estimate linear regression parameters (without calculus/iterative solutions) is only given in a bivariate setting. When moved to “multivariate”, they let the programming do the job. And I get it, it makes sense, since this is what we’re doing in real life when we’re at the job. However, a simple expression can make things way smoother:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20y_i%20=%20%5Cbeta_0%20+%20%5Cbeta_1%7BX_1%7D%20+%20%5Cbeta_2%7BX_2%7D%20+%20...%20+%20%5Cbeta_p%7BX_p%7D"></p>
