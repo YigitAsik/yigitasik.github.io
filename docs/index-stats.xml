@@ -12,9 +12,9 @@
 <generator>quarto-1.6.39</generator>
 <lastBuildDate>Fri, 12 Sep 2025 21:00:00 GMT</lastBuildDate>
 <item>
-  <title>Superiority of Regression in Causal Inference and Relation to Model Specification</title>
+  <title>Residuals, Multicollinearity, and the Problem with Treatment-Only Predictors</title>
   <dc:creator>Yiğit Aşık</dc:creator>
-  <link>https://yigitasik.github.io/posts/Superiority of Regression/</link>
+  <link>https://yigitasik.github.io/posts/Regression for Causal Inference/</link>
   <description><![CDATA[ 
 
 
@@ -43,9 +43,9 @@
   <category>Stats</category>
   <category>Inference</category>
   <category>Interpretablog</category>
-  <guid>https://yigitasik.github.io/posts/Superiority of Regression/</guid>
+  <guid>https://yigitasik.github.io/posts/Regression for Causal Inference/</guid>
   <pubDate>Fri, 12 Sep 2025 21:00:00 GMT</pubDate>
-  <media:content url="https://yigitasik.github.io/posts/Superiority of Regression/dagitty-model.png" medium="image" type="image/png" height="111" width="144"/>
+  <media:content url="https://yigitasik.github.io/posts/Regression for Causal Inference/dagitty-model.png" medium="image" type="image/png" height="111" width="144"/>
 </item>
 <item>
   <title>Quasi Stuff - Difference in Differences</title>
