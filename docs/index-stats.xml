@@ -42,7 +42,7 @@
  ]]></description>
   <category>Stats</category>
   <category>Inference</category>
-  <category>Interpretablog</category>
+  <category>Interpretability</category>
   <guid>https://yigitasik.github.io/posts/Regression for Causal Inference/</guid>
   <pubDate>Fri, 12 Sep 2025 21:00:00 GMT</pubDate>
   <media:content url="https://yigitasik.github.io/posts/Regression for Causal Inference/dagitty-model.png" medium="image" type="image/png" height="111" width="144"/>
