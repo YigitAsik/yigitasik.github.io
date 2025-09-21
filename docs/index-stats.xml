@@ -131,182 +131,9 @@ font-style: inherit;">1</span>]</span></code></pre></div>
 </table>
 </div>
 </div>
-<p>0.816 — keep that in mind.</p>
-<div id="66ccb301" class="cell" data-execution_count="4">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">df[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'skull_w_copy'</span>] <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> df[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'skull_w'</span>]</span>
-<span id="cb3-2"></span>
-<span id="cb3-3">df.head()</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="4">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">head_l</th>
-<th data-quarto-table-cell-role="th">skull_w</th>
-<th data-quarto-table-cell-role="th">skull_w_copy</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>94.1</td>
-<td>60.4</td>
-<td>60.4</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>92.5</td>
-<td>57.6</td>
-<td>57.6</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>94.0</td>
-<td>60.0</td>
-<td>60.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>93.2</td>
-<td>57.1</td>
-<td>57.1</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>91.5</td>
-<td>56.3</td>
-<td>56.3</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div id="032f4aa1" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><span class="cf" style="color: #003B4F;
-background-color: null;
-font-weight: bold;
-font-style: inherit;">with</span> pm.Model() <span class="im" style="color: #00769E;
-background-color: null;
-font-style: inherit;">as</span> model1:</span>
-<span id="cb4-2"></span>
-<span id="cb4-3">    cept <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pm.Normal(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'intercept'</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">92.6</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>)</span>
-<span id="cb4-4"></span>
-<span id="cb4-5">    <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># I don't mess with the symmetry</span></span>
-<span id="cb4-6">    beta_skullw <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pm.Normal(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'skull_w'</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3</span>)</span>
-<span id="cb4-7">    beta_skullw_copy <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pm.Normal(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'skull_w_copy'</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3</span>)</span>
-<span id="cb4-8"></span>
-<span id="cb4-9">    <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Sigma has to be positive</span></span>
-<span id="cb4-10">    sigma <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pm.HalfNormal(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'sigma'</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">6</span>)</span>
-<span id="cb4-11"></span>
-<span id="cb4-12">    <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Estimation</span></span>
-<span id="cb4-13">    mu <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> cept <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> (skull_w_centered<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span>beta_skullw) <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> (skull_w_centered_copy<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span>beta_skullw_copy)</span>
-<span id="cb4-14">    y <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pm.Normal(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'y'</span>, mu<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>mu, sigma<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>sigma, observed<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span>df[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'head_l'</span>])</span>
-<span id="cb4-15"></span>
-<span id="cb4-16">    pm.Deterministic(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'beta_sum'</span>, beta_skullw <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> beta_skullw_copy) <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># This is actually what's identifiable.</span></span>
-<span id="cb4-17"></span>
-<span id="cb4-18">    trace <span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span> pm.sample(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1000</span>, tune<span class="op" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2000</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Initializing NUTS using jitter+adapt_diag...
-Multiprocess sampling (4 chains in 4 jobs)
-NUTS: [intercept, skull_w, skull_w_copy, sigma]</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"e43125c180cd4fa3b8c3198782e67072","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
-</script>
-</div>
-<div class="cell-output cell-output-display">
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Sampling 4 chains for 2_000 tune and 1_000 draw iterations (8_000 + 4_000 draws total) took 9 seconds.</code></pre>
-</div>
-</div>
-<div id="5e4fa9de" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1">az.plot_posterior(trace, var_names<span class="op" style="color: #5E5E5E;
+<p>Around 0.816 — keep that in mind.</p>
+<div id="5e4fa9de" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">az.plot_posterior(trace, var_names<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>[<span class="st" style="color: #20794D;
 background-color: null;
@@ -319,7 +146,7 @@ background-color: null;
 font-style: inherit;">=</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">.89</span>)</span></code></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell-output cell-output-display" data-execution_count="8">
 <pre><code>array([&lt;Axes: title={'center': 'skull_w'}&gt;,
        &lt;Axes: title={'center': 'skull_w_copy'}&gt;,
        &lt;Axes: title={'center': 'beta_sum'}&gt;], dtype=object)</code></pre>
@@ -327,36 +154,36 @@ font-style: inherit;">.89</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://yigitasik.github.io/posts/Identifiability Issue/index_files/figure-html/cell-6-output-2.png" class="img-fluid figure-img"></p>
+<p><img src="https://yigitasik.github.io/posts/Identifiability Issue/index_files/figure-html/cell-4-output-2.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="e94d2193" class="cell" data-execution_count="19">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1">skull_w_dist <span class="op" style="color: #5E5E5E;
+<div id="e94d2193" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">skull_w_dist <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> trace.posterior[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'skull_w'</span>][<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">1</span>]</span>
-<span id="cb9-2">skull_w_copy_dist <span class="op" style="color: #5E5E5E;
+font-style: inherit;">0</span>]</span>
+<span id="cb5-2">skull_w_copy_dist <span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span> trace.posterior[<span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">'skull_w_copy'</span>][<span class="dv" style="color: #AD0000;
 background-color: null;
-font-style: inherit;">1</span>]</span>
-<span id="cb9-3"></span>
-<span id="cb9-4">plt.figure(figsize<span class="op" style="color: #5E5E5E;
+font-style: inherit;">0</span>]</span>
+<span id="cb5-3"></span>
+<span id="cb5-4">plt.figure(figsize<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">5</span>))</span>
-<span id="cb9-5"></span>
-<span id="cb9-6">plt.scatter(skull_w_dist, skull_w_copy_dist, s<span class="op" style="color: #5E5E5E;
+<span id="cb5-5"></span>
+<span id="cb5-6">plt.scatter(skull_w_dist, skull_w_copy_dist, s<span class="op" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
 background-color: null;
@@ -368,13 +195,13 @@ font-style: inherit;">.43</span>)</span></code></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://yigitasik.github.io/posts/Identifiability Issue/index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="https://yigitasik.github.io/posts/Identifiability Issue/index_files/figure-html/cell-5-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="0e299627" class="cell" data-execution_count="20">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><span class="cf" style="color: #003B4F;
+<div id="0e299627" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><span class="cf" style="color: #003B4F;
 background-color: null;
 font-weight: bold;
 font-style: inherit;">for</span> i <span class="kw" style="color: #003B4F;
@@ -385,7 +212,7 @@ background-color: null;
 font-style: inherit;">range</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">10</span>):</span>
-<span id="cb10-2">    <span class="bu" style="color: null;
+<span id="cb6-2">    <span class="bu" style="color: null;
 background-color: null;
 font-style: inherit;">print</span>((<span class="bu" style="color: null;
 background-color: null;
@@ -393,23 +220,23 @@ font-style: inherit;">float</span>(skull_w_dist[i]), <span class="bu" style="col
 background-color: null;
 font-style: inherit;">float</span>(skull_w_copy_dist[i])))</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>(2.1719939977885847, -1.26952688557421)
-(0.4554015427374477, 0.2744283320413641)
-(1.4619682228648934, -0.6567439452181076)
-(1.744581113218752, -0.85540185790859)
-(-1.054535017664959, 1.987257401399897)
-(1.5541538977650355, -0.7291865925845055)
-(0.2624248774653002, 0.6081965328591851)
-(1.357268352948161, -0.46139537255610363)
-(1.9091333381189857, -0.8864721497806237)
-(-1.9855787873259831, 2.8171167716562304)</code></pre>
+<pre><code>(3.9048626538535167, -3.1255189869958886)
+(-2.9323664950018005, 3.808560558848153)
+(-0.253518722705609, 1.12998380832265)
+(-1.7757320956912432, 2.644872542399044)
+(-1.1693805471416598, 2.0054535527772908)
+(-5.312591811956688, 6.1362012177510135)
+(-3.6857422924962964, 4.417532979288446)
+(0.46372693930833064, 0.20153951513903898)
+(-1.3630216489906541, 2.000311282396281)
+(1.2653379661450885, -0.2655350255316545)</code></pre>
 </div>
 </div>
 <p>Okay, the things that get attention on the first row of plots:</p>
 <ul>
 <li>The posterior distributions are extremely wide for both betas, reflecting the uncertainty.</li>
 <li>Could you calculate the sum of their means? :)</li>
-<li>Looking at the distribution of <code>beta_sum</code>: It’s centered around 0.81 with not so wide range. It’s because <em>only</em> the <em>sum</em> is identifiable.</li>
+<li>Looking at the distribution of <code>beta_sum</code>: It’s centered around 0.82 with not so wide range. It’s because <em>only</em> the <em>sum</em> is identifiable.</li>
 </ul>
 <p><em>Unidentifiability</em> means that the model does not make it possible to estimate the value of the parameter. Multicollinearity falls into this bucket of problems.</p>
 <p>The second plot is showing actually what’s going on. <em>After knowing the value of one, what’s the value of the other?</em> Well, both variables carry the same information. Hence, as you know one the other doesn’t help much — ridge of equally plausible joint values.</p>
@@ -420,8 +247,110 @@ font-style: inherit;">float</span>(skull_w_copy_dist[i])))</span></code></pre></
 <p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20y%20=%20%5Cbeta_%7B0%7D%20+%20(%5Cbeta_%7B1%7D+%5Cbeta_%7B2%7D)X"></p>
 <p>Hence, they are not separable. The effect on y is their sum.</p>
 <p>Alright, so, <em>is the model wrong?</em></p>
-<p>Nope. Predictions will be just fine, if that’s what you care about. You just can’t separate the effect of either variable, so you can’t make up your mind about which one is more important.</p>
-<p>I hope this post helps with internalizing what the issue is with multicollinearity. I’ll keep up with stats posts in the future. Until then, take care.</p>
+<p>Nope. You just can’t separate the effect of either variable, so you can’t make up your mind about which one is more important. Predictions will be just fine, if that’s what you care about.</p>
+<div id="a7aaae88" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb8-2"></span>
+<span id="cb8-3">az.plot_ppc(</span>
+<span id="cb8-4">    trace,</span>
+<span id="cb8-5">    group<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>,</span>
+<span id="cb8-6">    kind<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kde'</span>,</span>
+<span id="cb8-7">    num_pp_samples<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">200</span>,</span>
+<span id="cb8-8">    ax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>ax</span>
+<span id="cb8-9">)</span>
+<span id="cb8-10"></span>
+<span id="cb8-11">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'With both included'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>Text(0.5, 1.0, 'With both included')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Identifiability Issue/index_files/figure-html/cell-7-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="02d66039" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1">fig, ax <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> plt.subplots(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, figsize<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>))</span>
+<span id="cb10-2"></span>
+<span id="cb10-3">az.plot_ppc(</span>
+<span id="cb10-4">    trace,</span>
+<span id="cb10-5">    group<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'posterior'</span>,</span>
+<span id="cb10-6">    kind<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'kde'</span>,</span>
+<span id="cb10-7">    num_pp_samples<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">200</span>,</span>
+<span id="cb10-8">    ax<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>ax</span>
+<span id="cb10-9">)</span>
+<span id="cb10-10"></span>
+<span id="cb10-11">plt.title(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'With only one included'</span>)</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>Text(0.5, 1.0, 'With only one included')</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Identifiability Issue/index_files/figure-html/cell-8-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>I hope this post helps with internalizing what the issue is with multicollinearity, and sheds light into identifiability. I’ll keep up with stats posts in the future. Until next time, take care.</p>
 
 
 
