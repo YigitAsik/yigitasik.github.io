@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Interpretablog - ALEs/index.html",
       "/posts/Non-Identifiability Issue/index.html",
       "/posts/Regression for Causal Inference/index.html",
       "/posts/Diff-in-diffs/index.html",
