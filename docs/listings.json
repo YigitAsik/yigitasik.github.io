@@ -2,6 +2,7 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/Fixed Effects/index.html",
       "/posts/Interpretablog - ALEs/index.html",
       "/posts/Non-Identifiability Issue/index.html",
       "/posts/Regression for Causal Inference/index.html",

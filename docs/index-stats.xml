@@ -10,7 +10,938 @@
 <atom:link href="https://yigitasik.github.io/index-stats.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Mon, 29 Sep 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 11 Oct 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Fixed Effects</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Fixed Effects/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<section id="entity-time-fixed-effects" class="level2">
+<h2 class="anchored" data-anchor-id="entity-time-fixed-effects">Entity &amp; Time Fixed Effects</h2>
+<p>I mentioned fixed effects on <a href="https://yigitasik.github.io/posts/Diff-in-diffs/">difference in differences post</a> but I wanted to elaborate a bit further on the topic and show where it’s useful. I’m diving right into an example and explain along the way.</p>
+<div id="defaf2a7" class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pandas <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> pd</span>
+<span id="cb1-2"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> numpy <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> np</span>
+<span id="cb1-3"></span>
+<span id="cb1-4"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> matplotlib <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> pyplot <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> plt</span>
+<span id="cb1-5"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> seaborn <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sns</span>
+<span id="cb1-6"></span>
+<span id="cb1-7"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> sm</span>
+<span id="cb1-8"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> statsmodels.formula.api <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">as</span> smf</span>
+<span id="cb1-9"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">from</span> linearmodels.panel <span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> PanelOLS</span>
+<span id="cb1-10"></span>
+<span id="cb1-11"><span class="im" style="color: #00769E;
+background-color: null;
+font-style: inherit;">import</span> warnings</span>
+<span id="cb1-12"></span>
+<span id="cb1-13">warnings.filterwarnings(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'ignore'</span>)</span>
+<span id="cb1-14"></span>
+<span id="cb1-15">pd.set_option(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'display.float_format'</span>, <span class="kw" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">lambda</span> x: <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%.3f</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'</span> <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%</span> x)</span></code></pre></div>
+</div>
+<div id="e2aab9d7" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1">df <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> pd.read_csv(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'Grunfeld.csv'</span>, index_col<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)</span>
+<span id="cb2-2">df.head()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">invest</th>
+<th data-quarto-table-cell-role="th">value</th>
+<th data-quarto-table-cell-role="th">capital</th>
+<th data-quarto-table-cell-role="th">firm</th>
+<th data-quarto-table-cell-role="th">year</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>317.600</td>
+<td>3078.500</td>
+<td>2.800</td>
+<td>General Motors</td>
+<td>1935</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>391.800</td>
+<td>4661.700</td>
+<td>52.600</td>
+<td>General Motors</td>
+<td>1936</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>410.600</td>
+<td>5387.100</td>
+<td>156.900</td>
+<td>General Motors</td>
+<td>1937</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>257.700</td>
+<td>2792.200</td>
+<td>209.200</td>
+<td>General Motors</td>
+<td>1938</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>330.800</td>
+<td>4313.200</td>
+<td>203.400</td>
+<td>General Motors</td>
+<td>1939</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>I have data from 11 firms: Their capital, market value, investment for each year between 1935 to 1954. This is a panel data, since I have multiple observations for each firm, on different time periods.</p>
+<p>Let’s say that I am interested in the relationship between market value and investment. For simplicity, if we had data on a single year we could estimate the following for each firm i:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20invest_i%20=%20%5Cbeta_0%20+%20%5Cbeta_1%20value_i%20+%20%5Cbeta_2%20capital_i%20+%20%5Cepsilon_i"></p>
+<p>However, there are things that we miss with this approach:</p>
+<ol type="1">
+<li>There might be firm-level variables that we would like to have in the model. These are assumed to be constant for a firm.</li>
+</ol>
+<p>The idea is pretty neat actually. Think of having two years of data. Let’s say 1935 and 1936:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20invest_%7Bi%20%5C,%201936%7D%20=%20%5Cbeta_0%20+%20%5Cbeta_%7B1%7Dvalue_%7Bi%20%5C,%201936%7D%20+%20%5Cbeta_%7B2%7Dcapital_%7Bi%20%5C,%201936%7D%20+%20%5Cbeta_%7B3%7D%5Calpha_i%20+%20%5Cepsilon_%7Bi%20%5C,%201936%7D"></p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20invest_%7Bi%20%5C,%201935%7D%20=%20%5Cbeta_0%20+%20%5Cbeta_%7B1%7Dvalue_%7Bi%20%5C,%201935%7D%20+%20%5Cbeta_%7B2%7Dcapital_%7Bi%20%5C,%201935%7D%20+%20%5Cbeta_%7B3%7D%5Calpha_i%20+%20%5Cepsilon_%7Bi%20%5C,%201935%7D"></p>
+<p>Now, if you take the difference what happens is those <img src="https://latex.codecogs.com/png.latex?%5Cbeta_%7B3%7D%5Calpha_i"> terms get cancelled. What you’re left with is:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20invest_%7Bi%20%5C,%201936%7D%20-%20invest_%7Bi%20%5C,%201935%7D%20=%20%5Cbeta_%7B1%7D(value_%7Bi%5C,1936%7D%20-%20value_%7Bi%5C,1935%7D)%20+%20%5Cbeta_%7B2%7D(capital_%7Bi%5C,1936%7D%20-%20capital_%7Bi%5C,1935%7D)%20+%20(%5Cepsilon_%7Bi%20%5C,%201936%7D%20-%20%5Cepsilon_%7Bi%20%5C,%201935%7D)"></p>
+<p>I believe this is a very intuitive example. Accounting for unobserved firm-level characteristics is just adding firm as dummy in the regression!</p>
+<ol start="2" type="1">
+<li>The other thing that I haven’t mentioed above is the effects that are constant within a time period but may differ between years. These are shared between firms. Think of things like inflation, market trends etc.</li>
+</ol>
+<p>Well, I’ve got the idea. Let’s add that as a dummy as well?</p>
+<div id="a8c686a6" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1">lm <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> smf.ols(</span>
+<span id="cb3-2">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'invest ~ value + capital + C(firm) + C(year)'</span>,</span>
+<span id="cb3-3">    data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df</span>
+<span id="cb3-4">)</span>
+<span id="cb3-5">res <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> lm.fit()</span>
+<span id="cb3-6"></span>
+<span id="cb3-7">res.summary()</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>OLS Regression Results</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>invest</td>
+<td data-quarto-table-cell-role="th">R-squared:</td>
+<td>0.953</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Model:</td>
+<td>OLS</td>
+<td data-quarto-table-cell-role="th">Adj. R-squared:</td>
+<td>0.945</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Method:</td>
+<td>Least Squares</td>
+<td data-quarto-table-cell-role="th">F-statistic:</td>
+<td>122.1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Sun, 12 Oct 2025</td>
+<td data-quarto-table-cell-role="th">Prob (F-statistic):</td>
+<td>5.20e-108</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>01:14:10</td>
+<td data-quarto-table-cell-role="th">Log-Likelihood:</td>
+<td>-1153.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>220</td>
+<td data-quarto-table-cell-role="th">AIC:</td>
+<td>2370.</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Df Residuals:</td>
+<td>188</td>
+<td data-quarto-table-cell-role="th">BIC:</td>
+<td>2479.</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Df Model:</td>
+<td>31</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Covariance Type:</td>
+<td>nonrobust</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">coef</td>
+<td data-quarto-table-cell-role="th">std err</td>
+<td data-quarto-table-cell-role="th">t</td>
+<td data-quarto-table-cell-role="th">P&gt;|t|</td>
+<td data-quarto-table-cell-role="th">[0.025</td>
+<td data-quarto-table-cell-role="th">0.975]</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Intercept</td>
+<td>18.0876</td>
+<td>18.656</td>
+<td>0.970</td>
+<td>0.334</td>
+<td>-18.715</td>
+<td>54.890</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(firm)[T.Atlantic Refining]</td>
+<td>-112.5008</td>
+<td>17.752</td>
+<td>-6.337</td>
+<td>0.000</td>
+<td>-147.520</td>
+<td>-77.482</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(firm)[T.Chrysler]</td>
+<td>-13.5993</td>
+<td>17.540</td>
+<td>-0.775</td>
+<td>0.439</td>
+<td>-48.199</td>
+<td>21.001</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(firm)[T.Diamond Match]</td>
+<td>16.4928</td>
+<td>15.692</td>
+<td>1.051</td>
+<td>0.295</td>
+<td>-14.462</td>
+<td>47.448</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(firm)[T.General Electric]</td>
+<td>-241.0850</td>
+<td>28.000</td>
+<td>-8.610</td>
+<td>0.000</td>
+<td>-296.319</td>
+<td>-185.851</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(firm)[T.General Motors]</td>
+<td>-101.7696</td>
+<td>55.177</td>
+<td>-1.844</td>
+<td>0.067</td>
+<td>-210.615</td>
+<td>7.075</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(firm)[T.Goodyear]</td>
+<td>-77.9628</td>
+<td>16.435</td>
+<td>-4.744</td>
+<td>0.000</td>
+<td>-110.383</td>
+<td>-45.543</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(firm)[T.IBM]</td>
+<td>-6.4573</td>
+<td>16.271</td>
+<td>-0.397</td>
+<td>0.692</td>
+<td>-38.554</td>
+<td>25.640</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(firm)[T.US Steel]</td>
+<td>100.5492</td>
+<td>28.438</td>
+<td>3.536</td>
+<td>0.001</td>
+<td>44.450</td>
+<td>156.648</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(firm)[T.Union Oil]</td>
+<td>-56.7936</td>
+<td>16.403</td>
+<td>-3.462</td>
+<td>0.001</td>
+<td>-89.151</td>
+<td>-24.436</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(firm)[T.Westinghouse]</td>
+<td>-41.7165</td>
+<td>17.483</td>
+<td>-2.386</td>
+<td>0.018</td>
+<td>-76.204</td>
+<td>-7.229</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1936]</td>
+<td>-16.9592</td>
+<td>21.518</td>
+<td>-0.788</td>
+<td>0.432</td>
+<td>-59.407</td>
+<td>25.488</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1937]</td>
+<td>-36.3756</td>
+<td>22.364</td>
+<td>-1.627</td>
+<td>0.106</td>
+<td>-80.492</td>
+<td>7.741</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1938]</td>
+<td>-35.6237</td>
+<td>21.162</td>
+<td>-1.683</td>
+<td>0.094</td>
+<td>-77.370</td>
+<td>6.122</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1939]</td>
+<td>-63.0994</td>
+<td>21.505</td>
+<td>-2.934</td>
+<td>0.004</td>
+<td>-105.522</td>
+<td>-20.677</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1940]</td>
+<td>-39.8248</td>
+<td>21.626</td>
+<td>-1.842</td>
+<td>0.067</td>
+<td>-82.486</td>
+<td>2.836</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1941]</td>
+<td>-16.4878</td>
+<td>21.529</td>
+<td>-0.766</td>
+<td>0.445</td>
+<td>-58.957</td>
+<td>25.982</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1942]</td>
+<td>-17.9993</td>
+<td>21.275</td>
+<td>-0.846</td>
+<td>0.399</td>
+<td>-59.967</td>
+<td>23.968</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1943]</td>
+<td>-37.7724</td>
+<td>21.415</td>
+<td>-1.764</td>
+<td>0.079</td>
+<td>-80.016</td>
+<td>4.471</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1944]</td>
+<td>-38.3201</td>
+<td>21.459</td>
+<td>-1.786</td>
+<td>0.076</td>
+<td>-80.652</td>
+<td>4.012</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1945]</td>
+<td>-49.5395</td>
+<td>21.687</td>
+<td>-2.284</td>
+<td>0.023</td>
+<td>-92.322</td>
+<td>-6.757</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1946]</td>
+<td>-27.7544</td>
+<td>21.866</td>
+<td>-1.269</td>
+<td>0.206</td>
+<td>-70.888</td>
+<td>15.379</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1947]</td>
+<td>-34.8775</td>
+<td>21.589</td>
+<td>-1.616</td>
+<td>0.108</td>
+<td>-77.464</td>
+<td>7.709</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1948]</td>
+<td>-38.3307</td>
+<td>21.734</td>
+<td>-1.764</td>
+<td>0.079</td>
+<td>-81.204</td>
+<td>4.542</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1949]</td>
+<td>-65.2008</td>
+<td>21.901</td>
+<td>-2.977</td>
+<td>0.003</td>
+<td>-108.404</td>
+<td>-21.998</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1950]</td>
+<td>-67.3877</td>
+<td>22.028</td>
+<td>-3.059</td>
+<td>0.003</td>
+<td>-110.841</td>
+<td>-23.935</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1951]</td>
+<td>-54.8346</td>
+<td>22.437</td>
+<td>-2.444</td>
+<td>0.015</td>
+<td>-99.095</td>
+<td>-10.574</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1952]</td>
+<td>-56.4890</td>
+<td>22.819</td>
+<td>-2.475</td>
+<td>0.014</td>
+<td>-101.504</td>
+<td>-11.474</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">C(year)[T.1953]</td>
+<td>-58.5126</td>
+<td>23.819</td>
+<td>-2.457</td>
+<td>0.015</td>
+<td>-105.500</td>
+<td>-11.525</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">C(year)[T.1954]</td>
+<td>-81.7939</td>
+<td>24.204</td>
+<td>-3.379</td>
+<td>0.001</td>
+<td>-129.540</td>
+<td>-34.047</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">value</td>
+<td>0.1167</td>
+<td>0.013</td>
+<td>9.022</td>
+<td>0.000</td>
+<td>0.091</td>
+<td>0.142</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">capital</td>
+<td>0.3514</td>
+<td>0.021</td>
+<td>16.696</td>
+<td>0.000</td>
+<td>0.310</td>
+<td>0.393</td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Omnibus:</td>
+<td>32.466</td>
+<td data-quarto-table-cell-role="th">Durbin-Watson:</td>
+<td>0.988</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Prob(Omnibus):</td>
+<td>0.000</td>
+<td data-quarto-table-cell-role="th">Jarque-Bera (JB):</td>
+<td>180.276</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Skew:</td>
+<td>0.311</td>
+<td data-quarto-table-cell-role="th">Prob(JB):</td>
+<td>7.14e-40</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Kurtosis:</td>
+<td>7.391</td>
+<td data-quarto-table-cell-role="th">Cond. No.</td>
+<td>3.92e+04</td>
+</tr>
+</tbody>
+</table>
+<br><br>Notes:<br>[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.<br>[2] The condition number is large, 3.92e+04. This might indicate that there are<br>strong multicollinearity or other numerical problems.
+</div>
+</div>
+<p>You can fit the same with <code>PanelOLS</code>, like below, and get a cleaner table.</p>
+<div id="14a84ef1" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1">fe_model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> PanelOLS.from_formula(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'invest ~ value + capital + EntityEffects + TimeEffects'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df.set_index([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'firm'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year'</span>]))</span>
+<span id="cb4-2">fe_res <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fe_model.fit()</span>
+<span id="cb4-3"></span>
+<span id="cb4-4">fe_res.summary</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>PanelOLS Estimation Summary</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>invest</td>
+<td data-quarto-table-cell-role="th">R-squared:</td>
+<td>0.7253</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Estimator:</td>
+<td>PanelOLS</td>
+<td data-quarto-table-cell-role="th">R-squared (Between):</td>
+<td>0.7637</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>220</td>
+<td data-quarto-table-cell-role="th">R-squared (Within):</td>
+<td>0.7566</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Sun, Oct 12 2025</td>
+<td data-quarto-table-cell-role="th">R-squared (Overall):</td>
+<td>0.7625</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>01:14:15</td>
+<td data-quarto-table-cell-role="th">Log-likelihood</td>
+<td>-1153.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Cov. Estimator:</td>
+<td>Unadjusted</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th">F-statistic:</td>
+<td>248.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Entities:</td>
+<td>11</td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td>0.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Avg Obs:</td>
+<td>20.000</td>
+<td data-quarto-table-cell-role="th">Distribution:</td>
+<td>F(2,188)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min Obs:</td>
+<td>20.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max Obs:</td>
+<td>20.000</td>
+<td data-quarto-table-cell-role="th">F-statistic (robust):</td>
+<td>248.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td>0.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time periods:</td>
+<td>20</td>
+<td data-quarto-table-cell-role="th">Distribution:</td>
+<td>F(2,188)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Avg Obs:</td>
+<td>11.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Min Obs:</td>
+<td>11.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Max Obs:</td>
+<td>11.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Parameter Estimates</caption>
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">Parameter</td>
+<td data-quarto-table-cell-role="th">Std. Err.</td>
+<td data-quarto-table-cell-role="th">T-stat</td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td data-quarto-table-cell-role="th">Lower CI</td>
+<td data-quarto-table-cell-role="th">Upper CI</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">value</td>
+<td>0.1167</td>
+<td>0.0129</td>
+<td>9.0219</td>
+<td>0.0000</td>
+<td>0.0912</td>
+<td>0.1422</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">capital</td>
+<td>0.3514</td>
+<td>0.0210</td>
+<td>16.696</td>
+<td>0.0000</td>
+<td>0.3099</td>
+<td>0.3930</td>
+</tr>
+</tbody>
+</table>
+<br><br>F-test for Poolability: 18.476<br>P-value: 0.0000<br>Distribution: F(29,188)<br><br>Included effects: Entity, Time
+</div>
+</div>
+<p>One more thing though, check covariance type on both tables (nonrobust, unadjusted). It means errors are assumed to be independent which might be violated here. Think about it, observations are grouped in the sense that they belong to same firm. So, they share some unobserved component. Hence, errors might be correlated within each firm (across year).</p>
+<p>For the same reason, errors might be correlated within each year (e.g., firms are subject to same inflation).</p>
+<p>So, we should allow residuals to be correlated within groups.</p>
+<p>It’s possible to use clustered covariance type with <code>statsmodels</code> but it doesn’t allow it to be 2 dimensional. In other words, you either cluster by entity dimension (e.g., firm) or time dimension (e.g., year). PanelOLS, on the other hand, allows for <em>two-way clustering</em>.</p>
+<div id="a7e16e70" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">fe_model <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> PanelOLS.from_formula(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'invest ~ value + capital + EntityEffects + TimeEffects'</span>, data<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span>df.set_index([<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'firm'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'year'</span>]))</span>
+<span id="cb5-2">fe_res <span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span> fe_model.fit(cov_type<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'clustered'</span>, cluster_entity<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>, cluster_time<span class="op" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">=</span><span class="va" style="color: #111111;
+background-color: null;
+font-style: inherit;">True</span>)</span>
+<span id="cb5-3"></span>
+<span id="cb5-4">fe_res.summary</span></code></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>PanelOLS Estimation Summary</caption>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Dep. Variable:</td>
+<td>invest</td>
+<td data-quarto-table-cell-role="th">R-squared:</td>
+<td>0.7253</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Estimator:</td>
+<td>PanelOLS</td>
+<td data-quarto-table-cell-role="th">R-squared (Between):</td>
+<td>0.7637</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">No. Observations:</td>
+<td>220</td>
+<td data-quarto-table-cell-role="th">R-squared (Within):</td>
+<td>0.7566</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Date:</td>
+<td>Sun, Oct 12 2025</td>
+<td data-quarto-table-cell-role="th">R-squared (Overall):</td>
+<td>0.7625</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time:</td>
+<td>01:15:17</td>
+<td data-quarto-table-cell-role="th">Log-likelihood</td>
+<td>-1153.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Cov. Estimator:</td>
+<td>Clustered</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th">F-statistic:</td>
+<td>248.15</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Entities:</td>
+<td>11</td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td>0.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Avg Obs:</td>
+<td>20.000</td>
+<td data-quarto-table-cell-role="th">Distribution:</td>
+<td>F(2,188)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Min Obs:</td>
+<td>20.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Max Obs:</td>
+<td>20.000</td>
+<td data-quarto-table-cell-role="th">F-statistic (robust):</td>
+<td>84.060</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td>0.0000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Time periods:</td>
+<td>20</td>
+<td data-quarto-table-cell-role="th">Distribution:</td>
+<td>F(2,188)</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Avg Obs:</td>
+<td>11.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Min Obs:</td>
+<td>11.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Max Obs:</td>
+<td>11.000</td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+<td data-quarto-table-cell-role="th"></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="simpletable caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Parameter Estimates</caption>
+<tbody>
+<tr class="odd">
+<td></td>
+<td data-quarto-table-cell-role="th">Parameter</td>
+<td data-quarto-table-cell-role="th">Std. Err.</td>
+<td data-quarto-table-cell-role="th">T-stat</td>
+<td data-quarto-table-cell-role="th">P-value</td>
+<td data-quarto-table-cell-role="th">Lower CI</td>
+<td data-quarto-table-cell-role="th">Upper CI</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">value</td>
+<td>0.1167</td>
+<td>0.0117</td>
+<td>10.015</td>
+<td>0.0000</td>
+<td>0.0937</td>
+<td>0.1397</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">capital</td>
+<td>0.3514</td>
+<td>0.0447</td>
+<td>7.8622</td>
+<td>0.0000</td>
+<td>0.2633</td>
+<td>0.4396</td>
+</tr>
+</tbody>
+</table>
+<br><br>F-test for Poolability: 18.476<br>P-value: 0.0000<br>Distribution: F(29,188)<br><br>Included effects: Entity, Time
+</div>
+</div>
+<p>I feel like this one is a very intuitive example but for more, you can check <a href="https://matheusfacure.github.io/python-causality-handbook/14-Panel-Data-and-Fixed-Effects.html">this</a>.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>Stats</category>
+  <guid>https://yigitasik.github.io/posts/Fixed Effects/</guid>
+  <pubDate>Sat, 11 Oct 2025 21:00:00 GMT</pubDate>
+  <media:content url="https://yigitasik.github.io/posts/Fixed Effects/PanelOLS.png" medium="image" type="image/png" height="114" width="144"/>
+</item>
 <item>
   <title>Interpretablog - Handling the Enemy with ALEs</title>
   <dc:creator>Yiğit Aşık</dc:creator>

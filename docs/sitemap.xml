@@ -9,95 +9,11 @@
     <lastmod>2025-06-20T10:11:02.422Z</lastmod>
   </url>
   <url>
-    <loc>https://yigitasik.github.io/posts/Bayes Theorem/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.421Z</lastmod>
+    <loc>https://yigitasik.github.io/posts/Fixed Effects/index.html</loc>
+    <lastmod>2025-10-11T22:18:52.712Z</lastmod>
   </url>
   <url>
-    <loc>https://yigitasik.github.io/posts/Diff-in-diffs/index.html</loc>
-    <lastmod>2025-09-07T19:14:25.879Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/what happens to sample statistics/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.433Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.428Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Man on a Mission - May-June 2025/index.html</loc>
-    <lastmod>2025-06-20T10:35:53.177Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Interpretablog - Partial Dependence/index.html</loc>
-    <lastmod>2025-08-03T06:05:28.788Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/welcome/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.432Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Man on a Mission - March-April 2025/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.426Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Non-Identifiability Issue/index.html</loc>
-    <lastmod>2025-09-21T10:45:55.822Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index.html</loc>
-    <lastmod>2025-07-16T15:59:04.226Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Intuitive Approach to Mean and Variance/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.426Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.420Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/what is an interaction effect/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.433Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Bayesian Way - Predictions out of Posterior Distribution/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.424Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Interpretablog - Partial Regression Plots/index.html</loc>
-    <lastmod>2025-08-05T19:49:44.604Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Man on a Mission - Starting 2025/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.427Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Regression for Causal Inference/index.html</loc>
-    <lastmod>2025-09-14T15:37:38.247Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.430Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Interpretablog - ALEs/index.html</loc>
-    <lastmod>2025-09-30T14:47:40.382Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Model Fitting with Likelihood/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.427Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/How to Automatize Your Notebooks/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.425Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Nicer Contour Plots/index.html</loc>
-    <lastmod>2025-06-20T10:11:02.430Z</lastmod>
-  </url>
-  <url>
-    <loc>https://yigitasik.github.io/posts/Man on a Mission - February 2025/index.html</loc>
+    <loc>https://yigitasik.github.io/posts/How to Structure A Shiny App/index.html</loc>
     <lastmod>2025-06-20T10:11:02.426Z</lastmod>
   </url>
   <url>
@@ -105,8 +21,96 @@
     <lastmod>2025-06-20T10:11:02.426Z</lastmod>
   </url>
   <url>
-    <loc>https://yigitasik.github.io/posts/How to Structure A Shiny App/index.html</loc>
+    <loc>https://yigitasik.github.io/posts/Man on a Mission - February 2025/index.html</loc>
     <lastmod>2025-06-20T10:11:02.426Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Nicer Contour Plots/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.430Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/How to Automatize Your Notebooks/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.425Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Model Fitting with Likelihood/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.427Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Interpretablog - ALEs/index.html</loc>
+    <lastmod>2025-09-30T14:47:40.382Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Understanding distribution of log(odds ratio) through simulation/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.430Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Regression for Causal Inference/index.html</loc>
+    <lastmod>2025-09-14T15:37:38.247Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Man on a Mission - Starting 2025/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.427Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Interpretablog - Partial Regression Plots/index.html</loc>
+    <lastmod>2025-08-05T19:49:44.604Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Bayesian Way - Predictions out of Posterior Distribution/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.424Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/what is an interaction effect/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.433Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Basketball Analytics and Daily Job/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.420Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Intuitive Approach to Mean and Variance/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.426Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Interpretablog - Fire and Forget/index.html</loc>
+    <lastmod>2025-07-16T15:59:04.226Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Non-Identifiability Issue/index.html</loc>
+    <lastmod>2025-09-21T10:45:55.822Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Man on a Mission - March-April 2025/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.426Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/welcome/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.432Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Interpretablog - Partial Dependence/index.html</loc>
+    <lastmod>2025-08-03T06:05:28.788Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Man on a Mission - May-June 2025/index.html</loc>
+    <lastmod>2025-06-20T10:35:53.177Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Navigating Through Euroleague Shiny App/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.428Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/what happens to sample statistics/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.433Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Diff-in-diffs/index.html</loc>
+    <lastmod>2025-09-07T19:14:25.879Z</lastmod>
+  </url>
+  <url>
+    <loc>https://yigitasik.github.io/posts/Bayes Theorem/index.html</loc>
+    <lastmod>2025-06-20T10:11:02.421Z</lastmod>
   </url>
   <url>
     <loc>https://yigitasik.github.io/posts/p-value distribution/index.html</loc>
