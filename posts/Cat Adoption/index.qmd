@@ -20,12 +20,24 @@ $\displaystyle (\text{black}_{post} - \text{black}_{pre}) - (\text{non-black}_{p
 For time-to-event modeling, a natural choice is _exponential distribution_ with $\lambda$, where $\lambda$ reflects the rate of adoption in our case. In general, one can think of it as _average number of events per unit of time_. However, since there are censored observations, we end up with two distributions that are assigned to observations. It would be easier if I just give the model specification.
 
 $\displaystyle \text{Exponential}(\lambda_i)$ if true event observed.
+
 $\displaystyle \text{Exponential-CCDF}(\lambda_i)$ if true event unobserved.
+
 $\displaystyle \lambda_i = 1 / \mu_i$
-$\displaystyle \log{\mu_i} = \alpha_0 + \alpha_{\text{black}} \cdot \text{is_black}_i + \beta_{\text{post}} \cdot \text{post_movie}_i + \beta_{\text{inter}} \cdot (\text{post_movie}_i \cdot \text{is_black}_i) + \text{f}_{\text{time}}(\text{month}_i) + \gamma \cdot \text{time_trend}_z$
+
+$$
+\log(\mu_i)
+  = \alpha_0
+  + \alpha_{\text{black}} \cdot \text{is\_black}_i
+  + \beta_{\text{post}} \cdot \text{post\_movie}_i
+  + \beta_{\text{inter}} \cdot (\text{post\_movie}_i \cdot \text{is\_black}_i)
+  + f_{\text{time}}(\text{month}_i)
+  + \gamma \cdot \text{time\_trend}_z
+$$
 
 Prior distribution for each are normal, while month effects are hierarchical:
-$f_{\text{time}}(\text{month}_i) \sim \text{Normal}(0, \sigma_{\text{month}}) $
+
+$f_{\text{time}}(\text{month}_i) \sim \text{Normal}(0, \sigma_{\text{month}})$, 
 $\sigma_{\text{month}} \sim \text{Exponential}(1)$
 
 I aimed to capture seasonality and trend via time and month terms. On the other hand the interaction term, *b_inter*, gives the _extra shift for the black cats, after the movie_. However, instead of attempting to interpret the coefficients, we'll go with posterior contrasts.
@@ -35,10 +47,11 @@ While calculating the posterior contrasts, I averaged over the months that both 
 ![Posterior contrasts within each color of cats](diff_in_days_until_adoption-black_vs_others.png)
 
 So, it seems like shift for the black cats after the movie is larger compared to non-black cats. 89% HDI for blacks are -21.25 to -18.23 while it's -9.02 to -7.71 for non-blacks. But, let's get the _difference in differences_.
+
 ![Posterior contrast between cats (difference in differences)](DiD_until_adoption.png)
 
 The shift for the black cats after the movie seems to be around 10.5 days. In other words, black cats wait 10.5 days less on average, after the movie, compared to non-black cats. That's sweet :)
 
-Alright, to be honest, there's a caveat here. By modeling it as exponential, I assume that the $\lambda$ is constant within each strata that depend on my covariates. There's no dependence on _how long the cat has been waiting_. Well, that's problematic because that's unlikely to be true. I thought about swapping to piecewise exponential, where the lambda (the rate) is constant within the day intervals (e.g., 0-7 days, 7-14 days etc.). This might be a next step.
+Alright, to be honest, there's a caveat here. By modeling it as exponential, I assume that the $\lambda$ is constant within each strata. There's no dependence on _how long the cat has been waiting_. Within a particular stratum, waiting 1 day or 71 days does not make any difference. Well, that's problematic because that's unlikely to be true. So, this model can be thought as a baseline and improvements can be make. For example, I thought about swapping to piecewise exponential, where the lambda (the rate) is constant within the day intervals (e.g., 0-7 days, 7-14 days etc.). This might be a next step.
 
 Anyway, I hope you enjoyed this read. See you next time.
