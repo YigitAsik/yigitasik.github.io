@@ -32,7 +32,7 @@ $$
   + \beta_{\text{post}} \cdot \text{post\_movie}_i
   + \beta_{\text{inter}} \cdot (\text{post\_movie}_i \cdot \text{is\_black}_i)
   + f_{\text{time}}(\text{month}_i)
-  + \gamma \cdot \text{time_trend_z}
+  + \gamma \cdot \text{time\_trend}
 $$
 
 Prior distribution for each are normal, while month effects are hierarchical:
