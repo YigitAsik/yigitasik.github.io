@@ -10,7 +10,47 @@
 <atom:link href="https://yigitasik.github.io/index.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 11 Oct 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 27 Dec 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Do Black Cats Experience Better Adoption Since The Movie Flow</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Cat Adoption/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I came across a post on Instagram last week. It had the following message (or something similar):</p>
+<blockquote class="blockquote">
+<p>Oscar-winning film <em>Flow</em> raises adoptions for black cats.</p>
+</blockquote>
+<p>It really caught my attention (yea, I love cats). At first glance, I immediately thought of taking an RDiT (Regression Discontinuity in Time) approach where the running variable is <code>time</code> and threshold is whether or not the observation belongs to the post-movie period. However, adoption is a <em>censored variable</em>, for some cats we observe the true event and for some others, we don’t (e.g., maybe a cat runs away or gets transferred to some other shelter). Hence, it hints at <em>time-to-event</em> modeling. So, I changed the question and decided to attempt to answer the following: &gt; Do black cats <em>experience</em> better adoption process than non-black cats, after the movie <em>Flow</em>?</p>
+<p>One implication of “better adoption process” would be to wait less. So, the question maps into <em>do black cats wait less to be adopted compared to non-black cats, after the movie Flow?</em> I asked the ChatGPT about the data which directed me to <a href="https://catalog.data.gov/dataset?publisher=data.austintexas.gov">data from Austin TX</a></p>
+<p>I planned on taking a <code>difference-in-differences</code> approach: Within both black and non-black cats, for pre and post movie period, estimate the days until adoption. Then take the difference within, which leads to difference in days between pre and post period for each black and non-black cats. And then, take the <em>difference in differences</em>. I believe the expression below makes it easier to understand: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20(%5Ctext%7Bblack%7D_%7Bpost%7D%20-%20%5Ctext%7Bblack%7D_%7Bpre%7D)%20-%20(%5Ctext%7Bnon-black%7D_%7Bpost%7D%20-%20%5Ctext%7Bnon-black%7D_%7Bpre%7D)"></p>
+<p>For time-to-event modeling, a natural choice is <em>exponential distribution</em> with <img src="https://latex.codecogs.com/png.latex?%5Clambda">, where <img src="https://latex.codecogs.com/png.latex?%5Clambda"> reflects the rate of adoption in our case. In general, one can think of it as <em>average number of events per unit of time</em>. However, since there are censored observations, we end up with two distributions that are assigned to observations. It would be easier if I just give the model specification.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BExponential%7D(%5Clambda_i)"> if true event observed. <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BExponential-CCDF%7D(%5Clambda_i)"> if true event unobserved. <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Clambda_i%20=%201%20/%20%5Cmu_i"> <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Clog%7B%5Cmu_i%7D%20=%20%5Calpha_0%20+%20%5Calpha_%7B%5Ctext%7Bblack%7D%7D%20%5Ccdot%20%5Ctext%7Bis_black%7D_i%20+%20%5Cbeta_%7B%5Ctext%7Bpost%7D%7D%20%5Ccdot%20%5Ctext%7Bpost_movie%7D_i%20+%20%5Cbeta_%7B%5Ctext%7Binter%7D%7D%20%5Ccdot%20(%5Ctext%7Bpost_movie%7D_i%20%5Ccdot%20%5Ctext%7Bis_black%7D_i)%20+%20%5Ctext%7Bf%7D_%7B%5Ctext%7Btime%7D%7D(%5Ctext%7Bmonth%7D_i)%20+%20%5Cgamma%20%5Ccdot%20%5Ctext%7Btime_trend%7D_z"></p>
+<p>Prior distribution for each are normal, while month effects are hierarchical: $f_{}(<em>i) (0, </em>{}) $ <img src="https://latex.codecogs.com/png.latex?%5Csigma_%7B%5Ctext%7Bmonth%7D%7D%20%5Csim%20%5Ctext%7BExponential%7D(1)"></p>
+<p>I aimed to capture seasonality and trend via time and month terms. On the other hand the interaction term, <em>b_inter</em>, gives the <em>extra shift for the black cats, after the movie</em>. However, instead of attempting to interpret the coefficients, we’ll go with posterior contrasts.</p>
+<p>While calculating the posterior contrasts, I averaged over the months that both present before and after the movie (since post-movie period doesn’t include summer time). Here’s how the before-after contrasts look both for black (black line) and non-black (red line) cats.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Cat Adoption/diff_in_days_until_adoption-black_vs_others.png" class="img-fluid figure-img"></p>
+<figcaption>Posterior contrasts within each color of cats</figcaption>
+</figure>
+</div>
+<p>So, it seems like shift for the black cats after the movie is larger compared to non-black cats. 89% HDI for blacks are -21.25 to -18.23 while it’s -9.02 to -7.71 for non-blacks. But, let’s get the <em>difference in differences</em>. <img src="https://yigitasik.github.io/posts/Cat Adoption/DiD_until_adoption.png" class="img-fluid" alt="Posterior contrast between cats (difference in differences)"></p>
+<p>The shift for the black cats after the movie seems to be around 10.5 days. In other words, black cats wait 10.5 days less on average, after the movie, compared to non-black cats. That’s sweet :)</p>
+<p>Alright, to be honest, there’s a caveat here. By modeling it as exponential, I assume that the <img src="https://latex.codecogs.com/png.latex?%5Clambda"> is constant within each strata that depend on my covariates. There’s no dependence on <em>how long the cat has been waiting</em>. Well, that’s problematic because that’s unlikely to be true. I thought about swapping to piecewise exponential, where the lambda (the rate) is constant within the day intervals (e.g., 0-7 days, 7-14 days etc.). This might be a next step.</p>
+<p>Anyway, I hope you enjoyed this read. See you next time.</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <guid>https://yigitasik.github.io/posts/Cat Adoption/</guid>
+  <pubDate>Sat, 27 Dec 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Fixed Effects</title>
   <dc:creator>Yiğit Aşık</dc:creator>
@@ -6549,40 +6589,6 @@ font-style: inherit;">3</span>))</span>
   <guid>https://yigitasik.github.io/posts/Bayesian Way - Predictions out of Posterior Distribution/</guid>
   <pubDate>Sat, 01 Feb 2025 21:00:00 GMT</pubDate>
   <media:content url="https://yigitasik.github.io/posts/Bayesian Way - Predictions out of Posterior Distribution/sampled_models.png" medium="image" type="image/png" height="108" width="144"/>
-</item>
-<item>
-  <title>Man on a Mission: January 2025</title>
-  <dc:creator>Yiğit Aşık</dc:creator>
-  <link>https://yigitasik.github.io/posts/Man on a Mission - January 2025/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>As I <a href="https://yigitasik.github.io/posts/Man%20on%20a%20Mission%20-%20Starting%202025/">promised at the start of the year</a>, here’s what I have studied this month.</p>
-<hr>
-<section id="statistics" class="level3">
-<h3 class="anchored" data-anchor-id="statistics">Statistics</h3>
-<p>This month I finished <a href="https://allendowney.github.io/ThinkBayes2/"><em>Think Bayes</em></a> way before than I anticipated, and played with <a href="https://www.pymc.io/welcome.html">PyMC</a> a bit. I really enjoyed the whole book but wanted to dive a bit deep so moved on to John Kruschke’s <a href="https://www.sciencedirect.com/book/9780124058880/doing-bayesian-data-analysis#book-info"><em>Doing Bayesian Data Analysis</em></a> and I’m glad I did it. The book starts with main ideas of Bayesian view, <em>“Bayesian inference is reallocation of credibility across possibilities”</em> where credibility stands for probability and possibilities stand for possible values that our parameters can take when we attempt to model. After this introduction, Kruschke talks about what probabilities are and provides intuitive description for the distinction between <em>probability mass</em> and <em>probability density</em>. If you have trouble understanding probability distributions, you may want to take a look at it.</p>
-<p>Bayesian stuff aside, I really enjoyed the interpretation of mean as minimized variance alongside how we end up with median and mode when we change the distance measure (e.g., l2 norm to l1 etc.). Also, I coded Metropolis Algorithm (1-D) by using the example in the MCMC chapter. You can find it on my GitHub under <em>learn-stats-with-sims</em>.</p>
-<p>I’m currently at chapter 9, going through hierarchical models. We’ll see if the book keeps me engaged throughout the upcoming chapters as well.</p>
-<hr>
-</section>
-<section id="deep-learning-dl" class="level3">
-<h3 class="anchored" data-anchor-id="deep-learning-dl">Deep Learning (DL)</h3>
-<p>Well, I haven’t done much for the DL. Throughout the year, amount of time I spent on statistics will gradually decline to open up space for DL. I’ve just started to <a href="https://www.oreilly.com/library/view/hands-on-machine-learning/9781492032632/"><em>Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow</em></a>, skimming through Scikit-Learn part to start with Keras and Tensorflow while not missing out on anything (despite using sklearn pretty often, I don’t want to miss a useful thing that may come in handy in the future).</p>
-<hr>
-<p>In terms of sports analytics or production level data science, I haven’t done more than reading a few blog posts. Data science stuff aside, I have improved a lot on the website, added new functionalities such as widget to subscribe to the email list which allows you to get notified when I write a new post. It took quite some time to handle the front-end, so I count that as a win as well.</p>
-<p>See you next month!</p>
-
-
-</section>
-
- ]]></description>
-  <category>monthly</category>
-  <guid>https://yigitasik.github.io/posts/Man on a Mission - January 2025/</guid>
-  <pubDate>Thu, 30 Jan 2025 21:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

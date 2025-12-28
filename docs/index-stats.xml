@@ -10,7 +10,47 @@
 <atom:link href="https://yigitasik.github.io/index-stats.xml" rel="self" type="application/rss+xml"/>
 <description>Anything related to statistics, analytics, and data science</description>
 <generator>quarto-1.6.39</generator>
-<lastBuildDate>Sat, 11 Oct 2025 21:00:00 GMT</lastBuildDate>
+<lastBuildDate>Sat, 27 Dec 2025 21:00:00 GMT</lastBuildDate>
+<item>
+  <title>Do Black Cats Experience Better Adoption Since The Movie Flow</title>
+  <dc:creator>Yiğit Aşık</dc:creator>
+  <link>https://yigitasik.github.io/posts/Cat Adoption/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I came across a post on Instagram last week. It had the following message (or something similar):</p>
+<blockquote class="blockquote">
+<p>Oscar-winning film <em>Flow</em> raises adoptions for black cats.</p>
+</blockquote>
+<p>It really caught my attention (yea, I love cats). At first glance, I immediately thought of taking an RDiT (Regression Discontinuity in Time) approach where the running variable is <code>time</code> and threshold is whether or not the observation belongs to the post-movie period. However, adoption is a <em>censored variable</em>, for some cats we observe the true event and for some others, we don’t (e.g., maybe a cat runs away or gets transferred to some other shelter). Hence, it hints at <em>time-to-event</em> modeling. So, I changed the question and decided to attempt to answer the following: &gt; Do black cats <em>experience</em> better adoption process than non-black cats, after the movie <em>Flow</em>?</p>
+<p>One implication of “better adoption process” would be to wait less. So, the question maps into <em>do black cats wait less to be adopted compared to non-black cats, after the movie Flow?</em> I asked the ChatGPT about the data which directed me to <a href="https://catalog.data.gov/dataset?publisher=data.austintexas.gov">data from Austin TX</a></p>
+<p>I planned on taking a <code>difference-in-differences</code> approach: Within both black and non-black cats, for pre and post movie period, estimate the days until adoption. Then take the difference within, which leads to difference in days between pre and post period for each black and non-black cats. And then, take the <em>difference in differences</em>. I believe the expression below makes it easier to understand: <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20(%5Ctext%7Bblack%7D_%7Bpost%7D%20-%20%5Ctext%7Bblack%7D_%7Bpre%7D)%20-%20(%5Ctext%7Bnon-black%7D_%7Bpost%7D%20-%20%5Ctext%7Bnon-black%7D_%7Bpre%7D)"></p>
+<p>For time-to-event modeling, a natural choice is <em>exponential distribution</em> with <img src="https://latex.codecogs.com/png.latex?%5Clambda">, where <img src="https://latex.codecogs.com/png.latex?%5Clambda"> reflects the rate of adoption in our case. In general, one can think of it as <em>average number of events per unit of time</em>. However, since there are censored observations, we end up with two distributions that are assigned to observations. It would be easier if I just give the model specification.</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BExponential%7D(%5Clambda_i)"> if true event observed. <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Ctext%7BExponential-CCDF%7D(%5Clambda_i)"> if true event unobserved. <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Clambda_i%20=%201%20/%20%5Cmu_i"> <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Clog%7B%5Cmu_i%7D%20=%20%5Calpha_0%20+%20%5Calpha_%7B%5Ctext%7Bblack%7D%7D%20%5Ccdot%20%5Ctext%7Bis_black%7D_i%20+%20%5Cbeta_%7B%5Ctext%7Bpost%7D%7D%20%5Ccdot%20%5Ctext%7Bpost_movie%7D_i%20+%20%5Cbeta_%7B%5Ctext%7Binter%7D%7D%20%5Ccdot%20(%5Ctext%7Bpost_movie%7D_i%20%5Ccdot%20%5Ctext%7Bis_black%7D_i)%20+%20%5Ctext%7Bf%7D_%7B%5Ctext%7Btime%7D%7D(%5Ctext%7Bmonth%7D_i)%20+%20%5Cgamma%20%5Ccdot%20%5Ctext%7Btime_trend%7D_z"></p>
+<p>Prior distribution for each are normal, while month effects are hierarchical: $f_{}(<em>i) (0, </em>{}) $ <img src="https://latex.codecogs.com/png.latex?%5Csigma_%7B%5Ctext%7Bmonth%7D%7D%20%5Csim%20%5Ctext%7BExponential%7D(1)"></p>
+<p>I aimed to capture seasonality and trend via time and month terms. On the other hand the interaction term, <em>b_inter</em>, gives the <em>extra shift for the black cats, after the movie</em>. However, instead of attempting to interpret the coefficients, we’ll go with posterior contrasts.</p>
+<p>While calculating the posterior contrasts, I averaged over the months that both present before and after the movie (since post-movie period doesn’t include summer time). Here’s how the before-after contrasts look both for black (black line) and non-black (red line) cats.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://yigitasik.github.io/posts/Cat Adoption/diff_in_days_until_adoption-black_vs_others.png" class="img-fluid figure-img"></p>
+<figcaption>Posterior contrasts within each color of cats</figcaption>
+</figure>
+</div>
+<p>So, it seems like shift for the black cats after the movie is larger compared to non-black cats. 89% HDI for blacks are -21.25 to -18.23 while it’s -9.02 to -7.71 for non-blacks. But, let’s get the <em>difference in differences</em>. <img src="https://yigitasik.github.io/posts/Cat Adoption/DiD_until_adoption.png" class="img-fluid" alt="Posterior contrast between cats (difference in differences)"></p>
+<p>The shift for the black cats after the movie seems to be around 10.5 days. In other words, black cats wait 10.5 days less on average, after the movie, compared to non-black cats. That’s sweet :)</p>
+<p>Alright, to be honest, there’s a caveat here. By modeling it as exponential, I assume that the <img src="https://latex.codecogs.com/png.latex?%5Clambda"> is constant within each strata that depend on my covariates. There’s no dependence on <em>how long the cat has been waiting</em>. Well, that’s problematic because that’s unlikely to be true. I thought about swapping to piecewise exponential, where the lambda (the rate) is constant within the day intervals (e.g., 0-7 days, 7-14 days etc.). This might be a next step.</p>
+<p>Anyway, I hope you enjoyed this read. See you next time.</p>
+
+
+
+ ]]></description>
+  <category>Stats</category>
+  <guid>https://yigitasik.github.io/posts/Cat Adoption/</guid>
+  <pubDate>Sat, 27 Dec 2025 21:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Fixed Effects</title>
   <dc:creator>Yiğit Aşık</dc:creator>
