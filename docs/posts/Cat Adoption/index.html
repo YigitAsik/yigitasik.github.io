@@ -232,7 +232,7 @@ window.Quarto = {
 <figcaption>Posterior contrast between cats (difference in differences)</figcaption>
 </figure>
 </div>
-<p>The shift for the black cats after the movie seems to be around 10.5 days. In other words, black cats wait 10.5 days less on average, after the movie, compared to non-black cats. That’s sweet :)</p>
+<p>The shift for the black cats after the movie seems to be around 10.5 days. In other words, black cats seem to wait less, after the movie, compared to non-black cats. That’s sweet :)</p>
 <p>Alright, to be honest, there’s a caveat here. By modeling it as exponential, I assume that the <span class="math inline">\(\lambda\)</span> is constant within each strata. There’s no dependence on <em>how long the cat has been waiting</em>. Within a particular stratum, waiting 1 day or 71 days does not make any difference. Well, that’s problematic because that’s unlikely to be true. So, this model can be thought as a baseline and improvements can be make. For example, I thought about swapping to piecewise exponential, where the lambda (the rate) is constant within the day intervals (e.g., 0-7 days, 7-14 days etc.). This might be a next step.</p>
 <p>Anyway, I hope you enjoyed this read. See you next time.</p>
 
