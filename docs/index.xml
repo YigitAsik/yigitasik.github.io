@@ -387,7 +387,7 @@ font-style: inherit;">False</span>)</span>
 </table>
 </div>
 </div>
-<p>Instead of relying on a table (which is almost always a bad idea, you may want to search table 2 fallacy), let’s do what has been suggested above.</p>
+<p>Instead of relying on a table (which is almost always a bad idea, specifically in causal settings) that gives us coefficients on a scale that is not intuitive at all, let’s do what has been suggested above.</p>
 <div id="18f1bf57-81ba-4ade-a35f-15ed31e9a83a" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1">cats <span class="op" style="color: #5E5E5E;
 background-color: null;
